@@ -25,6 +25,9 @@ namespace Estrol.X3Jam.Server.Data {
             this.RoomMaster = user;
             this.PasswordFlag = flag;
             this.Password = password;
+            this.Users = new User[] {
+                user
+            };
 
             this.MaxUser = 8;
             this.CurrentUser = 1;
@@ -38,19 +41,52 @@ namespace Estrol.X3Jam.Server.Data {
             List<User> itr = new List<User>(Users) {
                 usr
             };
+            CurrentUser++;
 
+            SendByteMessage(1);
             Users = itr.ToArray();
         }
 
         public void RemoveUser(User usr) {
             List<User> itr = new List<User>(Users);
             itr.Remove(usr);
+            CurrentUser--;
+
+            if (usr.GetUsername() == RoomMaster.GetUsername() && CurrentUser > 1) {
+                SetNearestAsRoomMaster();
+            }
+            SendByteMessage(2);
 
             Users = itr.ToArray();
         }
 
+        public void SetNearestAsRoomMaster() {
+
+            SendByteMessage(3);
+        }
+
         public User[] GetUsers() {
             return Users;
+        }
+
+        public void SendByteMessage(int num) {
+            switch(num) {
+                case 1: {
+                    for (int i = 0; i < Users.Length; i++) {
+
+                    }
+
+                    break;
+                }
+
+                case 2: {
+                    break;
+                }
+
+                case 3: {
+                    break;
+                }
+            }
         }
     }
 }

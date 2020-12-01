@@ -160,7 +160,7 @@ namespace Estrol.X3Jam.Server.Handlers {
 
             Console.WriteLine("[Server] [{0}] Get character info!", state.UserInfo.GetUsername());
 
-            SetLength((short)base.ms.Length);
+            SetLength((short)base.m_MemoryStream.Length);
             Send();
         }
     }

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Estrol.X3Jam.Server.Properties {
+namespace Estrol.X3Jam.Website.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Estrol.X3Jam.Server.Properties {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Estrol.X3Jam.Server.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Estrol.X3Jam.Website.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,54 +57,6 @@ namespace Estrol.X3Jam.Server.Properties {
             }
             set {
                 resourceCulture = value;
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] Config {
-            get {
-                object obj = ResourceManager.GetObject("Config", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] EmuChannelListData {
-            get {
-                object obj = ResourceManager.GetObject("EmuChannelListData", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] EmuRoomList {
-            get {
-                object obj = ResourceManager.GetObject("EmuRoomList", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to //Lightboard
-        ///
-        /////Stateroom
-        ///
-        ///
-        /////StateWaiting
-        ///Welcome to X3-JAM, A new reimplemented O2-JAM 1.8 Server
-        ///Be aware that this server still in heavy development by
-        ///1 Reverse Engineer and 1 Programmer (yikes so small lol)
-        ///.
-        /// </summary>
-        internal static string News {
-            get {
-                return ResourceManager.GetString("News", resourceCulture);
             }
         }
     }

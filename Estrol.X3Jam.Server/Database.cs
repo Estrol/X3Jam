@@ -19,10 +19,6 @@ namespace Estrol.X3Jam.Server {
             this.main = main;
             rng = new RNGCryptoServiceProvider();
 
-            if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\conf")) {
-                Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + @"\conf");
-            }
-
             db_users = new SQLiteConnection("Data source=" + AppDomain.CurrentDomain.BaseDirectory + @"\conf\o2jam_users.db");
             db_users.Open();
             SQLiteCommand cm = new SQLiteCommand(db_users);

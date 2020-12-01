@@ -15,6 +15,11 @@
         TCPPing = 0x1771,
         LeaveCH = 0x07e5,
         CreateRoom = 0x07d4,
+        LeaveRoom = 0x0bbd,
+        RoomBGChange = 0x0fa2,
         SetSongID = 0x0fa0,
+        RoomInit = 0x0fa4,
+        ClientMSG = 0x07dc,
+        ClientMSG2 = 0x0bc3,
     }
 }

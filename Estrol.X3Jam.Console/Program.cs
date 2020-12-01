@@ -1,5 +1,7 @@
 ﻿using System;
 using Estrol.X3Jam.Server;
+using Estrol.X3Jam.Website;
+using System.Diagnostics;
 
 namespace Estrol.X3Jam.Console {
     public class Program {
@@ -11,6 +13,9 @@ namespace Estrol.X3Jam.Console {
 
             ServerMain sm = new ServerMain();
             sm.Intialize();
+
+            WebMain wm = new WebMain(15000);
+            wm.Initalize();
 
             while (true) {
                 System.Console.ReadKey();

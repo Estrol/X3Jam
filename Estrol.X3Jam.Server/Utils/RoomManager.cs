@@ -12,7 +12,7 @@ namespace Estrol.X3Jam.Server.Utils {
         public RoomManager() {
             Rooms = new Room[] {
                 new Room(0, "Debug Room #1", new User(new string[] {"null", "debug", "debug"}), 0x01) { SongID = 441, CurrentUser = 3 },
-                new Room(2, "Debug Room #2", new User(new string[] {"null", "debug", "debug"}), 0x01, "idk") { SongID = 441, CurrentUser = 4, MaxUser = 4 }
+                new Room(2, "Debug Room #2", new User(new string[] {"null", "debug", "debug"}), 0x02, "idk") { SongID = 441, CurrentUser = 4, MaxUser = 4 }
             };
         }
 

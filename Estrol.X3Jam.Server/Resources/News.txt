@@ -1,0 +1,9 @@
+//Lightboard
+
+//Stateroom
+
+
+//StateWaiting
+Welcome to X3-JAM, A new reimplemented O2-JAM 1.8 Server
+Be aware that this server still in heavy development by
+1 Reverse Engineer and 1 Programmer (yikes so small lol)

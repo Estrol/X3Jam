@@ -26,7 +26,8 @@ namespace Estrol.X3Jam.Server.Handlers {
                 );
             }
 
-            state.UserInfo = usr;
+            usr.SetConnnection(state);
+            state.m_user = usr;
 
             Send();
         }

@@ -5,28 +5,24 @@ using Estrol.X3Jam.Server.Data;
 
 namespace Estrol.X3Jam.Server {
     public class Server {
-        private ServerMain Main;
-        private Socket ServerSocket;
-        private short gamePort;
-        private short webPort;
+        private Socket m_ServerSocket;
+        private short m_gamePort;
 
         public delegate void ServerEventSender(object sender, Connection state);
         public event ServerEventSender OnServerMessage;
 
-        public Server(ServerMain Main, short gamePort, short webPort) {
-            this.Main = Main;
-            this.gamePort = gamePort;
-            this.webPort = webPort;
+        public Server(short gamePort) {
+            m_gamePort = gamePort;
 
-            ServerSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            ServerSocket.Bind(new IPEndPoint(IPAddress.Any, this.gamePort));
+            m_ServerSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            m_ServerSocket.Bind(new IPEndPoint(IPAddress.Any, m_gamePort));
         }
 
         public void Start() {
-            ServerSocket.Listen(gamePort);
-            Console.WriteLine("[Server] Server now listening at port {0}", gamePort);
+            m_ServerSocket.Listen(m_gamePort);
+            Console.WriteLine("[Server] Server now listening at port {0}", m_gamePort);
 
-            ServerSocket.BeginAccept(Server_OnAsyncConnection, ServerSocket);
+            m_ServerSocket.BeginAccept(Server_OnAsyncConnection, m_ServerSocket);
         }
 
         public void Send(Connection state, byte[] data, short length = 0) {
@@ -35,28 +31,19 @@ namespace Estrol.X3Jam.Server {
             }
 
             try {
-                state.Socket.BeginSend(data, 0, length, 0, Server_OnAsyncSend, state);
+                state.m_socket.BeginSend(data, 0, length, 0, Server_OnAsyncSend, state);
             } catch (Exception e) {
                 HandleException(e);
             }
         }
 
         public void ReadAgain(Connection state) {
-            state.raw = new byte[Connection.MAX_BUFFER_SIZE];
-            state.Buffer = null;
-            state.Socket.BeginReceive(state.raw, 0, Connection.MAX_BUFFER_SIZE, SocketFlags.None, Server_OnAsyncData, state);
+            state.m_raw = new byte[Connection.MAX_BUFFER_SIZE];
+            state.m_data = null;
+            state.m_socket.BeginReceive(state.m_raw, 0, Connection.MAX_BUFFER_SIZE, SocketFlags.None, Server_OnAsyncData, state);
         }
 
-        private void Server_OnAsyncSend(IAsyncResult ar) {
-            try {
-                //Connection state = (Connection)ar.AsyncState;
-                //state.raw = new byte[Connection.MAX_BUFFER_SIZE];
-                //state.Buffer = null;
-                //state.Socket.BeginReceive(state.raw, 0, Connection.MAX_BUFFER_SIZE, SocketFlags.None, Server_OnAsyncData, state);
-            } catch (Exception e) {
-                HandleException(e);
-            }
-        }
+        private void Server_OnAsyncSend(IAsyncResult ar) {}
 
         private void Server_OnAsyncConnection(IAsyncResult ar) {
             Connection state;
@@ -65,13 +52,13 @@ namespace Estrol.X3Jam.Server {
                 Socket _socket = (Socket)ar.AsyncState;
 
                 state = new Connection() {
-                    Socket = _socket.EndAccept(ar),
-                    Server = this,
-                    raw = new byte[Connection.MAX_BUFFER_SIZE]
+                    m_socket = _socket.EndAccept(ar),
+                    m_server = this,
+                    m_raw = new byte[Connection.MAX_BUFFER_SIZE]
                 };
 
-                state.Socket.BeginReceive(state.raw, 0, Connection.MAX_BUFFER_SIZE, SocketFlags.None, Server_OnAsyncData, state);
-                ServerSocket.BeginAccept(Server_OnAsyncConnection, ServerSocket);
+                state.m_socket.BeginReceive(state.m_raw, 0, Connection.MAX_BUFFER_SIZE, SocketFlags.None, Server_OnAsyncData, state);
+                m_ServerSocket.BeginAccept(Server_OnAsyncConnection, m_ServerSocket);
             } catch (Exception e) {
                 HandleException(e);
             }
@@ -80,14 +67,11 @@ namespace Estrol.X3Jam.Server {
         private void Server_OnAsyncData(IAsyncResult ar) {
             try {
                 Connection state = (Connection)ar.AsyncState;
-                 
-                state._opcode = BitConverter.ToUInt16(state.raw, 2);
-                state.opcode = (Packets)state._opcode;
 
-                state.Length = BitConverter.ToInt16(state.raw, 0);
-                state.Buffer = new byte[state.Length];
-                Buffer.BlockCopy(state.raw, 0, state.Buffer, 0, state.Length);
-                state.raw = null;
+                state.m_length = BitConverter.ToUInt16(state.m_raw, 0);
+                state.m_data = new byte[state.Length];
+                Buffer.BlockCopy(state.m_raw, 0, state.Buffer, 0, state.Length);
+                state.m_raw = null;
 
                 if (OnServerMessage == null) return;
                 OnServerMessage(this, state);
@@ -105,7 +89,7 @@ namespace Estrol.X3Jam.Server {
                     Console.WriteLine("[C# Exception] A thread tried to access socket that already disconnected");
                 }
             } else {
-                Console.WriteLine("[C# Unhandled Exception] {0}", e.Message);
+                Console.WriteLine("[C# Unhandled Exception] {0}\n{0}", e.Message, e.StackTrace);
             }
         }
     }

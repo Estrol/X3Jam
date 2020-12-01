@@ -5,15 +5,15 @@ using System.IO;
 
 namespace Estrol.X3Jam.Server.Data {
     public class Base {
-        public MemoryStream ms;
-        public BinaryWriter bw;
-        public Connection state;
+        public MemoryStream m_MemoryStream;
+        public BinaryWriter m_BinaryWriter;
+        public Connection m_connection;
 
         public Base(Connection state) {
-            this.state = state;
+            m_connection = state;
 
-            ms = new MemoryStream();
-            bw = new BinaryWriter(ms);
+            m_MemoryStream = new MemoryStream();
+            m_BinaryWriter = new BinaryWriter(m_MemoryStream);
         }
 
         /// <summary>
@@ -21,9 +21,9 @@ namespace Estrol.X3Jam.Server.Data {
         /// </summary>
         /// <param name="length"></param>
         public void SetLength(short length) {
-            bw.Seek(0, SeekOrigin.Begin);
-            bw.Write(length);
-            bw.Seek(ms.ToArray().Length, SeekOrigin.End);
+            m_BinaryWriter.Seek(0, SeekOrigin.Begin);
+            m_BinaryWriter.Write(length);
+            m_BinaryWriter.Seek(m_MemoryStream.ToArray().Length, SeekOrigin.End);
         }
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace Estrol.X3Jam.Server.Data {
         /// <returns></returns>
         public byte[] ToArray() {
             MemoryStream _ms = new MemoryStream();
-            ms.CopyTo(_ms);
+            m_MemoryStream.CopyTo(_ms);
 
             return _ms.ToArray();
         }
@@ -43,9 +43,9 @@ namespace Estrol.X3Jam.Server.Data {
         /// <param name="length"></param>
         public void WriteFromLength(short length) {
             byte[] tmpBuffer = new byte[length];
-            Buffer.BlockCopy(state.Buffer, 0, tmpBuffer, 0, length);
+            Buffer.BlockCopy(m_connection.Buffer, 0, tmpBuffer, 0, length);
 
-            bw.Write(tmpBuffer);
+            m_BinaryWriter.Write(tmpBuffer);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Estrol.X3Jam.Server.Data {
         /// </summary>
         /// <param name="data"></param>
         public void Write(byte data) {
-            bw.Write(data);
+            m_BinaryWriter.Write(data);
         }
 
         /// <summary>
@@ -61,7 +61,7 @@ namespace Estrol.X3Jam.Server.Data {
         /// </summary>
         /// <param name="data"></param>
         public void Write(short data) {
-            bw.Write(data);
+            m_BinaryWriter.Write(data);
         }
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Estrol.X3Jam.Server.Data {
         /// </summary>
         /// <param name="data"></param>
         public void Write(byte[] data) {
-            bw.Write(data);
+            m_BinaryWriter.Write(data);
         }
 
         /// <summary>
@@ -77,13 +77,13 @@ namespace Estrol.X3Jam.Server.Data {
         /// </summary>
         /// <param name="length"></param>
         public void Send(short length = 0) {
-            byte[] data = ms.ToArray();
+            byte[] data = m_MemoryStream.ToArray();
 
             if (length == 0) {
                 length = BitConverter.ToInt16(data, 0);
             }
 
-            state.Send(data, length);
+            m_connection.Send(data, length);
         }
     }
 }

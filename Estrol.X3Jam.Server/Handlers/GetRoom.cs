@@ -72,7 +72,7 @@ namespace Estrol.X3Jam.Server.Handlers {
             Write(ms3.ToArray());
 
             //Write(Properties.Resources.EmuRoomList);
-            Send((short)base.ms.Length);
+            Send((short)base.m_MemoryStream.Length);
         }
 
         public byte[] CreateWarningMessage(Connection state) {

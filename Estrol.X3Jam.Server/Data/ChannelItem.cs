@@ -1,44 +1,47 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Estrol.X3Jam.Server.Utils;
 
 namespace Estrol.X3Jam.Server.Data {
     public class ChannelItem {
-        private User[] users;
-        public int ChannelID;
-        public int UsrID;
+        private OJNList m_MusicList;
+        private User[] m_Users;
 
-        public ChannelItem(int ID) {
-            this.users = new User[] { };
-            this.ChannelID = ID;
-            this.UsrID = 0;
+        public int m_ChannelID;
+        public int m_MaxRoom;
+
+        public ChannelItem(int ID, string MusicList, int MaxRoom) {
+            m_Users = new User[] { };
+            m_ChannelID = ID;
+            m_MaxRoom = MaxRoom;
+            m_MusicList = OJNListDecoder.Decode(AppDomain.CurrentDomain.BaseDirectory + @"\conf\musiclist\" + MusicList);
         }
 
-        public int GetUsrID() {
-            int yeet = UsrID;
-            UsrID++;
-            return yeet;
+        public OJN[] GetMusicList() {
+            return m_MusicList.GetHeaders();
+        }
+
+        public int GetListCount() {
+            return m_MusicList.Count;
         }
 
         public User[] GetUsers() {
-            return users;
+            return m_Users;
         }
 
         public void AddUser(User usr) {
-            List<User> itr = new List<User>(users) {
+            List<User> itr = new List<User>(m_Users) {
                 usr
             };
 
-            users = itr.ToArray();
+            m_Users = itr.ToArray();
         }
 
         public void RemoveUser(User usr) {
-            List<User> itr = new List<User>(users);
+            List<User> itr = new List<User>(m_Users);
             itr.Remove(usr);
 
-            users = itr.ToArray();
+            m_Users = itr.ToArray();
         }
     }
 }
