@@ -6,6 +6,7 @@ using Estrol.X3Jam.Server.Data;
 using Estrol.X3Jam.Server.Utils;
 using Estrol.X3Jam.Server.Handlers;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Estrol.X3Jam.Server {
     public class ServerMain {
@@ -24,19 +25,9 @@ namespace Estrol.X3Jam.Server {
             Config = new Config();
             Database = new Database(this);
             ChannelMG = new ChannelManager(this);
-            LoadOJNList();
 
             Server.OnServerMessage += this.TCPEvent;
             Server.Start();
-        }
-
-        public void LoadOJNList() {
-            try {
-                this.OJNList = OJNListDecoder.Decode(AppDomain.CurrentDomain.BaseDirectory + @"\Image\OJNList.dat");
-                Console.WriteLine("[Server] Loaded OJNList with songs count {0}", this.OJNList.Count);
-            } catch (Exception) {
-                Console.WriteLine("[Server] Failed to load OJNList");
-            }
         }
 
         public void TCPEvent(object o, Connection c) {
@@ -49,7 +40,7 @@ namespace Estrol.X3Jam.Server {
                 case Packets.Login: new Login(c, PM, this); break;
                 case Packets.PlanetLogin: new PlanetLogin(c, PM, this); break;
 
-                case Packets.Channel: new Channel(c, PM); break;
+                case Packets.Channel: new Channel(c, PM, this); break;
                 case Packets.EnterCH: {
                     int ChannelID = PM.data[4] + 1;
                     if (ChannelID > ChannelMG.ChannelCount) {
@@ -234,21 +225,50 @@ namespace Estrol.X3Jam.Server {
 
                     ChannelItem ch = ChannelMG.GetChannelByID(c.UserInfo.GetChannel());
                     var headers = ch.GetMusicList();
-                    short packetLength = (short)(6 + (headers.Length * 12) + 12);
-                    bw.Write(packetLength);
-                    bw.Write(new byte[] { 0xBF, 0x0F }); // Header?
-                    bw.Write((short)ch.GetListCount());
 
-                    foreach (OJN ojn in headers) {
-                        bw.Write((short)ojn.Id);
-                        bw.Write((short)ojn.NoteCountEx);
-                        bw.Write((short)ojn.NoteCountNx);
-                        bw.Write((short)ojn.NoteCountHx);
-                        bw.Write(new byte[4]);
+                    if (headers.Length > 500) {
+                        var split_headers = headers.Split(2).ToArray();
+
+                        for (int i = 0; i < split_headers.Length; i++) {
+                            var hHeader = split_headers[i].ToArray();
+                            short length = (short)(6 + (hHeader.Length * 12) + 12);
+
+                            bw.Write(length);
+                            bw.Write(new byte[] { 0xBF, 0x0F }); // Header?
+                            bw.Write((short)hHeader.Length);
+
+                            foreach (OJN ojn in hHeader) {
+                                bw.Write(new byte[] {
+
+                                });
+
+                                bw.Write((short)ojn.Id);
+                                bw.Write((short)ojn.NoteCountEx);
+                                bw.Write((short)ojn.NoteCountNx);
+                                bw.Write((short)ojn.NoteCountHx);
+                                bw.Write(new byte[4]);
+                            }
+
+                            bw.Write(new byte[12]);
+                        }
+                    } else {
+                        short packetLength = (short)(6 + (headers.Length * 12) + 12);
+                        bw.Write(packetLength);
+                        bw.Write(new byte[] { 0xBF, 0x0F }); // Header?
+                        bw.Write((short)ch.GetListCount());
+
+                        foreach (OJN ojn in headers) {
+                            bw.Write((short)ojn.Id);
+                            bw.Write((short)ojn.NoteCountEx);
+                            bw.Write((short)ojn.NoteCountNx);
+                            bw.Write((short)ojn.NoteCountHx);
+                            bw.Write(new byte[4]);
+                        }
+
+                        bw.Write(new byte[12]);
                     }
-                    
+
                     Console.WriteLine("[Server] [{0}] Get MusicList Info!", c.UserInfo.GetUsername());
-                    bw.Write(new byte[12]);
                     c.Send(ms.ToArray());
                     break;
                 }

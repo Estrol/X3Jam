@@ -114,13 +114,6 @@ namespace Estrol.X3Jam.Server.Utils {
                 header.CoverOffset = reader.ReadInt32();
                 header.CharacterEncoding = encoding;
 
-                if (mstream.Length > 300 && header.ThumbnailSize > 0) {
-                    mstream.Seek(header.CoverOffset + header.CoverSize, SeekOrigin.Begin);
-                    using (var bitmapStream = new MemoryStream(reader.ReadBytes(header.ThumbnailSize))) {
-                        header.Thumbnail = new System.Drawing.Bitmap(bitmapStream);
-                    }
-                }
-
                 return header;
             }
         }

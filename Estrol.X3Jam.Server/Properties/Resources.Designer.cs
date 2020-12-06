@@ -63,6 +63,16 @@ namespace Estrol.X3Jam.Server.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] Channel {
+            get {
+                object obj = ResourceManager.GetObject("Channel", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] Config {
             get {
                 object obj = ResourceManager.GetObject("Config", resourceCulture);

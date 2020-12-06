@@ -3,95 +3,60 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30621.155
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Estrol.X3Jam.WPF", "Estrol.X3Jam.WPF\Estrol.X3Jam.WPF.csproj", "{C572226D-E555-45FE-8755-2AA0AC840A18}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Estrol.X3Jam.WPF", "Estrol.X3Jam.WPF\Estrol.X3Jam.WPF.csproj", "{C572226D-E555-45FE-8755-2AA0AC840A18}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Estrol.X3Jam.Server", "Estrol.X3Jam.Server\Estrol.X3Jam.Server.csproj", "{EB922894-3457-4ECD-A11F-DB9C90048FD0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Estrol.X3Jam.Server", "Estrol.X3Jam.Server\Estrol.X3Jam.Server.csproj", "{EB922894-3457-4ECD-A11F-DB9C90048FD0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Estrol.X3Jam.Console", "Estrol.X3Jam.Console\Estrol.X3Jam.Console.csproj", "{D9A95123-0C1B-4488-A304-F6F42E3B93FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Estrol.X3Jam.Console", "Estrol.X3Jam.Console\Estrol.X3Jam.Console.csproj", "{D9A95123-0C1B-4488-A304-F6F42E3B93FA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{94E302A1-5A54-4923-A097-C684CE86A29C}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Estrol.X3Jam.Website", "Estrol.X3Jam.Website\Estrol.X3Jam.Website.csproj", "{33C63B74-12ED-4A4A-A851-CB54B35B95B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Estrol.X3Jam.Website", "Estrol.X3Jam.Website\Estrol.X3Jam.Website.csproj", "{33C63B74-12ED-4A4A-A851-CB54B35B95B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|x86 = Debug|x86
-		DebugMulti|Any CPU = DebugMulti|Any CPU
-		DebugMulti|x86 = DebugMulti|x86
 		Release|Any CPU = Release|Any CPU
 		Release|x86 = Release|x86
-		Singleplayer_Debug|Any CPU = Singleplayer_Debug|Any CPU
-		Singleplayer_Debug|x86 = Singleplayer_Debug|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{C572226D-E555-45FE-8755-2AA0AC840A18}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C572226D-E555-45FE-8755-2AA0AC840A18}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C572226D-E555-45FE-8755-2AA0AC840A18}.Debug|x86.ActiveCfg = Debug|x86
-		{C572226D-E555-45FE-8755-2AA0AC840A18}.Debug|x86.Build.0 = Debug|x86
-		{C572226D-E555-45FE-8755-2AA0AC840A18}.DebugMulti|Any CPU.ActiveCfg = DebugMulti|Any CPU
-		{C572226D-E555-45FE-8755-2AA0AC840A18}.DebugMulti|Any CPU.Build.0 = DebugMulti|Any CPU
-		{C572226D-E555-45FE-8755-2AA0AC840A18}.DebugMulti|x86.ActiveCfg = DebugMulti|x86
-		{C572226D-E555-45FE-8755-2AA0AC840A18}.DebugMulti|x86.Build.0 = DebugMulti|x86
+		{C572226D-E555-45FE-8755-2AA0AC840A18}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C572226D-E555-45FE-8755-2AA0AC840A18}.Debug|x86.Build.0 = Debug|Any CPU
 		{C572226D-E555-45FE-8755-2AA0AC840A18}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C572226D-E555-45FE-8755-2AA0AC840A18}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C572226D-E555-45FE-8755-2AA0AC840A18}.Release|x86.ActiveCfg = Release|x86
-		{C572226D-E555-45FE-8755-2AA0AC840A18}.Release|x86.Build.0 = Release|x86
-		{C572226D-E555-45FE-8755-2AA0AC840A18}.Singleplayer_Debug|Any CPU.ActiveCfg = Singleplayer_Debug|x86
-		{C572226D-E555-45FE-8755-2AA0AC840A18}.Singleplayer_Debug|Any CPU.Build.0 = Singleplayer_Debug|x86
-		{C572226D-E555-45FE-8755-2AA0AC840A18}.Singleplayer_Debug|x86.ActiveCfg = Singleplayer_Debug|x86
-		{C572226D-E555-45FE-8755-2AA0AC840A18}.Singleplayer_Debug|x86.Build.0 = Singleplayer_Debug|x86
+		{C572226D-E555-45FE-8755-2AA0AC840A18}.Release|x86.ActiveCfg = Debug|x86
+		{C572226D-E555-45FE-8755-2AA0AC840A18}.Release|x86.Build.0 = Debug|x86
 		{EB922894-3457-4ECD-A11F-DB9C90048FD0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EB922894-3457-4ECD-A11F-DB9C90048FD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EB922894-3457-4ECD-A11F-DB9C90048FD0}.Debug|x86.ActiveCfg = Debug|x86
-		{EB922894-3457-4ECD-A11F-DB9C90048FD0}.Debug|x86.Build.0 = Debug|x86
-		{EB922894-3457-4ECD-A11F-DB9C90048FD0}.DebugMulti|Any CPU.ActiveCfg = DebugMulti|Any CPU
-		{EB922894-3457-4ECD-A11F-DB9C90048FD0}.DebugMulti|Any CPU.Build.0 = DebugMulti|Any CPU
-		{EB922894-3457-4ECD-A11F-DB9C90048FD0}.DebugMulti|x86.ActiveCfg = DebugMulti|x86
-		{EB922894-3457-4ECD-A11F-DB9C90048FD0}.DebugMulti|x86.Build.0 = DebugMulti|x86
+		{EB922894-3457-4ECD-A11F-DB9C90048FD0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EB922894-3457-4ECD-A11F-DB9C90048FD0}.Debug|x86.Build.0 = Debug|Any CPU
 		{EB922894-3457-4ECD-A11F-DB9C90048FD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EB922894-3457-4ECD-A11F-DB9C90048FD0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EB922894-3457-4ECD-A11F-DB9C90048FD0}.Release|x86.ActiveCfg = Release|x86
 		{EB922894-3457-4ECD-A11F-DB9C90048FD0}.Release|x86.Build.0 = Release|x86
-		{EB922894-3457-4ECD-A11F-DB9C90048FD0}.Singleplayer_Debug|Any CPU.ActiveCfg = Singleplayer_Debug|x86
-		{EB922894-3457-4ECD-A11F-DB9C90048FD0}.Singleplayer_Debug|Any CPU.Build.0 = Singleplayer_Debug|x86
-		{EB922894-3457-4ECD-A11F-DB9C90048FD0}.Singleplayer_Debug|x86.ActiveCfg = Singleplayer_Debug|x86
-		{EB922894-3457-4ECD-A11F-DB9C90048FD0}.Singleplayer_Debug|x86.Build.0 = Singleplayer_Debug|x86
 		{D9A95123-0C1B-4488-A304-F6F42E3B93FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D9A95123-0C1B-4488-A304-F6F42E3B93FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9A95123-0C1B-4488-A304-F6F42E3B93FA}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{D9A95123-0C1B-4488-A304-F6F42E3B93FA}.Debug|x86.Build.0 = Debug|Any CPU
-		{D9A95123-0C1B-4488-A304-F6F42E3B93FA}.DebugMulti|Any CPU.ActiveCfg = DebugMulti|Any CPU
-		{D9A95123-0C1B-4488-A304-F6F42E3B93FA}.DebugMulti|Any CPU.Build.0 = DebugMulti|Any CPU
-		{D9A95123-0C1B-4488-A304-F6F42E3B93FA}.DebugMulti|x86.ActiveCfg = DebugMulti|x86
-		{D9A95123-0C1B-4488-A304-F6F42E3B93FA}.DebugMulti|x86.Build.0 = DebugMulti|x86
 		{D9A95123-0C1B-4488-A304-F6F42E3B93FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9A95123-0C1B-4488-A304-F6F42E3B93FA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D9A95123-0C1B-4488-A304-F6F42E3B93FA}.Release|x86.ActiveCfg = Release|Any CPU
 		{D9A95123-0C1B-4488-A304-F6F42E3B93FA}.Release|x86.Build.0 = Release|Any CPU
-		{D9A95123-0C1B-4488-A304-F6F42E3B93FA}.Singleplayer_Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D9A95123-0C1B-4488-A304-F6F42E3B93FA}.Singleplayer_Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D9A95123-0C1B-4488-A304-F6F42E3B93FA}.Singleplayer_Debug|x86.ActiveCfg = Debug|Any CPU
-		{D9A95123-0C1B-4488-A304-F6F42E3B93FA}.Singleplayer_Debug|x86.Build.0 = Debug|Any CPU
 		{33C63B74-12ED-4A4A-A851-CB54B35B95B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{33C63B74-12ED-4A4A-A851-CB54B35B95B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{33C63B74-12ED-4A4A-A851-CB54B35B95B4}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{33C63B74-12ED-4A4A-A851-CB54B35B95B4}.Debug|x86.Build.0 = Debug|Any CPU
-		{33C63B74-12ED-4A4A-A851-CB54B35B95B4}.DebugMulti|Any CPU.ActiveCfg = DebugMulti|Any CPU
-		{33C63B74-12ED-4A4A-A851-CB54B35B95B4}.DebugMulti|Any CPU.Build.0 = DebugMulti|Any CPU
-		{33C63B74-12ED-4A4A-A851-CB54B35B95B4}.DebugMulti|x86.ActiveCfg = DebugMulti|x86
-		{33C63B74-12ED-4A4A-A851-CB54B35B95B4}.DebugMulti|x86.Build.0 = DebugMulti|x86
 		{33C63B74-12ED-4A4A-A851-CB54B35B95B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{33C63B74-12ED-4A4A-A851-CB54B35B95B4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{33C63B74-12ED-4A4A-A851-CB54B35B95B4}.Release|x86.ActiveCfg = Release|Any CPU
 		{33C63B74-12ED-4A4A-A851-CB54B35B95B4}.Release|x86.Build.0 = Release|Any CPU
-		{33C63B74-12ED-4A4A-A851-CB54B35B95B4}.Singleplayer_Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{33C63B74-12ED-4A4A-A851-CB54B35B95B4}.Singleplayer_Debug|Any CPU.Build.0 = Debug|Any CPU
-		{33C63B74-12ED-4A4A-A851-CB54B35B95B4}.Singleplayer_Debug|x86.ActiveCfg = Singleplayer_Debug|x86
-		{33C63B74-12ED-4A4A-A851-CB54B35B95B4}.Singleplayer_Debug|x86.Build.0 = Singleplayer_Debug|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

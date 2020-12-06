@@ -9,9 +9,11 @@ namespace Estrol.X3Jam.Server.Data {
 
         public int m_ChannelID;
         public int m_MaxRoom;
+        public int m_CurrentRoom;
 
         public ChannelItem(int ID, string MusicList, int MaxRoom) {
             m_Users = new User[] { };
+            m_CurrentRoom = 0;
             m_ChannelID = ID;
             m_MaxRoom = MaxRoom;
             m_MusicList = OJNListDecoder.Decode(AppDomain.CurrentDomain.BaseDirectory + @"\conf\musiclist\" + MusicList);

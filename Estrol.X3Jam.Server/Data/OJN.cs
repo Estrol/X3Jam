@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.Linq;
+﻿using System.Linq;
 using System.Text;
 
 namespace Estrol.X3Jam.Server.Data {
@@ -48,7 +47,6 @@ namespace Estrol.X3Jam.Server.Data {
         public int CoverOffset { get; set; }
         public byte KeyMode { get; set; } = 7;
         public Encoding CharacterEncoding { get; set; } = Encoding.GetEncoding("big5");
-        public Image Thumbnail { get; set; }
         public string Source { get; set; }
         public bool Encrypted { get; set; }
 

@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace Estrol.X3Jam.Server.Utils {
     public static class DataUtils {
+        public static IEnumerable<IEnumerable<T>> Split<T>(this T[] array, int size) {
+            for (var i = 0; i < (float)array.Length / size; i++) {
+                yield return array.Skip(i * size).Take(size);
+            }
+        }
+
         public static string[] GetUserAuthentication(byte[] data) {
             int length = 0;
             for (int i = 0; i < data.Length; i++) {
