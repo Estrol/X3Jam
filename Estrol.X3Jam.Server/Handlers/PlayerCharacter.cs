@@ -5,13 +5,13 @@ using System.Text;
 
 namespace Estrol.X3Jam.Server.Handlers {
     public class PlayerCharacter : Base {
-        public PlayerCharacter(Connection state, PacketManager PM) : base(state) {
+        public PlayerCharacter(ClientSocket state, PacketManager PM) : base(state) {
             User user = state.UserInfo;
 
             Write((short)0);
             Write(new byte[] { 0xd1, 0x07 });
             Write(new byte[4]);
-            Write(Encoding.GetEncoding(1252).GetBytes(user.GetUsername().ToCharArray()));
+            Write(Encoding.GetEncoding(1252).GetBytes(user.Username.ToCharArray()));
             Write(0x00);
             Write(0x01); // Female character
 
@@ -158,7 +158,7 @@ namespace Estrol.X3Jam.Server.Handlers {
                 0xE7, 0x03, 0x00, 0x00, 0x9F, 0x00, 0x00, 0x00, 0xE7, 0x03, 0x00, 0x00
             });*/
 
-            Console.WriteLine("[Server] [{0}] Get character info!", state.UserInfo.GetUsername());
+            Console.WriteLine("[Server] [{0}] Get character info!", state.UserInfo.Username);
 
             SetLength((short)base.m_MemoryStream.Length);
             Send();

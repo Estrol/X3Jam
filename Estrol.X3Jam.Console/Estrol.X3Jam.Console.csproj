@@ -4,9 +4,20 @@
 		<TargetFramework>net5.0</TargetFramework>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<StartupObject>Estrol.X3Jam.Console.Program</StartupObject>
+		<Platforms>AnyCPU;x64</Platforms>
+		<ApplicationIcon>Icon.ico</ApplicationIcon>
+		<AssemblyName>X3Console</AssemblyName>
+		<NoWin32Manifest>true</NoWin32Manifest>
+		<Authors>Estrol</Authors>
 	</PropertyGroup>
+	<ItemGroup>
+	  <None Remove="Resources\Icon.ico" />
+	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\Estrol.X3Jam.Server\Estrol.X3Jam.Server.csproj" />
 		<ProjectReference Include="..\Estrol.X3Jam.Website\Estrol.X3Jam.Website.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Resource Include="Resources\Icon.ico" />
 	</ItemGroup>
 </Project>

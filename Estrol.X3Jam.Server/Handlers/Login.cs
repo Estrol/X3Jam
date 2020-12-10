@@ -2,30 +2,27 @@
 using System.Text;
 using Estrol.X3Jam.Server.Data;
 using Estrol.X3Jam.Server.Utils;
+using Estrol.X3Jam.Utility;
 
 namespace Estrol.X3Jam.Server.Handlers {
     public class Login : Base {
-        public Login(Connection state, PacketManager PM, ServerMain _b) : base(state) {
+        public Login(ClientSocket state, PacketManager PM, ServerMain _b) : base(state) {
             string[] UserAuth = DataUtils.GetUserAuthentication(PM.data);
 
-            User usr = _b.Database.CredentialsLogin(UserAuth[0], UserAuth[1]);
+            User usr = _b.Database.Login(UserAuth[0], UserAuth[1]);
             if (usr == null) {
                 Write(new byte[] {
                     0x08, 0x00, 0xf0, 0x03, 0xff, 0xff, 0xff, 0xff
                 });
 
-                Console.WriteLine("[Server] [Auth] Authenticate for user {0} failed",
-                    UserAuth[0]
-                );
+                Log.Write("[{0}@{1}] Authenticating for user {2} failed.", "null", state.IPAddr, UserAuth[0]);
             } else {
                 Write(new byte[] {
                     0x0c, 0x00, 0xf0, 0x03, 0x00, 0x00, 0x00, 0x00,
                     0xa4, 0x9d, 0x00, 0x00
                 });
 
-                Console.WriteLine("[Server] [Auth] Authenticate for user {0} success",
-                    UserAuth[0]
-                );
+                Log.Write("[{0}@{1}] Authenticating for user {2} success.", "null", state.IPAddr, UserAuth[0]);
             }
 
             Send();

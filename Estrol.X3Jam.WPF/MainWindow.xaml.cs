@@ -24,6 +24,7 @@ namespace Estrol.X3Jam.WPF {
 
         public MainWindow() {
             InitializeComponent();
+
             ConsoleWindow.Text = "[Message] Welcome to X3-JAM. written by DMJam Dev Group (Estrol and MatVeiQaaa)\n"
                 + string.Format("[Message] Current time is {0}\n", DateTime.Now);
 

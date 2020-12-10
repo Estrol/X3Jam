@@ -1,10 +1,11 @@
 ﻿using System;
 using Estrol.X3Jam.Server.Data;
 using Estrol.X3Jam.Server.Utils;
+using Estrol.X3Jam.Utility;
 
 namespace Estrol.X3Jam.Server.Handlers {
     public class Channel : Base {
-        public Channel(Connection state, PacketManager PM, ServerMain _b) : base(state) {
+        public Channel(ClientSocket state, PacketManager PM, ServerMain _b) : base(state) {
             Write((short)0x00); // len
             Write(new byte[] {
                 0xEB, 0x03, 0x2C, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -36,10 +37,9 @@ namespace Estrol.X3Jam.Server.Handlers {
             }
 
             Write(Properties.Resources.Channel);
-            //Write(Properties.Resources.EmuChannelListData);
-
             SetLength((short)m_MemoryStream.Length);
-            Console.WriteLine("[Server] [{0}] Get Channel Info!", state.UserInfo.GetUsername());
+
+            Log.Write("[{0}@{1}] Get channel list.", state.UserInfo.Username, state.IPAddr);
             Send();
         }
     }

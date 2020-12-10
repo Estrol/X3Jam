@@ -1,12 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using System.Windows;
+using System.Linq;
+using System.Collections.Generic;
+
+using Estrol.X3Jam.Utility;
 using Estrol.X3Jam.Server.Data;
 using Estrol.X3Jam.Server.Utils;
 using Estrol.X3Jam.Server.Handlers;
-using System.Linq;
-using System.Collections.Generic;
 
 namespace Estrol.X3Jam.Server {
     public class ServerMain {
@@ -14,24 +15,36 @@ namespace Estrol.X3Jam.Server {
         public OJNList OJNList;
         public RoomManager RoomMG;
         public ChannelManager ChannelMG;
-        public Database Database;
+        public DataNetwork Database;
         public Config Config;
 
         public ServerMain() {}
 
         public void Intialize() {
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+
             Server = new Server(15010);
             RoomMG = new RoomManager();
             Config = new Config();
-            Database = new Database(this);
-            ChannelMG = new ChannelManager(this);
+            Database = new DataNetwork();
+            Database.Intialize();
 
+            ChannelMG = new ChannelManager(this);
             Server.OnServerMessage += this.TCPEvent;
             Server.Start();
         }
 
-        public void TCPEvent(object o, Connection c) {
+        public void TCPEvent(object o, ClientSocket c) {
             PacketManager PM = new PacketManager(c.Buffer);
+
+            string[] NoLoginOpcodes = { "Connect", "PlanetConnect", "Login", "PlanetLogin", "Disconnect" };
+            string OpcodeName = Enum.GetName(typeof(Packets), PM.opcode);
+
+            if (OpcodeName != null && !NoLoginOpcodes.Contains(OpcodeName)) {
+                if (c.UserInfo == null) {
+                    return;
+                }
+            }
 
             switch (PM.opcode) {
                 case Packets.Connect: new Connect(c, PM); break;
@@ -44,18 +57,22 @@ namespace Estrol.X3Jam.Server {
                 case Packets.EnterCH: {
                     int ChannelID = PM.data[4] + 1;
                     if (ChannelID > ChannelMG.ChannelCount) {
-                        Console.WriteLine("[Server] [{0}] Attempting to enter channel: {1}, which doesn't exists in server!",
-                            c.UserInfo.GetUsername(),
-                            ChannelID);
+                        Log.Write("[{0}@{1}] Attempting to enter channel: {2}, that doesn't exists in server!", 
+                            c.UserInfo.Username,
+                            c.IPAddr,
+                            ChannelID
+                        );
 
                         break;
                     }
 
-                    Console.WriteLine("[Server] [{0}] Entering channel: {1}",
-                        c.UserInfo.GetUsername(),
-                        ChannelID);
+                    Log.Write("[{0}@{1}] Entering channel: {2}",
+                        c.UserInfo.Username,
+                        c.IPAddr,
+                        ChannelID
+                    );
 
-                    c.UserInfo.SetChannel(ChannelID);
+                    c.UserInfo.ChannelID = ChannelID;
                     var CH = ChannelMG.GetChannelByID(ChannelID);
                     CH.AddUser(c.UserInfo);
 
@@ -67,10 +84,10 @@ namespace Estrol.X3Jam.Server {
                 }
 
                 case Packets.LeaveCH: {
-                    var CH = ChannelMG.GetChannelByID(c.UserInfo.GetChannel());
+                    var CH = ChannelMG.GetChannelByID(c.UserInfo.ChannelID);
                     CH.RemoveUser(c.UserInfo);
 
-                    c.UserInfo.SetChannel(null);
+                    c.UserInfo.ChannelID = -1;
 
                     c.Send(new byte[] {
                         0x08, 00, 0xe6, 0x07, 0x00, 0x00, 0x00, 0x00
@@ -80,15 +97,14 @@ namespace Estrol.X3Jam.Server {
 
                 case Packets.SetSongID: {
                     ushort SongID = BitConverter.ToUInt16(PM.data, 2);
-                    Room room = RoomMG.GetRoomById(c.UserInfo.GetRoom());
+                    Room room = RoomMG.GetRoomById(c.UserInfo.Room);
 
                     room.SetSongID(SongID);
                     Console.WriteLine("[Server] [Channel: {0}, Room: {1}] Set SongID: {2}",
-                        c.UserInfo.GetChannel(),
-                        c.UserInfo.GetRoom(),
+                        c.UserInfo.ChannelID,
+                        c.UserInfo.Room,
                         SongID);
 
-                    RoomSendMSG(string.Format("Setting Room {0}'s SongID to {1}", room.RoomID, SongID), room.RoomID);
                     ushort p_len = (ushort)(PM.data.Length + 2);
                     byte[] len = BitConverter.GetBytes(p_len);
                     byte[] data = len.Concat(PM.data).ToArray();
@@ -101,15 +117,17 @@ namespace Estrol.X3Jam.Server {
                 case Packets.CreateRoom: {
                     string RoomName = DataUtils.GetString(PM.data);
 
-                    Console.WriteLine("[Server] [{0}] Create a Room with name: \"{1}\", in channel: {2}",
-                        c.UserInfo.GetUsername(),
+                    Log.Write("[{0}@{1}] Create a room with name: \"{2}\", in channel: {3}",
+                        c.UserInfo.Username,
+                        c.IPAddr,
                         RoomName,
-                        c.UserInfo.GetChannel());
+                        c.UserInfo.ChannelID
+                    );
 
                     int roomID = RoomMG.GetNearestEmptyRoomID();
                     Room room = new Room(roomID, RoomName, c.UserInfo, 0x0);
 
-                    c.UserInfo.SetRoom(roomID);
+                    c.UserInfo.Room = roomID;
                     RoomMG.AddRoom(room);
 
                     c.Send(new byte[] {
@@ -117,14 +135,13 @@ namespace Estrol.X3Jam.Server {
                         0x00, 0x00, 0x00, 0x00, 0x00
                     });
 
-                    RoomSendMSG(string.Format("Room created successfully with ID: {0}", room.RoomID), room.RoomID);
                     break;
                 }
 
                 case Packets.LeaveRoom: {
-                    Room room = RoomMG.GetRoomById(c.UserInfo.GetRoom());
+                    Room room = RoomMG.GetRoomById(c.UserInfo.Room);
                     room.RemoveUser(c.UserInfo);
-                    c.UserInfo.SetRoom(null);
+                    c.UserInfo.Room = -1;
 
                     c.Send(new byte[] {
                         0x08, 0x00, 0xbe, 0x0b, 0x00, 0x00, 0x00, 0x00
@@ -173,7 +190,7 @@ namespace Estrol.X3Jam.Server {
 
                 case Packets.ClientMSG: {
                     string message = DataUtils.GetString(PM.data);
-                    ChannelItem ch = ChannelMG.GetChannelByID(c.UserInfo.GetChannel());
+                    ChannelItem ch = ChannelMG.GetChannelByID(c.UserInfo.ChannelID);
                     User usr = c.UserInfo;
 
                     if (message.StartsWith("!") && message.Length > 1) {
@@ -186,22 +203,29 @@ namespace Estrol.X3Jam.Server {
 
                         switch (command) {
                             case "whois": {
-                                ListSendMSG("Not implemented yet!", ch);
+                                ListSendMSG("Not implemented yet!", ch, usr, true, true);
                                 break;
                             }
 
-                            case "send": {
-                                ListSendMSG(string.Join(" ", args), ch);
+                            case "annon": {
+                                if (args.Length == 0) {
+                                    ListSendMSG("annon <message> [send_to_all=false]", ch, usr, true, true);
+                                }
+
+                                string[] bool_ = new[] { "true", "false" };
+                                if (bool_.Contains(args[args.Length].ToLower())) {
+
+                                }
                                 break;
                             }
 
                             case "count": {
-                                ListSendMSG(string.Format("Current users in CH {0}: {1}", ch.m_ChannelID, ch.GetUsers().Length), ch);
+                                ListSendMSG(string.Format("Current users in CH {0}: {1}", ch.m_ChannelID, ch.GetUsers().Length), ch, usr, true, true);
                                 break;
                             }
 
                             default: {
-                                ListSendMSG(string.Format("Unknown command: {0}", command), ch);
+                                ListSendMSG(string.Format("Unknown command: {0}", command), ch, usr, true, true);
                                 break;
                             }
                         }
@@ -215,7 +239,7 @@ namespace Estrol.X3Jam.Server {
                     string message = DataUtils.GetString(PM.data);
                     User usr = c.UserInfo;
 
-                    RoomSendMSG(message, usr.GetRoom(), usr);
+                    RoomSendMSG(message, usr.Room, usr);
                     break;
                 }
 
@@ -223,53 +247,43 @@ namespace Estrol.X3Jam.Server {
                     var ms = new MemoryStream();
                     var bw = new BinaryWriter(ms);
 
-                    ChannelItem ch = ChannelMG.GetChannelByID(c.UserInfo.GetChannel());
-                    var headers = ch.GetMusicList();
+                    ChannelItem ch = ChannelMG.GetChannelByID(c.UserInfo.ChannelID);
+                    OJN[] headers = ch.GetMusicList();
 
-                    if (headers.Length > 500) {
+                    List<OJN[]> list = new List<OJN[]> { headers };
+
+                    if (headers.Length > 690) {
                         var split_headers = headers.Split(2).ToArray();
+                        list.Clear();
 
                         for (int i = 0; i < split_headers.Length; i++) {
-                            var hHeader = split_headers[i].ToArray();
-                            short length = (short)(6 + (hHeader.Length * 12) + 12);
+                            OJN[] _headers = split_headers[i].ToArray();
 
-                            bw.Write(length);
-                            bw.Write(new byte[] { 0xBF, 0x0F }); // Header?
-                            bw.Write((short)hHeader.Length);
-
-                            foreach (OJN ojn in hHeader) {
-                                bw.Write(new byte[] {
-
-                                });
-
-                                bw.Write((short)ojn.Id);
-                                bw.Write((short)ojn.NoteCountEx);
-                                bw.Write((short)ojn.NoteCountNx);
-                                bw.Write((short)ojn.NoteCountHx);
-                                bw.Write(new byte[4]);
-                            }
-
-                            bw.Write(new byte[12]);
+                            list.Add(_headers);
                         }
-                    } else {
-                        short packetLength = (short)(6 + (headers.Length * 12) + 12);
+                    }
+
+                    for (int i = 0; i < 1; i++) {
+                        OJN[] OJNHeader = list[i];
+
+                        short packetLength = (short)(6 + (OJNHeader.Length * 12) + 12);
                         bw.Write(packetLength);
                         bw.Write(new byte[] { 0xBF, 0x0F }); // Header?
-                        bw.Write((short)ch.GetListCount());
+                        bw.Write((short)OJNHeader.Length);
 
-                        foreach (OJN ojn in headers) {
+                        foreach (OJN ojn in OJNHeader) {
                             bw.Write((short)ojn.Id);
                             bw.Write((short)ojn.NoteCountEx);
                             bw.Write((short)ojn.NoteCountNx);
                             bw.Write((short)ojn.NoteCountHx);
-                            bw.Write(new byte[4]);
+                            bw.Write(0);
                         }
 
                         bw.Write(new byte[12]);
                     }
 
-                    Console.WriteLine("[Server] [{0}] Get MusicList Info!", c.UserInfo.GetUsername());
-                    c.Send(ms.ToArray());
+                    Console.WriteLine("[Server] [{0}] Get MusicList Info!", c.UserInfo.Username);
+                    c.Send(ms.ToArray(), (short)ms.Length);
                     break;
                 }
 
@@ -277,14 +291,14 @@ namespace Estrol.X3Jam.Server {
                     string usrStr = "null";
 
                     if (c.UserInfo != null) {
-                        var CH = ChannelMG.GetChannelByID(c.UserInfo.GetChannel());
+                        var CH = ChannelMG.GetChannelByID(c.UserInfo.ChannelID);
                         if (CH != null) {
                             CH.RemoveUser(c.UserInfo);
                         }
-                        usrStr = c.UserInfo.GetUsername();
+                        usrStr = c.UserInfo.Username;
                     }
 
-                    Console.WriteLine("[Server] [{0}] Disconnected!", usrStr);
+                    Log.Write("[{0}@{1}] Disconnected", usrStr, c.IPAddr);
                     c.m_socket.Disconnect(true);
                     return;
                 }
@@ -319,7 +333,7 @@ namespace Estrol.X3Jam.Server {
             c.Read();
         }
 
-        public void ListSendMSG(string Message, ChannelItem ch, User usr = null) {
+        public void ListSendMSG(string Message, ChannelItem ch, User usr, bool system = false, bool self = false) {
             User[] users = ch.GetUsers();
 
             using (var stream = new MemoryStream())
@@ -328,8 +342,8 @@ namespace Estrol.X3Jam.Server {
                 bw.Write(new byte[] { 0xdd, 0x07 });
 
                 char[] str;
-                if (usr != null) {
-                    str = usr.GetNickname().ToCharArray();
+                if (!system) {
+                    str = usr.Nickname.ToCharArray();
                 } else {
                     str = "System".ToCharArray();
                 }
@@ -346,15 +360,19 @@ namespace Estrol.X3Jam.Server {
 
                 byte[] data = stream.ToArray();
 
-                for (int i = 0; i < users.Length; i++) {
-                    User user = users[i];
+                if (!self) {
+                    for (int i = 0; i < users.Length; i++) {
+                        User user = users[i];
 
-                    user.SendMessage(data);
+                        user.Message(data);
+                    }
+                } else {
+                    usr.Message(data);
                 }
             }
         }
 
-        public void RoomSendMSG(string Message, int RoomID, User usr = null) {
+        public void RoomSendMSG(string Message, int RoomID, User usr, bool system = false, bool self = false) {
             Room room = RoomMG.GetRoomById(RoomID);
             User[] users = room.GetUsers();
 
@@ -364,8 +382,8 @@ namespace Estrol.X3Jam.Server {
                 bw.Write(new byte[] { 0xdd, 0x07 });
 
                 char[] str;
-                if (usr != null) {
-                    str = usr.GetNickname().ToCharArray();
+                if (!system) {
+                    str = usr.Nickname.ToCharArray();
                 } else {
                     str = "System".ToCharArray();
                 }
@@ -382,10 +400,14 @@ namespace Estrol.X3Jam.Server {
 
                 byte[] data = stream.ToArray();
 
-                for (int i = 0; i < users.Length; i++) {
-                    User user = users[i];
+                if (!self) {
+                    for (int i = 0; i < users.Length; i++) {
+                        User user = users[i];
 
-                    user.SendMessage(data);
+                        user.Message(data);
+                    }
+                } else {
+                    usr.Message(data);
                 }
             }
         }

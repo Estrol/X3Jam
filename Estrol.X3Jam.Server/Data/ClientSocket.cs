@@ -1,9 +1,10 @@
-﻿using System.Net.Sockets;
+﻿using System.Net;
+using System.Net.Sockets;
 using Estrol.X3Jam.Server.Data;
 
 namespace Estrol.X3Jam.Server.Data {
-    public class Connection {
-        public const int MAX_BUFFER_SIZE = 10248;
+    public class ClientSocket {
+        public const int MAX_BUFFER_SIZE = 256;
         public Server m_server;
         public Socket m_socket;
         public User m_user;
@@ -15,6 +16,13 @@ namespace Estrol.X3Jam.Server.Data {
         public byte[] Buffer => m_data;
         public ushort Length => m_length;
         public User UserInfo => m_user;
+        public string IPAddr {
+            get {
+                IPEndPoint ip = m_socket.RemoteEndPoint as IPEndPoint;
+
+                return ip.Address.ToString();
+            }
+        }
 
         public void Read() {
             m_server.ReadAgain(this);

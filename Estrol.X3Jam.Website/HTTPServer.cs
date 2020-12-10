@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Estrol.X3Jam.Website {
@@ -29,15 +30,27 @@ namespace Estrol.X3Jam.Website {
             while (loop) {
                 try {
                     TcpClient client = await listener.AcceptTcpClientAsync();
-                    NetworkStream ns = client.GetStream();
 
-                    WebConnection wc = new WebConnection(client, ns);
-
-                    OnDataReceived?.Invoke(this, wc);
+                    ThreadPool.QueueUserWorkItem(HandleClient, client);
                 } catch (Exception e) {
                     if (!e.Message.Contains("An existing connection was forcibly closed by the remote host")) {
                         Console.WriteLine("[Website] Exception: {0}", e.Message);
                     }
+                }
+            }
+        }
+
+        public void HandleClient(object _client) {
+            try {
+                TcpClient client = (TcpClient)_client;
+                NetworkStream ns = client.GetStream();
+
+                WebConnection wc = new WebConnection(client, ns);
+
+                OnDataReceived?.Invoke(this, wc);
+            } catch (Exception e) {
+                if (!e.Message.Contains("An existing connection was forcibly closed by the remote host")) {
+                    Console.WriteLine("[Website] Exception: {0}", e.Message);
                 }
             }
         }

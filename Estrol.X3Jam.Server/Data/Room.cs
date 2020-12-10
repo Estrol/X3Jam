@@ -52,7 +52,7 @@ namespace Estrol.X3Jam.Server.Data {
             itr.Remove(usr);
             CurrentUser--;
 
-            if (usr.GetUsername() == RoomMaster.GetUsername() && CurrentUser > 1) {
+            if (usr.Username == RoomMaster.Username && CurrentUser > 1) {
                 SetNearestAsRoomMaster();
             }
             SendByteMessage(2);

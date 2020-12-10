@@ -21,7 +21,7 @@ namespace Estrol.X3Jam.Console {
                     WebMain wm = new WebMain(15000);
                     wm.Initalize();
 
-                    Task NeverReturn = new Task(() => { while (true) { } });
+                    Task NeverReturn = new Task(() => { while (true) { System.Console.Read(); } });
                     NeverReturn.Start();
                     NeverReturn.GetAwaiter().GetResult();
                 } else {

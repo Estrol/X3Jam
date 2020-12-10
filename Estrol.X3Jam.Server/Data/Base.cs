@@ -7,9 +7,9 @@ namespace Estrol.X3Jam.Server.Data {
     public class Base {
         public MemoryStream m_MemoryStream;
         public BinaryWriter m_BinaryWriter;
-        public Connection m_connection;
+        public ClientSocket m_connection;
 
-        public Base(Connection state) {
+        public Base(ClientSocket state) {
             m_connection = state;
 
             m_MemoryStream = new MemoryStream();

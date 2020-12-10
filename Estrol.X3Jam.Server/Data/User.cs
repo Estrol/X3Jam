@@ -1,76 +1,57 @@
 ﻿namespace Estrol.X3Jam.Server.Data {
     public class User {
-        private Connection state;
+        private ClientSocket m_state;
 
-        private string nickname;
-        private string username;
-        private string password;
+        private string m_nickname;
+        private string m_username;
 
-        private int ChannelID;
-        private int RoomID;
-        private int level;
+        private int m_channelID;
+        private int m_roomID;
+        private int m_level;
 
-        public User(string[] auth) {
-            nickname = auth[0];
-            username = auth[0];
-            password = auth[1];
-            level = 1;
+        public string[] Info => new[] { m_username, m_nickname };
+        public string Username => m_username;
+        public string Nickname => m_nickname;
+        public int Level => m_level;
+        public int ChannelID {
+            set {
+                m_channelID = value;
+            }
+            get {
+                return m_channelID;
+            }
         }
 
-        public string[] GetInfo() {
-            return new string[] { username, nickname };
+        public ClientSocket Connection {
+            set {
+                m_state = value;
+            }
+            get {
+                return m_state;
+            }
         }
 
-        public void SetConnnection(Connection state) {
-            this.state = state;
+        public int Room {
+            set {
+                m_roomID = value;
+            }
+            get {
+                return m_roomID;
+            }
         }
 
-        public void SendMessage(byte[] data) {
-            if (state == null) {
+        public void Message(byte[] data) {
+            if (m_state == null) {
                 return;
             }
 
-            state.Send(data);
+            m_state.Send(data);
         }
 
-        public void IncreaseLevel() {
-            level++;
-        }
-
-        public string GetUsername() {
-            return this.username;
-        }
-
-        public string GetNickname() {
-            return this.nickname;
-        }
-
-        public void SetChannel(int? val) {
-            if (val != null) {
-                this.ChannelID = (int)val;
-            } else {
-                this.ChannelID = -1;
-            }
-        }
-
-        public int GetChannel() {
-            if (this.ChannelID == null) {
-                return -1;
-            }
-
-            return (int)this.ChannelID;
-        }
-
-        public void SetRoom(int? val) {
-            if (val != null) {
-                this.RoomID = (int)val;
-            } else {
-                this.RoomID = -1;
-            }
-        }
-
-        public int GetRoom() {
-            return (int)this.RoomID;
+        public User(string[] auth) {
+            m_nickname = auth[0];
+            m_username = auth[0];
+            m_level = 1;
         }
     }
 }

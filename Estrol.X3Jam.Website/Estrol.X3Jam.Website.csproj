@@ -3,5 +3,6 @@
 		<OutputType>Library</OutputType>
 		<TargetFramework>net5.0</TargetFramework>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<Platforms>AnyCPU;x64</Platforms>
 	</PropertyGroup>
 </Project>

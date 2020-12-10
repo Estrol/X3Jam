@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using Estrol.X3Jam.Server.Utils;
+using Estrol.X3Jam.Utility;
 
 namespace Estrol.X3Jam.Server {
     public class Config {
@@ -24,7 +25,7 @@ namespace Estrol.X3Jam.Server {
             }
 
             ini = new INILoader(AppDomain.CurrentDomain.BaseDirectory + @"\conf\server.conf");
-            Console.WriteLine("[Server] Config Loaded!");
+            Log.Write("Configuration loaded.");
         }
 
         public string GetConfigValue(string section) {

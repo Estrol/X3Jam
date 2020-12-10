@@ -5,7 +5,7 @@ using Estrol.X3Jam.Server.Utils;
 
 namespace Estrol.X3Jam.Server.Handlers {
     public class PlanetConnect : Base {
-        public PlanetConnect(Connection state, PacketManager PM) : base(state) {
+        public PlanetConnect(ClientSocket state, PacketManager PM) : base(state) {
             Write(new byte[] {
                 0x37, 0x00, 0xf4, 0x03, 0x40, 0xba, 0x11, 0x36,
                 0x84, 0x0d, 0x40, 0x7b, 0x78, 0x64, 0x2a, 0xc9,

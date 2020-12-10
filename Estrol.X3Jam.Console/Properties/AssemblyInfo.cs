@@ -6,11 +6,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("X3Jam Server Emulator")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A O2-JAM Server for version 1.8 (or e1.8 custom version)")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Estrol.X3Jam.Console")]
-[assembly: AssemblyCopyright("Copyright ©  2020")]
+[assembly: AssemblyCompany("Estrol's Group Developers")]
+[assembly: AssemblyProduct("X3-JAM")]
+[assembly: AssemblyCopyright("Copyright © Estrol's Group Developers  2020")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

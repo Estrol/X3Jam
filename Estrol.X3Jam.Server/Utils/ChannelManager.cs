@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Estrol.X3Jam.Server.Data;
+using Estrol.X3Jam.Utility;
 
 namespace Estrol.X3Jam.Server.Utils {
     public class ChannelManager {
@@ -13,7 +14,9 @@ namespace Estrol.X3Jam.Server.Utils {
 
             List<ChannelItem> itrs = new List<ChannelItem>();
             int CHCount = main.Config.GetChannelCount();
-            ChannelCount = CHCount;
+            ChannelCount = 0;
+
+            bool isError = false;
 
             for (int i = 0; i < CHCount; i++) {
                 string data = main.Config.GetChannelByID(i);
@@ -22,15 +25,28 @@ namespace Estrol.X3Jam.Server.Utils {
                 try {
                     ChannelItem ch = new ChannelItem(i + 1, split_data[0], int.Parse(split_data[1]));
                     itrs.Add(ch);
+
+                    ChannelCount++;
                 } catch (Exception e) {
-                    Console.WriteLine("[Server] Failed to load Channel {0}: {1}", i + 1, e.Message);
+                    if (e is System.IO.FileNotFoundException) {
+                        string msg = e.Message.Replace(AppDomain.CurrentDomain.BaseDirectory, @"\");
+
+                        Log.Write("Failed to load channel {0}: {1}", i + 1, msg);
+                    } else {
+                        Log.Write("Failed to load channel {0}: {1}", i + 1, e.Message);
+                    }
+                    
+                    isError = true;
                     break;
                 }
             }
 
             channels = itrs.ToArray();
+            if (isError) {
+                Log.Write("One of channels failed to load try checking if OJNList.dat is defined!");
+            }
 
-            Console.WriteLine("[Server] Loaded like {0} channels", CHCount);
+            Log.Write("Loaded like {0} channels", ChannelCount);
         }
 
         public ChannelItem GetChannelByID(int ID) {

@@ -2,10 +2,11 @@
 using System.Text;
 using Estrol.X3Jam.Server.Data;
 using Estrol.X3Jam.Server.Utils;
+using Estrol.X3Jam.Utility;
 
 namespace Estrol.X3Jam.Server.Handlers {
     public class Connect : Base {
-        public Connect(Connection state, PacketManager PM) : base(state) {
+        public Connect(ClientSocket state, PacketManager PM) : base(state) {
             Write(new byte[] {
                 0x37, 0x00, 0xf2, 0x03, 0x02, 0x00, 0x00, 0x5d,
                 0xfe, 0xda, 0xad, 0xf5, 0x7f, 0x6b, 0x0e, 0x49,
@@ -15,8 +16,8 @@ namespace Estrol.X3Jam.Server.Handlers {
                 0x67, 0xb5, 0xaa, 0xe1, 0x8b, 0x5d, 0x7c, 0x7b,
                 0x2a, 0xac, 0x22, 0xc3, 0x02, 0xf8, 0x1e
             });
-            Console.WriteLine("[Server] A client connected!");
 
+            Log.Write("Client connected!");
             Send();
         }
     }
