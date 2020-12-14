@@ -47,7 +47,9 @@ namespace Estrol.X3Jam.Website {
 
                 WebConnection wc = new WebConnection(client, ns);
 
-                OnDataReceived?.Invoke(this, wc);
+                if (wc.forwarded) {
+                    OnDataReceived?.Invoke(this, wc);
+                }
             } catch (Exception e) {
                 if (!e.Message.Contains("An existing connection was forcibly closed by the remote host")) {
                     Console.WriteLine("[Website] Exception: {0}", e.Message);

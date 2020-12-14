@@ -18,7 +18,7 @@ namespace Estrol.X3Jam.Console {
                     ServerMain sm = new ServerMain();
                     sm.Intialize();
 
-                    WebMain wm = new WebMain(15000);
+                    WebMain wm = new WebMain(sm, 15000);
                     wm.Initalize();
 
                     Task NeverReturn = new Task(() => { while (true) { System.Console.Read(); } });

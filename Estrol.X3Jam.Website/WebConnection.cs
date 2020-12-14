@@ -12,8 +12,13 @@ namespace Estrol.X3Jam.Website {
         public byte[] data;
         public Uri url;
         public string sData;
+        public string sBody;
+
+        public bool forwarded;
 
         public WebConnection(TcpClient tc, NetworkStream ns) {
+            forwarded = true;
+
             this.tc = tc;
             this.ns = ns;
             data = new byte[2000];
@@ -33,12 +38,20 @@ namespace Estrol.X3Jam.Website {
                 HTTPVersion = data_1[2]
             };
 
+            if (header.Method == HTTPMethod.OPTIONS) {
+                Send_Cors();
+                forwarded = false;
+            }
+
+            int data_post_index = 0;
+
             for (int i = 0; i < HeaderData.Length - 1; i++) {
                 string hData = HeaderData[i + 1];
                 string[] SpaceSeperator = new string[] { " " };
                 string[] spData = hData.Split(SpaceSeperator, StringSplitOptions.RemoveEmptyEntries);
-                if (spData[0] == "\0") continue;
+                if (spData[0] == "\0" || spData[0].EndsWith("\0")) break;
                 string rData = spData[1];
+                data_post_index++;
 
                 switch(spData[0].Replace(":", string.Empty)) {
                     case "Host": {
@@ -84,6 +97,10 @@ namespace Estrol.X3Jam.Website {
                     }
                 }
             }
+
+            if (header.Method == HTTPMethod.POST) {
+                sBody = HeaderData[HeaderData.Length - 1];
+            }
         }
 
         public void Send(string sData, int status = 200, string mime = "text/plain") {
@@ -96,6 +113,29 @@ namespace Estrol.X3Jam.Website {
             header.Append(resSize);
             header.Append(Environment.NewLine);
             header.Append(sData);
+            header.Append(Environment.NewLine);
+
+            byte[] hData = Encoding.ASCII.GetBytes(header.ToString());
+
+            ns.Write(hData, 0, hData.Length);
+            ns.Flush();
+
+            //Console.WriteLine("[DEBUG] Sending HTTP response!");
+            tc.Close();
+        }
+
+        public void Send_Cors() {
+            StringBuilder header = new StringBuilder();
+            string resHeader = string.Format("{0} {1}\r\n", this.header.HTTPVersion, HTTPStatus.GetResponseStatus(204));
+            header.Append(resHeader);
+            string res1 = string.Format("Connection: Keep-Alive");
+            header.Append(res1);
+            string res2 = string.Format("Access-Control-Allow-Origin: *");
+            header.Append(res2);
+            string res3 = string.Format("Access-Control-Allow-Methods: POST");
+            header.Append(res3);
+            string res4 = string.Format("Access-Control-Max-Age: 3600");
+            header.Append(res4);
             header.Append(Environment.NewLine);
 
             byte[] hData = Encoding.ASCII.GetBytes(header.ToString());

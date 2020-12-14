@@ -81,10 +81,33 @@ namespace Estrol.X3Jam.Server {
             }
         }
 
+        public bool Exists(string username) {
+            if (!m_ready) {
+                throw new Exception("DataNetwork is not ready! Please invoke .Intialized first!");
+            }
+
+            username = username.ToLower();
+
+            var cm = new SQLiteCommand(m_db) {
+                CommandText = "SELECT * FROM users WHERE username = ?"
+            };
+
+            cm.Parameters.Add(new SQLiteParameter("username", username));
+            var dr = cm.ExecuteReader(CommandBehavior.CloseConnection);
+
+            while (dr.Read()) {
+                return true;
+            }
+
+            return false;
+        } 
+
         public void Register(string username, string password) {
             if (!m_ready) {
                 throw new Exception("DataNetwork is not ready! Please invoke .Intialized first!");
             }
+
+            username = username.ToLower();
 
             byte[] salt = new byte[6];
             m_rng.GetBytes(salt);
@@ -98,7 +121,7 @@ namespace Estrol.X3Jam.Server {
                 CommandText = "INSERT INTO users(username, password, salt, nickname, master) VALUES(?,?,?,?,?)",
             };
 
-            List<SQLiteParameter> list = new List<SQLiteParameter>() {
+            SQLiteParameter[] parameters = {
                 new SQLiteParameter("username", username),
                 new SQLiteParameter("password", Convert.ToBase64String(hashed_password)),
                 new SQLiteParameter("salt", P(salt)),
@@ -106,7 +129,9 @@ namespace Estrol.X3Jam.Server {
                 new SQLiteParameter("master", false)
             };
 
-            cm.Parameters.Add(list);
+            for (int i = 0; i < parameters.Length; i++) {
+                cm.Parameters.Add(parameters[i]);
+            }
             cm.ExecuteNonQuery();
         }
 
@@ -114,6 +139,8 @@ namespace Estrol.X3Jam.Server {
             if (!m_ready) {
                 throw new Exception("DataNetwork is not ready! Please invoke .Intialized first!");
             }
+
+            username = username.ToLower();
 
             var cm = new SQLiteCommand(m_db) {
                 CommandText = "SELECT * FROM users WHERE username = ?"

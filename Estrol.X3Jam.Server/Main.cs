@@ -162,6 +162,24 @@ namespace Estrol.X3Jam.Server {
                     break;
                 }
 
+                case Packets.JoinRoom: {
+                    short roomID = BitConverter.ToInt16(PM.data, 3);
+                    Room room = RoomMG.GetRoomById(roomID);
+                    room.AddUser(c.UserInfo);
+
+                    var ns = new MemoryStream();
+                    using (var bw = new BinaryWriter(ns)) {
+                        bw.Write((short)0);
+                        bw.Write((short)0x0bbb);
+                        bw.Write(0); // padding?
+                        bw.Write((byte)roomID); // Room Position
+                        bw.Write((byte)0x0); // Idk need more data
+                        bw.Write(Encoding.UTF8.GetBytes(room.RoomName.ToCharArray())); // RoomName
+                    }
+
+                    break;
+                }
+
                 case Packets.GetRoom: new GetRoom(c, PM, this); break;
 
                 case Packets.GetChar: new PlayerCharacter(c, PM); break;

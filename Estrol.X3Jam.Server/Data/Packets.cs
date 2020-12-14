@@ -21,5 +21,6 @@
         RoomInit = 0x0fa4,
         ClientMSG = 0x07dc,
         ClientMSG2 = 0x0bc3,
+        JoinRoom = 0x0bba
     }
 }

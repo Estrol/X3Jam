@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -72,6 +72,14 @@ namespace Estrol.X3Jam.Server.Data {
         public void SendByteMessage(int num) {
             switch(num) {
                 case 1: {
+                    var ns = new MemoryStream();
+                    using (var bw = new BinaryWriter(ns)) {
+                        bw.Write((short)0);
+                        bw.Write((short)0x0bbc); // Player join room opcode
+
+
+                    }
+
                     for (int i = 0; i < Users.Length; i++) {
 
                     }
