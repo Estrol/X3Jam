@@ -15,7 +15,7 @@ namespace Estrol.X3Jam.Console {
                     System.Console.WriteLine("[Message] Welcome to X3-JAM. written by DMJam Dev Group (Estrol and MatVeiQaaa)\n"
                         + string.Format("[Message] Current time is {0}", DateTime.Now));
 
-                    ServerMain sm = new ServerMain();
+                    O2JamServer sm = new O2JamServer();
                     sm.Intialize();
 
                     WebMain wm = new WebMain(sm, 15000);

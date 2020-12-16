@@ -11,12 +11,12 @@ using Estrol.X3Jam.Server;
 namespace Estrol.X3Jam.Website {
     public class WebMain {
         public HTTPServer listener;
-        public ServerMain main;
+        public O2JamServer main;
         public int port;
 
         public bool loop = false;
 
-        public WebMain(ServerMain main, int port) {
+        public WebMain(O2JamServer main, int port) {
             this.main = main;
             this.port = port;
             listener = new HTTPServer(IPAddress.Any, port);
