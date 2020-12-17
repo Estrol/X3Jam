@@ -36,13 +36,17 @@ namespace Estrol.X3Jam.Server.CData {
     }
 
     public class Character {
+        public string Username { set; get; }
+        public string Nickname { set; get; }
+        public int Rank { set; get; }
+        public int Level { set; get; }
         public int Gender { set; get; } = 0;
         public int Instrument { set; get; } = 0;
         public int Hair { set; get; } = 0;
         public int Accessory { set; get; } = 0;
         public int Glove { set; get; } = 0;
         public int Necklace { set; get; } = 0;
-        public int Top { set; get; } = 0;
+        public int Cloth { set; get; } = 0;
         public int Pant { set; get; } = 0;
         public int Glass { set; get; } = 0;
         public int Earring { set; get; } = 0;
@@ -56,9 +60,9 @@ namespace Estrol.X3Jam.Server.CData {
 
         public int[] ToArray() => new[] {
             Instrument, Hair, Accessory, Glove,
-            Necklace, Top, Pant, Glass,
-            Earring, Shoe, Face, Wing,
-            HairAccessory, InstrumentAccessory, ClothAccessory, Pet
+            Necklace, Cloth, Pant, Glass,
+            Earring, ClothAccessory, Shoe, Face,
+            Wing, InstrumentAccessory, Pet, HairAccessory
         };
     }
 }

@@ -66,16 +66,18 @@ namespace Estrol.X3Jam.Server.CNetwork {
         }
 
         private void Server_OnAsyncData(IAsyncResult ar) {
+            Client state = (Client)ar.AsyncState;
+
+            state.m_length = BitConverter.ToUInt16(state.m_raw, 0);
+            state.m_data = new byte[state.Length];
+            Buffer.BlockCopy(state.m_raw, 0, state.Buffer, 0, state.Length);
+            state.m_raw = null;
+
+            if (OnServerMessage == null) return;
+            OnServerMessage(this, state);
+
             try {
-                Client state = (Client)ar.AsyncState;
-
-                state.m_length = BitConverter.ToUInt16(state.m_raw, 0);
-                state.m_data = new byte[state.Length];
-                Buffer.BlockCopy(state.m_raw, 0, state.Buffer, 0, state.Length);
-                state.m_raw = null;
-
-                if (OnServerMessage == null) return;
-                OnServerMessage(this, state);
+                
             } catch (Exception e) {
 #if DEBUG
                 throw;

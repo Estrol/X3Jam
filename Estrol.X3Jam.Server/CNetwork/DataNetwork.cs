@@ -30,27 +30,31 @@ namespace Estrol.X3Jam.Server.CNetwork {
             Log.Write("Preparing Database tables!");
             var cm = new SQLiteCommand(m_db);
 
-            cm.CommandText = @"CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY, username TEXT, password TEXT, salt TEXT, nickname TEXT, master BOOLEAN)";
+            cm.CommandText = "CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY, username TEXT, password TEXT, salt TEXT, nickname TEXT, master BOOLEAN)";
             cm.ExecuteNonQuery();
 
-            cm.CommandText = @"CREATE TABLE IF NOT EXISTS users_character(id INTEGER PRIMARY KEY, username TEXT,"
-                + "gender INTEGER,"
-                + "instrument INTEGER,"
-                + "hair INTEGER,"
-                + "accessory INTEGER,"
-                + "glove INTEGER,"
-                + "necklace INTEGER,"
-                + "top INTEGER,"
-                + "pant INTEGER,"
-                + "glass INTEGER,"
-                + "earring INTEGER,"
-                + "shoe INTEGER,"
-                + "face INTEGER,"
-                + "wing INTEGER,"
-                + "hairaccessory INTEGER,"
-                + "instrumentaccessory INTEGER,"
-                + "clothaccessory INTEGER,"
-                + "pet INTEGER)";
+            cm.CommandText = "CREATE TABLE IF NOT EXISTS users_info(id INTEGER PRIMARY KEY," +
+                "Username TEXT," +
+                "Nickname TEXT," +
+                "Level INTEGER," +
+                "Rank INTEGER," +
+                "Gender INTEGER," +
+                "Instrument INTEGER," +
+                "Hair INTEGER," + 
+                "Accessory INTEGER," +
+                "Glove INTEGER," +
+                "Necklace INTEGER," +
+                "Cloth INTEGER," +
+                "Pant INTEGER," +
+                "Glass INTEGER," +
+                "Earring INTEGER," +
+                "Shoe INTEGER," +
+                "Face INTEGER," +
+                "Wing INTEGER, " +
+                "HairAccessory INTEGER," +
+                "InstrumentAccessory INTEGER," +
+                "ClothAccessory INTEGER," +
+                "Pet INTEGER)";
             cm.ExecuteNonQuery();
 
 #if DEBUG
@@ -173,62 +177,86 @@ namespace Estrol.X3Jam.Server.CNetwork {
 
         public Character GetChar(string username) {
             var cm = new SQLiteCommand(m_db) {
-                CommandText = "SELECT * FROM users_character where username = ?"
+                CommandText = "SELECT * FROM users_info where Username = ?"
             };
 
-            cm.Parameters.Add(new SQLiteParameter("username", username));
+            cm.Parameters.Add(new SQLiteParameter("Username", username));
             var dr = cm.ExecuteReader(CommandBehavior.CloseConnection);
 
             while (dr.Read()) {
-                Character character = new Character() {
-                    Gender = (int)dr["gender"],
-                    Instrument = (int)dr["instrument"],
-                    Hair = (int)dr["hair"],
-                    Accessory = (int)dr["accessory"],
-                    Glove = (int)dr["glove"],
-                    Necklace = (int)dr["necklace"],
-                    Top = (int)dr["top"],
-                    Pant = (int)dr["pant"],
-                    Glass = (int)dr["glass"],
-                    Earring = (int)dr["earring"],
-                    Shoe = (int)dr["shoe"],
-                    Face = (int)dr["face"],
-                    Wing = (int)dr["wing"],
-                    HairAccessory = (int)dr["hairaccessory"],
-                    InstrumentAccessory = (int)dr["instrumentaccessory"],
-                    ClothAccessory = (int)dr["clothaccessory"],
-                    Pet = (int)dr["pet"]
-                };
+                Character character = new();
+                character.Username = (string)dr["Username"];
+                character.Nickname = (string)dr["Nickname"];
+                character.Level = DBGetI(dr, "Level");
+                character.Rank = DBGetI(dr, "Rank");
+                character.Gender = DBGetI(dr, "Gender");
+                character.Instrument = DBGetI(dr, "Instrument");
+                character.Hair = DBGetI(dr, "Hair");
+                character.Accessory = DBGetI(dr, "Accessory");
+                character.Glove = DBGetI(dr, "Glove");
+                character.Necklace = DBGetI(dr, "Necklace");
+                character.Cloth = DBGetI(dr, "Cloth");
+                character.Pant = DBGetI(dr, "Pant");
+                character.Glass = DBGetI(dr, "Glass");
+                character.Earring = DBGetI(dr, "Earring");
+                character.Shoe = DBGetI(dr, "Shoe");
+                character.Face = DBGetI(dr, "Face");
+                character.Wing = DBGetI(dr, "Wing");
+                character.HairAccessory = DBGetI(dr, "HairAccessory");
+                character.InstrumentAccessory = DBGetI(dr, "InstrumentAccessory");
+                character.ClothAccessory = DBGetI(dr, "ClothAccessory");
+                character.Pet = DBGetI(dr, "Pet");
 
                 return character;
             }
 
             var cm2 = new SQLiteCommand(m_db) {
-                CommandText = "INSERT INTO users_character(username,instrument," +
-                "hair,accessory,glove,necklace,top,pant,glass,earring," +
-                "shoe,face,wing,hairaccessory,instrumentaccessory,cl" +
-                "othaccessory,pet) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?," +
-                "?,?,?)"
+                CommandText = "INSERT INTO users_info("
+                    + "Username,"
+                    + "Nickname," 
+                    + "Rank,"
+                    + "Level,"
+                    + "Gender,"
+                    + "Instrument,"
+                    + "Hair,"
+                    + "Accessory,"
+                    + "Glove,"
+                    + "Necklace,"
+                    + "Cloth,"
+                    + "Pant,"
+                    + "Glass,"
+                    + "Earring,"
+                    + "Shoe,"
+                    + "Face,"
+                    + "Wing,"
+                    + "HairAccessory,"
+                    + "InstrumentAccessory,"
+                    + "ClothAccessory,"
+                    + "Pet) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
             };
 
             SQLiteParameter[] parameters = {
-                new SQLiteParameter("username", username),
-                new SQLiteParameter("instrument", 0),
-                new SQLiteParameter("hair", 0),
-                new SQLiteParameter("accessory", 0),
-                new SQLiteParameter("glove", 0),
-                new SQLiteParameter("necklace", 0),
-                new SQLiteParameter("top", 0),
-                new SQLiteParameter("pant", 0),
-                new SQLiteParameter("glass", 0),
-                new SQLiteParameter("earring", 0),
-                new SQLiteParameter("shoe", 0),
-                new SQLiteParameter("face", 36),
-                new SQLiteParameter("wing", 0),
-                new SQLiteParameter("hairaccessory", 0),
-                new SQLiteParameter("instrumentaccessory", 0),
-                new SQLiteParameter("clothaccessory", 0),
-                new SQLiteParameter("pet", 0),
+                new SQLiteParameter("Username", username),
+                new SQLiteParameter("Nickname", username),
+                new SQLiteParameter("Level", 0),
+                new SQLiteParameter("Rank", 0),
+                new SQLiteParameter("Gender", 0),
+                new SQLiteParameter("Instrument", 0),
+                new SQLiteParameter("Hair", 0),
+                new SQLiteParameter("Accessory", 0),
+                new SQLiteParameter("Glove", 0),
+                new SQLiteParameter("Necklace", 0),
+                new SQLiteParameter("Cloth", 0),
+                new SQLiteParameter("Pant", 0),
+                new SQLiteParameter("Glass", 0),
+                new SQLiteParameter("Earring", 0),
+                new SQLiteParameter("Shoe", 0),
+                new SQLiteParameter("Face", 36),
+                new SQLiteParameter("Wing", 0),
+                new SQLiteParameter("HairAccessory", 0),
+                new SQLiteParameter("InstrumentAccessory", 0),
+                new SQLiteParameter("ClothAccessory", 0),
+                new SQLiteParameter("Pet", 0),
             };
 
             for (int i = 0; i < parameters.Length; i++) {
@@ -237,6 +265,12 @@ namespace Estrol.X3Jam.Server.CNetwork {
 
             cm2.ExecuteNonQuery();
             return new Character();
+        }
+
+        public static int DBGetI(SQLiteDataReader dr, string name) {
+            var dbval = dr[name];
+            int val = dbval is DBNull ? 0 : Convert.ToInt32(dbval);
+            return val;
         }
 
         public static byte[] S(string hex) {

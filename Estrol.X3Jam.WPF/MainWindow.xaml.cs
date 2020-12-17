@@ -20,7 +20,7 @@ namespace Estrol.X3Jam.WPF {
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window {
-        private ServerMain Server;
+        private O2JamServer Server;
 
         public MainWindow() {
             InitializeComponent();
@@ -30,7 +30,7 @@ namespace Estrol.X3Jam.WPF {
 
             Console.SetOut(new MultiTextWriter(new RichTextBoxWritter(ConsoleWindow), Console.Out));
 
-            Server = new ServerMain();
+            Server = new O2JamServer();
             Server.Intialize();
         }
 

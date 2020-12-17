@@ -26,7 +26,7 @@ namespace Estrol.X3Jam.Server.CHandler {
             Write((long)0);
             Write(0);
 
-            Log.Write("[{0}@{1}] Server Music List", Client.UserInfo, Client.IPAddr);
+            Log.Write("[{0}@{1}] Server Music List", Client.UserInfo.Username, Client.IPAddr);
             Send();
         }
     }

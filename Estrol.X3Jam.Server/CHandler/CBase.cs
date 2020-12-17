@@ -24,6 +24,15 @@ namespace Estrol.X3Jam.Server.CHandler {
             m_writer = new BinaryWriter(m_stream);
         }
 
+        public CBase(Client client, bool stream) {
+            m_client = client;
+
+            if (stream) {
+                m_stream = new MemoryStream(8192);
+                m_writer = new BinaryWriter(m_stream);
+            }
+        }
+
         public abstract void Code();
 
         public void Handle() {
@@ -56,6 +65,15 @@ namespace Estrol.X3Jam.Server.CHandler {
         }
 
         private void _Send(byte[] data, short length) {
+            m_client.Send(data, length);
+        }
+
+        public void Send(byte[] data) {
+            short length = BitConverter.ToInt16(data, 0);
+            Send(data, length);
+        }
+
+        public void Send(byte[] data, short length) {
             m_client.Send(data, length);
         }
 

@@ -16,16 +16,11 @@ namespace Estrol.X3Jam.Server.Utils {
             ctor(capacity);
         }
 
-        public void SetL() {
-            m_bw.Seek(0, SeekOrigin.Begin);
-            m_bw.Write(m_ms.Length);
-
-            m_bw.Seek((int)m_ms.Length, SeekOrigin.End);
-        }
+        public void SetL() => SetL((int)m_ms.Length);
 
         public void SetL(int length) {
             m_bw.Seek(0, SeekOrigin.Begin);
-            m_bw.Write(length);
+            m_bw.Write((short)length);
 
             m_bw.Seek((int)m_ms.Length, SeekOrigin.End);
         }

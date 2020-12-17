@@ -8,10 +8,9 @@ namespace Estrol.X3Jam.Server.CHandler {
         public override void Code() {
             Write((short)0);
             Write((short)0x7d1);
-            Write((short)0);
+            Write(0);
             Write(Client.UserInfo.Nickname);
-            Write((byte)0x00);
-            Write((byte)0x01); // Female Character
+            Write((byte)Client.UserInfo.Char.Gender); // Female Character
 
             Write(new byte[] {
                 0xC6, 0xF5, 0x02, 0x00, 0x96, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x9a, 0x02, 0x00, 0x00,

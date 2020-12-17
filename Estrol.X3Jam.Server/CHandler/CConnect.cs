@@ -2,8 +2,8 @@
 using Estrol.X3Jam.Utility;
 
 namespace Estrol.X3Jam.Server.CHandler {
-    public class CRoomSongID : CBase {
-        public CRoomSongID(Client client) : base(client) { }
+    public class CConnect : CBase {
+        public CConnect(Client client) : base(client) { }
 
         public override void Code() {
             Write(new byte[] {

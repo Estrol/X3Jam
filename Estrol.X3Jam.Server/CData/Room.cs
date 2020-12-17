@@ -29,6 +29,7 @@ namespace Estrol.X3Jam.Server.CData {
                 user
             };
 
+            this.SongID = 0;
             this.MaxUser = 8;
             this.CurrentUser = 1;
         }

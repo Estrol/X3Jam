@@ -1,4 +1,5 @@
 ﻿using Estrol.X3Jam.Server.CData;
+using Estrol.X3Jam.Utility;
 using System;
 
 namespace Estrol.X3Jam.Server.CHandler {
@@ -14,6 +15,7 @@ namespace Estrol.X3Jam.Server.CHandler {
             m_client.UserInfo.MusicCount = list;
 
             Write(new byte[] { 0x04, 0x00, 0xe9, 0x07 });
+            Log.Write("[{0}@{1}] Client Music List", Client.UserInfo.Username, Client.IPAddr);
             Send();
         }
     }

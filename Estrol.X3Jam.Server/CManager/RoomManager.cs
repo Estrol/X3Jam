@@ -10,7 +10,7 @@ namespace Estrol.X3Jam.Server.CManager {
         private Room[] Rooms;
 
         public RoomManager() {
-            Rooms = new Room[] {};
+            Rooms = Array.Empty<Room>();
         }
 
         public int EmptyID() {
@@ -30,7 +30,7 @@ namespace Estrol.X3Jam.Server.CManager {
         }
 
         public bool Add(Room room) {
-            List<Room> itr = new List<Room>(Rooms) {
+            List<Room> itr = new(Rooms) {
                 room
             };
 
@@ -39,7 +39,7 @@ namespace Estrol.X3Jam.Server.CManager {
         }
 
         public bool Remove(Room room) {
-            List<Room> itr = new List<Room>(Rooms);
+            List<Room> itr = new(Rooms);
             itr.Remove(room);
 
             Rooms = itr.ToArray();

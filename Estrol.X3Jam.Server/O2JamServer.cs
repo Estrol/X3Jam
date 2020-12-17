@@ -59,7 +59,7 @@ namespace Estrol.X3Jam.Server {
             CBase handler;
             switch (message.opcode) {
                 case ClientPacket.Connect:
-                    handler = new CRoomSongID(client);
+                    handler = new CConnect(client);
                     handler.Handle();
                     break;
 
@@ -94,7 +94,7 @@ namespace Estrol.X3Jam.Server {
                     break;
 
                 case ClientPacket.SetSongID:
-                    handler = new CRoomSongID(client);
+                    handler = new CRoomMusicID(client);
                     handler.Handle();
                     break;
 
