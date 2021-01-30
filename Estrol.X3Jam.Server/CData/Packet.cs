@@ -12,8 +12,8 @@ namespace Estrol.X3Jam.Server.CData {
         public Packet(Client state) {
             m_connection = state;
 
-            m_MemoryStream = new MemoryStream();
-            m_BinaryWriter = new BinaryWriter(m_MemoryStream);
+            m_MemoryStream = new();
+            m_BinaryWriter = new(m_MemoryStream);
         }
 
         /// <summary>

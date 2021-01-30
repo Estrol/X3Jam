@@ -6,9 +6,9 @@ namespace Estrol.X3Jam.Server.CHandler {
     public class CPlanetLogin: CBase {
         public CPlanetLogin(Client client) : base(client) { }
         public override void Code() {
-            string[] UserAuth = DataUtils.GetUserAuthentication(m_client.Message.data);
+            string[] UserAuth = DataUtils.GetUserAuthentication(Client.Message.data);
 
-            User usr = m_client.Main.Database.Login(UserAuth[0], UserAuth[1]);
+            User usr = Client.Main.Database.Login(UserAuth[0], UserAuth[1]);
             if (usr == null) {
                 Write(new byte[] {
                     0x08, 0x00, 0xf0, 0x03, 0xff, 0xff, 0xff, 0xff
@@ -20,11 +20,11 @@ namespace Estrol.X3Jam.Server.CHandler {
                     0x08, 0x00, 0xe9, 0x03, 0x00, 0x00, 0x00, 0x00
                 });
 
-                Log.Write("[{0}@{1}] Resuming session.", UserAuth[0], m_client.IPAddr);
+                Log.Write("[{0}@{1}] Resuming session.", UserAuth[0], Client.IPAddr);
             }
 
-            usr.Connection = m_client;
-            m_client.m_user = usr;
+            usr.Connection = Client;
+            Client.m_user = usr;
 
             Send();
         }

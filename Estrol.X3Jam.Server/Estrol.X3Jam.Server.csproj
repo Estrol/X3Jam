@@ -9,7 +9,6 @@
 	  <PackageReference Include="System.Data.SQLite" Version="1.0.113.6" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\Estrol.X3Jam.Log\Estrol.X3Jam.Utility.csproj" />
 	  <ProjectReference Include="..\Estrol.X3Jam.Utility\Estrol.X3Jam.Utility.csproj" />
 	</ItemGroup>
 </Project>

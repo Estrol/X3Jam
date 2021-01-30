@@ -57,5 +57,9 @@ namespace Estrol.X3Jam.Server.Utils {
 
             return Encoding.UTF8.GetString(buf);
         }
+
+        public static TV GetValue<TK, TV>(this Dictionary<TK, TV> dict, TK key, TV defaultValue = default) {
+            return dict.TryGetValue(key, out TV value) ? value : defaultValue;
+        }
     }
 }

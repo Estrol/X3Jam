@@ -3,69 +3,68 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Estrol.X3Jam.Server.CData;
+using Estrol.X3Jam.Server.CManager;
 
 namespace Estrol.X3Jam.Server.CHandler {
     public abstract class CBase {
-        private MemoryStream m_stream;
-        private BinaryWriter m_writer;
-        public Client m_client;
-
-        public Client Client => m_client;
-        public MemoryStream Stream => m_stream;
-        public BinaryWriter Writer => m_writer;
+        public Client Client { get; private set; } 
+        public O2JamServer Main { get; private set; }
+        public MemoryStream Stream { get; private set; }
+        public BinaryWriter Writer { get; private set; }
+        public RoomManager RoomManager { get; private set; }
+        public ChanManager ChanManager { get; private set; }
 
         /// <summary>
         /// Intialize Client handler
         /// </summary>
         public CBase(Client client) {
-            m_client = client;
-
-            m_stream = new MemoryStream(8192);
-            m_writer = new BinaryWriter(m_stream);
+            Intialize(client, true);
         }
 
         public CBase(Client client, bool stream) {
-            m_client = client;
+            Intialize(client, stream);
+        }
+
+        public void Intialize(Client client, bool stream) {
+            Client = client;
+            Main = Client.Main;
+            ChanManager = Client.Main.ChannelManager;
+            if (Client.UserInfo != null && Client.UserInfo.ChannelID != -1) {
+                RoomManager = ChanManager.GetChannelByID(Client.UserInfo.ChannelID).RManager;
+            }
 
             if (stream) {
-                m_stream = new MemoryStream(8192);
-                m_writer = new BinaryWriter(m_stream);
+                Stream = new MemoryStream(8192);
+                Writer = new BinaryWriter(Stream);
             }
         }
 
         public abstract void Code();
 
-        public void Handle() {
-#if DEBUG
-            Code();
-#else
-            try {
-                Code();
-            } catch (Exception) {
-                throw;
-            }
-#endif
-        }
+        /// <summary>
+        /// Execute Code() function;
+        /// </summary>
+        public void Handle() => Code();
         
         /// <summary>
         /// Send the data with length of 2 first byte data
         /// </summary>
         public void Send() {
-            byte[] data = m_stream.ToArray();
+            byte[] data = Stream.ToArray();
             short length = BitConverter.ToInt16(data, 0);
-            _Send(data, length);
+            TSend(data, length);
         }
 
         /// <summary>
         /// Send the data with specific length
         /// </summary>
         public void Send(short length) {
-            byte[] data = m_stream.ToArray();
-            _Send(data, length);
+            byte[] data = Stream.ToArray();
+            TSend(data, length);
         }
 
-        private void _Send(byte[] data, short length) {
-            m_client.Send(data, length);
+        private void TSend(byte[] data, short length) {
+            Client.Send(data, length);
         }
 
         public void Send(byte[] data) {
@@ -73,41 +72,39 @@ namespace Estrol.X3Jam.Server.CHandler {
             Send(data, length);
         }
 
-        public void Send(byte[] data, short length) {
-            m_client.Send(data, length);
-        }
+        public void Send(byte[] data, short length) => Client.Send(data, length);
 
         // Single data types
-        
+
         /// <summary>
         /// Write short into array
         /// </summary>
         /// <param name="val"></param>
-        public void Write(short val) => m_writer.Write(val);
+        public void Write(short val) => Writer.Write(val);
 
         /// <summary>
         /// Write int32 to array
         /// </summary>
         /// <param name="val"></param>
-        public void Write(int val) => m_writer.Write(val);
+        public void Write(int val) => Writer.Write(val);
 
         /// <summary>
         /// Write double to array
         /// </summary>
         /// <param name="val"></param>
-        public void Write(double val) => m_writer.Write(val);
+        public void Write(double val) => Writer.Write(val);
 
         /// <summary>
         /// Write char to array
         /// </summary>
         /// <param name="val"></param>
-        public void Write(char val) => m_writer.Write(val);
+        public void Write(char val) => Writer.Write(val);
 
         /// <summary>
         /// Write byte to array
         /// </summary>
         /// <param name="val"></param>
-        public void Write(byte val) => m_writer.Write(val);
+        public void Write(byte val) => Writer.Write(val);
 
         // Array data types
 
@@ -115,13 +112,13 @@ namespace Estrol.X3Jam.Server.CHandler {
         /// Write byte[] to array
         /// </summary>
         /// <param name="val"></param>
-        public void Write(byte[] val) => m_writer.Write(val);
+        public void Write(byte[] val) => Writer.Write(val);
 
         /// <summary>
         /// Write char[] to array
         /// </summary>
         /// <param name="val"></param>
-        public void Write(char[] val) => m_writer.Write(val);
+        public void Write(char[] val) => Writer.Write(val);
 
         // String based type
 
@@ -141,16 +138,22 @@ namespace Estrol.X3Jam.Server.CHandler {
             data = data.Concat(new char[1]).ToArray();
 
             byte[] bData = encoding.GetBytes(data);
-            m_writer.Write(bData);
+            Writer.Write(bData);
         }
 
-        public void SetL() => SetL((int)m_stream.Length);
+        /// <summary>
+        /// Set first 2 byte of the stream length into stream
+        /// </summary>
+        public void SetL() => SetL((int)Stream.Length);
 
+        /// <summary>
+        /// Set first 2 byte of the stream length into stream
+        /// </summary>
         public void SetL(int length) {
-            m_writer.Seek(0, SeekOrigin.Begin);
-            m_writer.Write((short)length);
+            Writer.Seek(0, SeekOrigin.Begin);
+            Writer.Write((short)length);
 
-            m_writer.Seek((int)m_stream.Length, SeekOrigin.End);
+            Writer.Seek((int)Stream.Length, SeekOrigin.End);
         }
     }
 }

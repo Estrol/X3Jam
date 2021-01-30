@@ -13,10 +13,8 @@ namespace Estrol.X3Jam.Server {
     public class O2JamServer {
         public Configuration Config;
         public DataNetwork Database;
-        public RoomManager RoomManager;
         public ChanManager ChannelManager;
         public TCPServer Server;
-
 
         public string[] StaticOpcode = {
             "Connect", "Login",
@@ -29,23 +27,34 @@ namespace Estrol.X3Jam.Server {
         }
 
         public void Intialize() {
-            Config = new Configuration();
-
-            ChannelManager = new ChanManager(this);
-            RoomManager = new RoomManager();
-            Database = new DataNetwork();
+            Config = new();
+            ChannelManager = new(this);
+            Database = new();
             Database.Intialize();
 
             short port = short.Parse(Config.Get("GamePort"));
-            Server = new TCPServer(port);
+
+            Server = new(port);
             Server.OnServerMessage += TCPMessage;
             Server.Start();
         }
 
         public void TCPMessage(object o, Client client) {
-            CMessage message = new CMessage(client.Buffer);
+            CMessage message = new(client, client.Buffer);
             client.Message = message;
             client.Main = this;
+
+            if (message.IsFailed) {
+                if (client.UserInfo != null) {
+                    Channel ch = client.Main.ChannelManager.GetChannelByID(client.UserInfo.ChannelID);
+                    if (ch != null) {
+                        ch.RemoveUser(client.UserInfo);
+                    }
+                }
+
+                client.m_socket.Disconnect(true);
+                return;
+            }
 
             string name = Enum.GetName(typeof(ClientPacket), message.opcode);
             if (name != null && !StaticOpcode.Contains(name)) {
@@ -135,6 +144,11 @@ namespace Estrol.X3Jam.Server {
 
                 case ClientPacket.ClientList:
                     handler = new CMusicList(client);
+                    handler.Handle();
+                    break;
+
+                case ClientPacket.RoomRingChange:
+                    handler = new CRoomRingChange(client);
                     handler.Handle();
                     break;
 

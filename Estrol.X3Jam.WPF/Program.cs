@@ -8,10 +8,8 @@ using System.Windows;
 
 namespace Estrol.X3Jam.WPF {
     public class Program : Application {
-
         static void Main() {
-            bool createNew = true;
-            using Mutex mutex = new Mutex(true, "X3JAMSERVER", out createNew);
+            using Mutex mutex = new(true, "X3JAMSERVER", out var createNew);
             if (createNew) {
                 Program pg = new Program();
                 pg.IntializeComponent();

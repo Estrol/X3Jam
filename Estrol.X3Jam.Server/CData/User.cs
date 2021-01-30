@@ -13,10 +13,11 @@ namespace Estrol.X3Jam.Server.CData {
         public int Level { set; get; }
         public byte[] MusicCount { set; get; }
         public int MusicLength { set; get; }
-        public int ChannelID { set; get; }
+        public int ChannelID { set; get; } = -1;
         public Client Connection { set; get; }
-        public int Room { set; get; }
+        public int Room { set; get; } = -1;
         public Character Char { set; get; }
+        public int Ready { set; get; } = 0;
 
         public User(string[] auth, Character character) {
             Nickname = auth[0];

@@ -23,7 +23,7 @@ namespace Estrol.X3Jam.Server.CManager {
                 string[] split_data = data.Split(new[] { ',' });
 
                 try {
-                    Channel ch = new Channel(i + 1, split_data[0], int.Parse(split_data[1]));
+                    Channel ch = new Channel(main, this, i + 1, split_data[0], int.Parse(split_data[1]));
                     itrs.Add(ch);
 
                     ChannelCount++;
@@ -46,7 +46,7 @@ namespace Estrol.X3Jam.Server.CManager {
                 Log.Write("One of channels failed to load try checking if OJNList.dat is defined!");
             }
 
-            Log.Write("Loaded like {0} channels", ChannelCount);
+            Log.Write("::Channels -> {0} Loaded!", ChannelCount);
         }
 
         public Channel GetChannelByID(int ID) {

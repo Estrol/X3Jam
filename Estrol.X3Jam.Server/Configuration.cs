@@ -25,7 +25,7 @@ namespace Estrol.X3Jam.Server {
             }
 
             ini = new INILoader(AppDomain.CurrentDomain.BaseDirectory + @"\conf\server.conf");
-            Log.Write("Configuration loaded.");
+            Log.Write("::Config -> Loaded!");
         }
 
         public string Get(string section) {

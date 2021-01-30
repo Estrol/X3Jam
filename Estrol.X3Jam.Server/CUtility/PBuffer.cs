@@ -9,11 +9,11 @@ namespace Estrol.X3Jam.Server.Utils {
         private BinaryWriter m_bw;
 
         public PBuffer() {
-            ctor(8124);
+            BufferIntialize(8192);
         }
 
         public PBuffer(int capacity) {
-            ctor(capacity);
+            BufferIntialize(capacity);
         }
 
         public void SetL() => SetL((int)m_ms.Length);
@@ -29,7 +29,7 @@ namespace Estrol.X3Jam.Server.Utils {
             return m_ms.ToArray();
         }
 
-        private void ctor(int c) {
+        private void BufferIntialize(int c) {
             m_ms = new MemoryStream(c);
             m_bw = new BinaryWriter(m_ms);
         }
@@ -42,7 +42,7 @@ namespace Estrol.X3Jam.Server.Utils {
 
         public void WriteD(double val)  => m_bw.Write(val);
          
-        public void WriteBB(byte val)    => m_bw.Write(val);
+        public void WriteBB(byte val)   => m_bw.Write(val);
 
         public void WriteS(short val)   => m_bw.Write(val);
 

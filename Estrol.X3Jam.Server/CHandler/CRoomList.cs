@@ -1,64 +1,65 @@
-﻿using System.IO;
+﻿using System.Data.Entity.Core.Metadata.Edm;
+using System.IO;
+using System.Text;
 using Estrol.X3Jam.Server.CData;
+using Estrol.X3Jam.Server.CUtility;
 using Estrol.X3Jam.Server.Utils;
+using Estrol.X3Jam.Utility;
 
 namespace Estrol.X3Jam.Server.CHandler {
     public class CRoomList: CBase {
         public CRoomList(Client client) : base(client, false) { }
 
         public override void Code() {
-            Channel channel = m_client.Main.ChannelManager.GetChannelByID(m_client.UserInfo.ChannelID);
+            Channel channel = ChanManager.GetChannelByID(Client.UserInfo.ChannelID);
             User[] users = channel.GetUsers();
 
-            PBuffer buf = new PBuffer();
-            buf.WriteS(0);
-            buf.WriteS(0x7db);
-            buf.WriteI(0);
+            PacketBuffer buf = new(); // First Stream
+            buf.Write((short)0);
+            buf.Write((short)0x7db);
+            buf.Write(0);
 
             foreach (User user in users) {
-                buf.WriteStr(user.Info[0]);
-                buf.WriteStr(user.Info[1]);
-                buf.WriteI(1);
+                buf.Write(user.Info[0]);
+                buf.Write(user.Info[1]);
+                buf.Write(1);
             }
 
-            buf.SetL();
+            buf.SetLength();
             Send(buf.ToArray());
 
-            PBuffer buf2 = new PBuffer();
-            buf2.WriteS(0);
-            buf2.WriteS(0x7d3);
-            buf2.WriteI(120);
+            buf.Stream.SetLength(0); // Reset Stream;
+            buf.Write((short)0);
+            buf.Write((short)0x7d3);
+            buf.Write(channel.m_MaxRoom);
 
-            int count = 0;
-            for (int i = 0; i < 120; i++) {
-                Room room = m_client.Main.RoomManager.GetIndex(count);
+            for (int i = 0; i < channel.m_MaxRoom; i++) {
+                Room room = RoomManager.GetIndex(i);
 
                 if (room != null && room.RoomID == i) {
-                    buf2.WriteI(room.RoomID);
-                    buf2.WriteBB(0x02);
-                    buf2.WriteStr(room.RoomName);
-                    buf2.WriteBB(0x10);
-                    buf2.WriteBB(0x00);
-                    buf2.WriteBB(room.PasswordFlag);
-                    buf2.WriteS((short)room.SongID);
-                    buf2.WriteBB(0x00);
-                    buf2.WriteBB((byte)room.MaxUser);
-                    buf2.WriteBB((byte)room.CurrentUser);
-                    buf2.WriteL(0);
-
-                    count++;
+                    buf.Write(room.RoomID);
+                    buf.Write((byte)room.IsPlaying); //waiting or playing
+                    buf.Write(room.RoomName, Encoding.UTF8);
+                    buf.Write((byte)0x00);
+                    buf.Write((short)room.SongID);
+                    buf.Write((byte)0x00);
+                    buf.Write((byte)room.MaxUser);
+                    buf.Write((byte)room.CurrentUser);
+                    buf.Write(new byte[8]);
                 } else {
-                    buf2.WriteBB(8);
-                    buf2.WriteBA(new byte[11]);
-                    buf2.WriteBB(0xff);
-                    buf2.WriteBA(new byte[9]);
+                    buf.Write((byte)i);
+                    buf.Write(new byte[11]);
+                    buf.Write((byte)0xff);
+                    buf.Write(new byte[9]);
                 }
             }
 
-            buf2.WriteBB(0xff);
-            buf2.WriteBA(new byte[11]);
-            buf2.SetL();
-            Send(buf2.ToArray());
+            buf.Write((byte)0xff);
+            buf.Write(new byte[11]);
+            buf.SetLength();
+
+            Log.Write("[{0}@{1}] Room List.", Client.UserInfo.Username, Client.IPAddr);
+            Send(buf.ToArray());
         }
     }
 }

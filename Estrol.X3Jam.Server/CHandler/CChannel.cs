@@ -8,38 +8,28 @@ namespace Estrol.X3Jam.Server.CHandler {
         public override void Code() {
             Write((short)0x00); 
             Write(new byte[] {
-                0xEB, 0x03, 0x2C, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-                0x00, 0x00
+                0xEB, 0x03, 0x2C, 0x01, 0x00, 0x00, 0x00, 0x00
             });
 
-            for (int i = 0; i < 20; i++) {
-                Channel ch = m_client.Main.ChannelManager.GetChannelByID(i + 1);
+            for (int i = 0; i < 40; i++) {
+                Channel ch = Client.Main.ChannelManager.GetChannelByID(i + 1);
 
                 if (ch != null) {
-                    Write(new byte[] {
-                        0x01, // Wth?
-                        0x00,
-                        0x00,
-                        (byte)(ch.m_ChannelID - 1), // ChannelID
-                        (byte)ch.m_MaxRoom, // Channel Max Rooms: 120
-                        0x2e, // Channel current rooms;
-                        0x00,
-                        0x00,
-                        0x00,
-                        0x00,
-                        0x00,
-                        0x00,
-                        0x00
-                    });
+                    Write((short)(ch.m_ChannelID - 1));
+                    Write((short)ch.m_MaxRoom);
+                    Write((short)0);
+                    Write((short)ch.Count); // Current users
+                    Write((short)0);
+                    Write((short)1); // idk
+                    Write((byte)0); // Padding?
                 } else {
                     Write(new byte[13]);
                 }
             }
 
-            Write(Properties.Resources.Channel);
             SetL();
 
-            Log.Write("[{0}@{1}] Get channel list.", m_client.UserInfo.Username, m_client.IPAddr);
+            Log.Write("[{0}@{1}] Get channel list.", Client.UserInfo.Username, Client.IPAddr);
             Send();
         }
     }

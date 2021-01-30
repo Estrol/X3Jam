@@ -7,7 +7,6 @@
 		<Platforms>AnyCPU;x64</Platforms>
 		<ApplicationIcon>Icon.ico</ApplicationIcon>
 		<AssemblyName>X3Console</AssemblyName>
-		<NoWin32Manifest>true</NoWin32Manifest>
 		<Authors>Estrol</Authors>
 	</PropertyGroup>
 	<ItemGroup>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Estrol.X3Jam.Utility {
     public static class Log {
@@ -16,6 +17,7 @@ namespace Estrol.X3Jam.Utility {
             string time = DateTime.Now.ToString("HH:mm:ss:ff");
 
             Console.WriteLine("[{0}] {1}", time, content);
+            Debug.WriteLine("[{0}] {1}", time, content);
         }
     }
 }

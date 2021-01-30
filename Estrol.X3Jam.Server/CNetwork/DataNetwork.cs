@@ -27,7 +27,6 @@ namespace Estrol.X3Jam.Server.CNetwork {
         }
 
         public void Intialize() {
-            Log.Write("Preparing Database tables!");
             var cm = new SQLiteCommand(m_db);
 
             cm.CommandText = "CREATE TABLE IF NOT EXISTS users(id INTEGER PRIMARY KEY, username TEXT, password TEXT, salt TEXT, nickname TEXT, master BOOLEAN)";
@@ -68,7 +67,7 @@ namespace Estrol.X3Jam.Server.CNetwork {
 #endif
 
             m_ready = true;
-            Log.Write("Database finish prepared!");
+            Log.Write("::Database -> Loaded!");
         }
 
         public int PlayerCount {

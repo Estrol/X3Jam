@@ -21,7 +21,7 @@ namespace Estrol.X3Jam.Server.CNetwork {
 
         public void Start() {
             m_ServerSocket.Listen(m_gamePort);
-            Log.Write("Server now listening for connections in port: {0}", m_gamePort);
+            Log.Write("::Server -> Ready! -> Now listening at port {0}", m_gamePort);
 
             m_ServerSocket.BeginAccept(Server_OnAsyncConnection, m_ServerSocket);
         }
@@ -75,15 +75,6 @@ namespace Estrol.X3Jam.Server.CNetwork {
 
             if (OnServerMessage == null) return;
             OnServerMessage(this, state);
-
-            try {
-                
-            } catch (Exception e) {
-#if DEBUG
-                throw;
-#endif
-                HandleException(e);
-            }
         }
 
         private void HandleException(Exception e) {

@@ -1,23 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
+using Estrol.X3Jam.Server.CManager;
 using Estrol.X3Jam.Server.OJNData;
 
 namespace Estrol.X3Jam.Server.CData {
     public class Channel {
+        public O2JamServer Main;
+        public ChanManager CManager;
+        public RoomManager RManager;
+
         private OJNList m_MusicList;
         private User[] m_Users;
 
         public int m_ChannelID;
         public int m_MaxRoom;
-        public int m_CurrentRoom;
 
-        public Channel(int ID, string MusicList, int MaxRoom) {
-            m_Users = new User[] { };
-            m_CurrentRoom = 0;
+        public Channel(O2JamServer Main, ChanManager CManager, int ID, string MusicList, int MaxRoom) {
+            this.Main = Main;
+            this.CManager = CManager;
+            this.RManager = new RoomManager(Main, this);
+
+            m_Users = Array.Empty<User>();
             m_ChannelID = ID;
             m_MaxRoom = MaxRoom;
             m_MusicList = OJNListDecoder.Decode(AppDomain.CurrentDomain.BaseDirectory + @"\conf\musiclist\" + MusicList);
         }
+
+        public int Count => RManager.Count;
 
         public OJN[] GetMusicList() {
             return m_MusicList.GetHeaders();
