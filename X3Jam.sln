@@ -20,6 +20,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Estrol.X3Jam.Utility", "Est
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Estrol.X3Jam.Console", "Estrol.X3Jam.Console\Estrol.X3Jam.Console.csproj", "{7BA17CF9-F145-4ADF-B5DA-8F71B8E9C967}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Estrol.X3Jam.Launcher", "Estrol.X3Jam.Launcher\Estrol.X3Jam.Launcher.csproj", "{4FD38057-42C3-442D-AD71-5B95474E97C8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -90,6 +92,18 @@ Global
 		{7BA17CF9-F145-4ADF-B5DA-8F71B8E9C967}.Release|x64.Build.0 = Release|x64
 		{7BA17CF9-F145-4ADF-B5DA-8F71B8E9C967}.Release|x86.ActiveCfg = Release|Any CPU
 		{7BA17CF9-F145-4ADF-B5DA-8F71B8E9C967}.Release|x86.Build.0 = Release|Any CPU
+		{4FD38057-42C3-442D-AD71-5B95474E97C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4FD38057-42C3-442D-AD71-5B95474E97C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4FD38057-42C3-442D-AD71-5B95474E97C8}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4FD38057-42C3-442D-AD71-5B95474E97C8}.Debug|x64.Build.0 = Debug|Any CPU
+		{4FD38057-42C3-442D-AD71-5B95474E97C8}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4FD38057-42C3-442D-AD71-5B95474E97C8}.Debug|x86.Build.0 = Debug|Any CPU
+		{4FD38057-42C3-442D-AD71-5B95474E97C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4FD38057-42C3-442D-AD71-5B95474E97C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4FD38057-42C3-442D-AD71-5B95474E97C8}.Release|x64.ActiveCfg = Release|Any CPU
+		{4FD38057-42C3-442D-AD71-5B95474E97C8}.Release|x64.Build.0 = Release|Any CPU
+		{4FD38057-42C3-442D-AD71-5B95474E97C8}.Release|x86.ActiveCfg = Release|Any CPU
+		{4FD38057-42C3-442D-AD71-5B95474E97C8}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

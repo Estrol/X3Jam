@@ -7,6 +7,7 @@ using System.Text;
 
 using Estrol.X3Jam.Server;
 using Estrol.X3Jam.Website;
+using System.Runtime.InteropServices;
 
 namespace Estrol.X3Jam.Console {
     public class Program {
@@ -26,10 +27,15 @@ namespace Estrol.X3Jam.Console {
                 NeverReturn.Start();
                 NeverReturn.GetAwaiter().GetResult();
             } else {
+#if _WINDOWS
+                MessageBox(IntPtr.Zero, "The server program already open!\nIf you want enable multiple server please set multi-server to 1 in config!", "Error", (uint)0x00000010L);
+#else
+
                 System.Console.WriteLine("ERROR: The server program already open!");
                 System.Console.WriteLine("ERROR: If you want enable multi server please set multi-server to 1 in config");
                 System.Console.WriteLine("ERROR: Press any key to continue");
                 System.Console.ReadKey();
+#endif
             }
         }
         
@@ -47,6 +53,8 @@ namespace Estrol.X3Jam.Console {
             System.Console.WriteLine(logo);
             System.Console.WriteLine("\nX3Jam Server Developer version (c) 2021 Estrol's Group Developers (Estrol and MatVeiQaa)");
             System.Console.WriteLine(string.Format("Current time is {0}\n", DateTime.Now));
+            System.Console.WriteLine("Server Version: alpha-0.3 build #0012");
+            System.Console.WriteLine();
         }
 
         public static void CopyTo(Stream src, Stream dest)
@@ -72,5 +80,8 @@ namespace Estrol.X3Jam.Console {
 
             return Encoding.UTF8.GetString(mso.ToArray());
         }
+
+        [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+        public static extern int MessageBox(IntPtr hWnd, String text, String caption, uint type);
     }
 }
