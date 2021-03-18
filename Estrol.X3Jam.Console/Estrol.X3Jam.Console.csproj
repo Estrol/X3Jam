@@ -3,11 +3,12 @@
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net5.0</TargetFramework>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-		<StartupObject>Estrol.X3Jam.Console.Program</StartupObject>
+		<StartupObject>Estrol.X3Jam.IConsole.Program</StartupObject>
 		<Platforms>AnyCPU;x64</Platforms>
 		<ApplicationIcon>Icon.ico</ApplicationIcon>
 		<AssemblyName>X3Console</AssemblyName>
 		<Authors>Estrol</Authors>
+		<RootNamespace>Estrol.X3Jam.IConsole</RootNamespace>
 	</PropertyGroup>
 	<ItemGroup>
 	  <None Remove="Resources\Icon.ico" />

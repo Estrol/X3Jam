@@ -5,8 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Estrol.X3Jam.Server.CData {
-    public enum RoomStatus : byte {
-        Playing = 0x00,
-        Waiting = 0x01
+    public enum RoomMode : byte {
+        Solo = 0x0,
+        VS = 0x1,
+        Unknown = 0x2,
+        JAM = 0x3
     }
 }

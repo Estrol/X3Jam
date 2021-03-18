@@ -3,6 +3,7 @@ using Estrol.X3Jam.Server.CUtility;
 using Estrol.X3Jam.Server.Utils;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity.Core.Objects.DataClasses;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,19 +13,43 @@ namespace Estrol.X3Jam.Server.CManager {
         private O2JamServer Server;
         private Channel Channel;
         private Dictionary<int, Room> Rooms;
+        private int MaxRoom;
 
-        public RoomManager(O2JamServer svr, Channel ch) {
+        public RoomManager(O2JamServer svr, Channel ch, int _MaxRoom) {
             Channel = ch;
             Server = svr;
 
-            Rooms = new(120);
+            Rooms = new(_MaxRoom);
+            MaxRoom = _MaxRoom;
+
+            Rooms.Add(0, new(
+                this,
+                0,
+                "TEST",
+                441,
+                new User(new string[] { "Hello", "World" }, new()),
+                0,
+                "Ass",
+                0x1)
+            );
+
+            Rooms.Add(1, new(
+                this,
+                1,
+                "TEST",
+                441,
+                new User(new string[] { "Hello1", "World1" }, new()),
+                0,
+                "Ass",
+                0x1)
+            );
         }
 
         public int Count => Rooms.Count;
 
         public int EmptyID() {
             int count = 0;
-            for (int i = 0; i < 120; i++) {
+            for (int i = 0; i < MaxRoom; i++) {
                 Room room = GetIndex(i);
 
                 if (room?.RoomID == i) {
@@ -56,7 +81,7 @@ namespace Estrol.X3Jam.Server.CManager {
         }
 
         public Room GetIndex(int index) {
-            if (index > Rooms.Count) return null;
+            if (index + 1 > Rooms.Count) return null;
 
             return Rooms.GetValue(index);
         }

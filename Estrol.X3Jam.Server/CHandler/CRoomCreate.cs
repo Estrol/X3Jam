@@ -10,7 +10,7 @@ namespace Estrol.X3Jam.Server.CHandler {
             string Name = DataUtils.GetString(Client.Message.data);
 
             int roomID = RoomManager.EmptyID();
-            Room room = new Room(RoomManager, roomID, Name, Client.UserInfo, 0x0);
+            Room room = new(RoomManager, roomID, Name, 0x0, Client.UserInfo, 0x0);
 
             Log.Write("[{0}@{1}] Create a room with name: \"{2}\" at position: {3}, in channel: {4}",
                 Client.UserInfo.Username,

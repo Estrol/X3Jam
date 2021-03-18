@@ -7,6 +7,7 @@ using System.IO;
 using System.Text.Json;
 using System.Diagnostics;
 using Estrol.X3Jam.Server;
+using Estrol.X3Jam.Utility;
 
 namespace Estrol.X3Jam.Website {
     public class WebMain {
@@ -117,6 +118,7 @@ namespace Estrol.X3Jam.Website {
                             wc.Send(msg_str, 200, "application/json");
                         }
                     } catch (Exception e) {
+                        Log.Write(e.Message);
                         wc.Send("<b>Internal Server Error</b><br><b1>An error that I won't tell you!</b1>", 500, "text/html");
                     }
                     break;

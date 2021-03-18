@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading;
-using System.Threading.Tasks;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
@@ -9,10 +8,18 @@ using Estrol.X3Jam.Server;
 using Estrol.X3Jam.Website;
 using System.Runtime.InteropServices;
 
-namespace Estrol.X3Jam.Console {
+namespace Estrol.X3Jam.IConsole {
     public class Program {
+        static ManualResetEvent ExitEvent = new(false);
+
         static void Main(string[] args) {
-            System.Console.Title = "X3Jam - O2-JAM 1.8 Server Emulation";
+            Type t = Type.GetType("Mono.Runtime");
+            if (t != null) {
+                Console.WriteLine("ERROR: You can't run this using mono, please use .NET 5 to run this!");
+                return;
+            }
+
+            Console.Title = "X3Jam - O2-JAM 1.8 Server Emulation";
             PrintLogo();
 
             using Mutex mutex = new(true, "X3JAMSERVER", out bool createNew); 
@@ -23,23 +30,27 @@ namespace Estrol.X3Jam.Console {
                 WebMain Website = new(Server, 15000);
                 Website.Initalize();
 
-                Task NeverReturn = new(() => { while (true) { System.Console.Read(); } });
-                NeverReturn.Start();
-                NeverReturn.GetAwaiter().GetResult();
+                Console.CancelKeyPress += Console_CancelKeyPress;
+                ExitEvent.WaitOne();
             } else {
 #if _WINDOWS
-                MessageBox(IntPtr.Zero, "The server program already open!\nIf you want enable multiple server please set multi-server to 1 in config!", "Error", (uint)0x00000010L);
+                _ = MessageBox(IntPtr.Zero, "The server program already open!\nIf you want enable multiple server please set multi-server to 1 in config!", "Error", (uint)0x00000010L);
 #else
 
-                System.Console.WriteLine("ERROR: The server program already open!");
-                System.Console.WriteLine("ERROR: If you want enable multi server please set multi-server to 1 in config");
-                System.Console.WriteLine("ERROR: Press any key to continue");
-                System.Console.ReadKey();
+                Console.WriteLine("ERROR: The server program already open!");
+                Console.WriteLine("ERROR: If you want enable multi server please set multi-server to 1 in config");
+                Console.WriteLine("ERROR: Press any key to continue");
+                Console.ReadKey();
 #endif
             }
         }
-        
-        static void PrintLogo() {
+
+        private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e) {
+            ExitEvent.Set();
+            e.Cancel = true;
+        }
+
+        private static void PrintLogo() {
             /// Base64 + GZipped X3-JAM Logo
             string LogoZipBase64 = "H4sIAAAAAAAEAJWSUQ6AIAxD/028g8f" +
                 "1ExKniYmX4yQGDFspQ6PZj1spj8IyT0v+0r7mkiPtsZT+rlyme" +
@@ -50,14 +61,14 @@ namespace Estrol.X3Jam.Console {
 
             string logo = Unzip(Convert.FromBase64String(LogoZipBase64));
 
-            System.Console.WriteLine(logo);
-            System.Console.WriteLine("\nX3Jam Server Developer version (c) 2021 Estrol's Group Developers (Estrol and MatVeiQaa)");
-            System.Console.WriteLine(string.Format("Current time is {0}\n", DateTime.Now));
-            System.Console.WriteLine("Server Version: alpha-0.3 build #0012");
-            System.Console.WriteLine();
+            Console.WriteLine(logo);
+            Console.WriteLine("\nX3Jam Server Developer version (c) 2021 Estrol's Group Developers (Estrol and MatVeiQaa)");
+            Console.WriteLine(string.Format("Current time is {0}\n", DateTime.Now));
+            Console.WriteLine("Server Version: alpha-0.3 build #0012");
+            Console.WriteLine();
         }
 
-        public static void CopyTo(Stream src, Stream dest)
+        private static void CopyTo(Stream src, Stream dest)
         {
             byte[] bytes = new byte[4096];
 
@@ -69,7 +80,7 @@ namespace Estrol.X3Jam.Console {
             }
         }
 
-        public static string Unzip(byte[] bytes)
+        private static string Unzip(byte[] bytes)
         {
             using var msi = new MemoryStream(bytes);
             using var mso = new MemoryStream();
@@ -82,6 +93,6 @@ namespace Estrol.X3Jam.Console {
         }
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-        public static extern int MessageBox(IntPtr hWnd, String text, String caption, uint type);
+        private static extern int MessageBox(IntPtr hWnd, String text, String caption, uint type);
     }
 }

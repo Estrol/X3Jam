@@ -1,22 +1,24 @@
-﻿using System.Data.Entity.Core.Metadata.Edm;
-using System.IO;
-using System.Text;
-using Estrol.X3Jam.Server.CData;
+﻿using Estrol.X3Jam.Server.CData;
 using Estrol.X3Jam.Server.CUtility;
-using Estrol.X3Jam.Server.Utils;
 using Estrol.X3Jam.Utility;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Estrol.X3Jam.Server.CHandler {
-    public class CRoomList: CBase {
-        public CRoomList(Client client) : base(client, false) { }
+    public class CRoomList : CBase {
+        public CRoomList(Client client) : base(client) {}
 
         public override void Code() {
-            Channel channel = ChanManager.GetChannelByID(Client.UserInfo.ChannelID);
-            User[] users = channel.GetUsers();
+            Channel channelById = ChanManager.GetChannelByID(Client.UserInfo.ChannelID);
+            User[] users = channelById.GetUsers();
 
-            PacketBuffer buf = new(); // First Stream
+            PacketBuffer buf = new();
             buf.Write((short)0);
-            buf.Write((short)0x7db);
+            buf.Write((short)2011);
             buf.Write(0);
 
             foreach (User user in users) {
@@ -28,37 +30,60 @@ namespace Estrol.X3Jam.Server.CHandler {
             buf.SetLength();
             Send(buf.ToArray());
 
-            buf.Stream.SetLength(0); // Reset Stream;
+            buf.Stream.SetLength(0L);
             buf.Write((short)0);
-            buf.Write((short)0x7d3);
-            buf.Write(channel.m_MaxRoom);
+            buf.Write((short)2003);
+            buf.Write(channelById.m_MaxRoom);
+            int num = 0;
 
-            for (int i = 0; i < channel.m_MaxRoom; i++) {
-                Room room = RoomManager.GetIndex(i);
+            for (int i = 0; i < channelById.m_MaxRoom; ++i) {
+                Room index2 = RoomManager.GetIndex(i);
+                if (index2 != null && index2.RoomID == i) {
+                    /**
+                    * Structure
+                    * int32     RoomID
+                    * int8      Flag (1 = Waiting, 2 = Playing)
+                    * int8[]    Room name (string-null terminated)
+                    * int16     OJNID
+                    * int8      IsPassword (0 = Nope, 1 = Yes)
+                    * int8      Difficulty (0 = EX, 1 = NX, 2 = EX, 3 = RX)
+                    * int8      RoomMode   (0 = Single, 1 = VS, 2 = Unknown, 3 = JAM)
+                    * int8      Speed!!!   (Speed from 0-8)
+                    * int8      Max Players
+                    * int8      Current Players
+                    * int8      Min Player's Lvl
+                    * int8      Max Player's Lvl
+                    * int8[8]   Undocumented
+                    */
 
-                if (room != null && room.RoomID == i) {
-                    buf.Write(room.RoomID);
-                    buf.Write((byte)room.IsPlaying); //waiting or playing
-                    buf.Write(room.RoomName, Encoding.UTF8);
-                    buf.Write((byte)0x00);
-                    buf.Write((short)room.SongID);
-                    buf.Write((byte)0x00);
-                    buf.Write((byte)room.MaxUser);
-                    buf.Write((byte)room.CurrentUser);
-                    buf.Write(new byte[8]);
+                    buf.Write(index2.RoomID);
+                    buf.Write((byte)index2.IsPlaying);
+                    buf.Write(index2.RoomName, Encoding.UTF8);
+                    buf.Write(index2.PasswordFlag);
+                    buf.Write((short)index2.SongID);
+                    buf.Write((byte)0);
+                    buf.Write((byte)3);
+                    buf.Write((byte)8);
+                    buf.Write((byte)index2.MaxUser);
+                    buf.Write((byte)index2.CurrentUser);
+                    buf.Write((byte)index2.MinLvl);
+                    buf.Write((byte)index2.MaxLvl);
+                    buf.Write(new byte[6]);
+                    Log.Write(string.Format("{0} {1}", index2.RoomName, index2.RoomID));
+
+                    ++num;
                 } else {
-                    buf.Write((byte)i);
+                    buf.Write((byte)8);
                     buf.Write(new byte[11]);
-                    buf.Write((byte)0xff);
+                    buf.Write(byte.MaxValue);
                     buf.Write(new byte[9]);
+
                 }
             }
-
-            buf.Write((byte)0xff);
+            buf.Write(byte.MaxValue);
             buf.Write(new byte[11]);
             buf.SetLength();
-
-            Log.Write("[{0}@{1}] Room List.", Client.UserInfo.Username, Client.IPAddr);
+            Log.Write("[{0}@{1}] Room List. {2} room in total", Client.UserInfo.Username, Client.IPAddr, num);
             Send(buf.ToArray());
         }
     }

@@ -18,7 +18,7 @@ namespace Estrol.X3Jam.Server.CData {
         public Channel(O2JamServer Main, ChanManager CManager, int ID, string MusicList, int MaxRoom) {
             this.Main = Main;
             this.CManager = CManager;
-            this.RManager = new RoomManager(Main, this);
+            this.RManager = new RoomManager(Main, this, MaxRoom);
 
             m_Users = Array.Empty<User>();
             m_ChannelID = ID;

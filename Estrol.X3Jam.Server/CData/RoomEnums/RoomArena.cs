@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Estrol.X3Jam.Server.CData {
-    public enum RoomArena {
+    public enum RoomArena : byte {
         Random =  0xff,
         Arena1 = 0x1,
         Arena2 = 0x2,

@@ -29,8 +29,10 @@ namespace Estrol.X3Jam.Server.CData {
         public int RoomBG;
         public int SongID;
         public int Mode;
+        public int MinLvl;
+        public int MaxLvl;
 
-        public Room(RoomManager rm, int _RoomID, string Name, User user, byte flag, string password = "", int mode = 0, int ojn = 0) {
+        public Room(RoomManager rm, int _RoomID, string Name, int ojn, User user, byte flag, string password = "", int mode = 0) {
             RoomManager = rm;
 
             RoomName = Name;
@@ -45,10 +47,12 @@ namespace Estrol.X3Jam.Server.CData {
             WaitForSong = true;
             Arena = RoomArena.Random;
             Speed = RoomSpeed.Speed10; 
-            IsPlaying = (RoomStatus)0x01; // 1: Waiting, 0: Playing
+            IsPlaying = RoomStatus.Waiting; // 1: Waiting, 2: Playing
             Mode = 0; // 0: Solo, 1: VS
             MaxUser = 8;
-            CurrentUser = 1; 
+            CurrentUser = 1;
+            MinLvl = 0;
+            MaxLvl = 0;
 
             SongID = ojn; // For DEBUG Purpose only
         }
