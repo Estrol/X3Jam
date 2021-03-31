@@ -22,7 +22,9 @@ namespace Estrol.X3Jam.Server.CHandler {
             Write(ring_data);
             SetL();
 
-            Send();
+            byte[] data = ToArray();
+            foreach (User usr in room.GetUsers())
+                usr.Connection.Send(data);
         }
     }
 }

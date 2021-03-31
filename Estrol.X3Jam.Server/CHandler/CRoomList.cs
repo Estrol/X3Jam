@@ -37,8 +37,8 @@ namespace Estrol.X3Jam.Server.CHandler {
             int num = 0;
 
             for (int i = 0; i < channelById.m_MaxRoom; ++i) {
-                Room index2 = RoomManager.GetIndex(i);
-                if (index2 != null && index2.RoomID == i) {
+                Room room = RoomManager.GetIndex(i);
+                if (room != null && room.RoomID == i) {
                     /**
                     * Structure
                     * int32     RoomID
@@ -56,20 +56,22 @@ namespace Estrol.X3Jam.Server.CHandler {
                     * int8[8]   Undocumented
                     */
 
-                    buf.Write(index2.RoomID);
-                    buf.Write((byte)index2.IsPlaying);
-                    buf.Write(index2.RoomName, Encoding.UTF8);
-                    buf.Write(index2.PasswordFlag);
-                    buf.Write((short)index2.SongID);
-                    buf.Write((byte)0);
-                    buf.Write((byte)3);
-                    buf.Write((byte)8);
-                    buf.Write((byte)index2.MaxUser);
-                    buf.Write((byte)index2.CurrentUser);
-                    buf.Write((byte)index2.MinLvl);
-                    buf.Write((byte)index2.MaxLvl);
+                    Log.Write(room.Mode.ToString());
+
+                    buf.Write(room.RoomID);
+                    buf.Write((byte)room.IsPlaying);
+                    buf.Write(room.RoomName, Encoding.UTF8);
+                    buf.Write(room.PasswordFlag);
+                    buf.Write((short)room.SongID);
+                    buf.Write((byte)room.Difficulty);
+                    buf.Write((byte)room.Mode);
+                    buf.Write((byte)room.Speed);
+                    buf.Write((byte)room.MaxUser);
+                    buf.Write((byte)room.CurrentUser);
+                    buf.Write((byte)room.MinLvl);
+                    buf.Write((byte)room.MaxLvl);
                     buf.Write(new byte[6]);
-                    Log.Write(string.Format("{0} {1}", index2.RoomName, index2.RoomID));
+                    Log.Write(string.Format("{0} {1}", room.RoomName, room.RoomID));
 
                     ++num;
                 } else {

@@ -22,6 +22,7 @@ namespace Estrol.X3Jam.Server.CManager {
             Rooms = new(_MaxRoom);
             MaxRoom = _MaxRoom;
 
+            /**
             Rooms.Add(0, new(
                 this,
                 0,
@@ -36,13 +37,24 @@ namespace Estrol.X3Jam.Server.CManager {
             Rooms.Add(1, new(
                 this,
                 1,
-                "TEST",
+                "TEST2",
                 441,
                 new User(new string[] { "Hello1", "World1" }, new()),
                 0,
                 "Ass",
                 0x1)
             );
+
+            Rooms.Add(2, new(
+                this,
+                2,
+                "TEST3",
+                441,
+                new User(new string[] { "Hello1", "World1" }, new()),
+                0,
+                "Ass",
+                0x1)
+            );*/
         }
 
         public int Count => Rooms.Count;
@@ -68,7 +80,7 @@ namespace Estrol.X3Jam.Server.CManager {
             int pos = EmptyID();
             Rooms.Add(pos, room);
 
-            //Send(1, room, room.RoomName, room.Mode);
+            Send(1, room, room.RoomName, (int)room.Mode);
             return true;
         }
 

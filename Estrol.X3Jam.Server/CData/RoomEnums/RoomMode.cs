@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Estrol.X3Jam.Server.CData {
     public enum RoomMode : byte {
-        Solo = 0x0,
-        VS = 0x1,
-        Unknown = 0x2,
-        JAM = 0x3
+        Solo = 0x0,     // Wait
+        VS = 0x1,       // Wait
+        Unknown = 0x2,  // Couple?
+        JAM = 0x3       // Playing
     }
 }

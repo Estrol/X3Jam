@@ -16,6 +16,19 @@ namespace Estrol.X3Jam.Server.CHandler {
 
                 Log.Write("[{0}@{1}] User: {2} attempting to connect in planet login manager with wrong credentinal (could be manually login using custom websocket?).", "null", Client.IPAddr, UserAuth[0]);
             } else {
+                var result = Client.Main.Server.GetClient(Client, usr.Username);
+                if (result != null) {
+                    Write(new byte[] {
+                        0x08, 0x00, 0xe9, 0x03, 0xfe, 0xff, 0xff, 0xff
+                    });
+
+                    Log.Write("[{0}@{1}] Attempt to connect already connected account!", Client.IPAddr, UserAuth[0]);
+                    Client.Main.Server.RemoveClient(Client);
+                    Client.m_socket.Disconnect(true);
+                    Send();
+                    return;
+                }
+
                 Write(new byte[] {
                     0x08, 0x00, 0xe9, 0x03, 0x00, 0x00, 0x00, 0x00
                 });

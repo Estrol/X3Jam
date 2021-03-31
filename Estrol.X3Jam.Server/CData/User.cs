@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Estrol.X3Jam.Server.CData.RoomEnums;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,9 @@ namespace Estrol.X3Jam.Server.CData {
         public int Room { set; get; } = -1;
         public Character Char { set; get; }
         public int Ready { set; get; } = 0;
+        public bool IsFinished { set; get; } = false;
+        public RoomColor Color { set; get; } = 0;
+        public bool IsRoomMaster { set; get; } = false;
 
         public User(string[] auth, Character character) {
             Nickname = auth[0];

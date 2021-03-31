@@ -88,7 +88,7 @@ namespace Estrol.X3Jam.Website {
 
                 case "/web_api/register": {
                     if (wc.header.Method != HTTPMethod.POST) {
-                        wc.Send("<b>Access is denied!</b><br><b1>Unknown method GET!</b1>", 200, "text/html");
+                        wc.Send("<b>Access is denied!</b><br><b1>Unknown method GET!</b1>", 403, "text/html");
                         break;
                     }
 

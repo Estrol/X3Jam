@@ -11,12 +11,18 @@ namespace Estrol.X3Jam.Server.CHandler {
             if (Client.UserInfo != null) {
                 Channel ch = Client.Main.ChannelManager.GetChannelByID(Client.UserInfo.ChannelID);
                 if (ch != null) {
+                    Room room = ch.RManager.GetID(Client.UserInfo.Room);
+                    if (room != null) {
+                        room.RemoveUser(Client.UserInfo);
+                    }
+
                     ch.RemoveUser(Client.UserInfo);
                 }
                 usr = Client.UserInfo.Username;
             }
 
             Log.Write("[{0}@{1}] Disconnected", usr, Client.IPAddr);
+            Client.Main.Server.RemoveClient(Client);
             Client.m_socket.Disconnect(true);
         }
     }

@@ -117,8 +117,8 @@ namespace Estrol.X3Jam.Server {
                     handler.Handle();
                     break;
 
-                case ClientPacket.RoomInit:
-                    handler = new CRoomIntialize(client);
+                case ClientPacket.RoomPlrColorChange:
+                    handler = new CPlayerColorChange(client);
                     handler.Handle();
                     break;
 
@@ -175,6 +175,16 @@ namespace Estrol.X3Jam.Server {
                 case ClientPacket.Disconnect:
                     handler = new CDisconnect(client);
                     handler.Handle();
+                    break;
+
+                case ClientPacket.RoomBGChange:
+                    handler = new CRoomBGChange(client);
+                    handler.Handle();
+                    break;
+
+                case ClientPacket.Tutorial1:
+                case ClientPacket.Tutorial2:
+                    // Ignored
                     break;
 
                 default: {

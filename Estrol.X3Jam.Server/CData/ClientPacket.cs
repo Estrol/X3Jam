@@ -18,12 +18,19 @@
         LeaveRoom = 0x0bbd,
         RoomBGChange = 0x0fa2,
         SetSongID = 0x0fa0,
-        RoomInit = 0x0fa4,
         ClientMSG = 0x07dc,
         ClientMSG2 = 0x0bc3,
         JoinRoom = 0x0bba,
         RoomListAddRoom = 0x07d5,
         RoomListRemoveRoom = 0x07d7,
-        RoomRingChange = 0xfb7
+        RoomRingChange = 0xfb7,
+        Tutorial1 = 0x138e,
+        Tutorial2 = 0x138f,
+        GameStart = 0xfaa,
+        ApplyRing = 0xfac,
+        GameQuit = 0xfb5,
+        GamePing = 0xfae,
+        ScoreSubmit = 0xfb0,
+        RoomPlrColorChange = 0x0fa4,
     }
 }

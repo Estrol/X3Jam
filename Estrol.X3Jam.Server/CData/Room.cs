@@ -1,19 +1,29 @@
-﻿using Estrol.X3Jam.Server.CManager;
-using Estrol.X3Jam.Server.CUtility;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿/**
+ * NOTE: this source is absolute ass, my codestyle is very terrible and it took me over 4 months
+ * TODO: clean this shit (such code style, etc) after it working properly
+ */
+
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Collections.Generic;
+
+using Estrol.X3Jam.Utility;
+using Estrol.X3Jam.Server.CManager;
+using Estrol.X3Jam.Server.CUtility;
+using Estrol.X3Jam.Server.CData.RoomEnums;
+using Estrol.X3Jam.Server.Utils;
 
 namespace Estrol.X3Jam.Server.CData {
     public class Room {
         public RoomManager RoomManager;
         private Dictionary<int, User> Users;
+        private List<RoomUser> Players;
+        private int PlayerCount;
+        private RoomColor Color;
 
         public string RoomName;
         public string Password;
+        public RoomMode Mode;
+        public RoomDifficulty Difficulty;
         public RoomArena Arena;
         public RoomSpeed Speed;
         public RoomStatus IsPlaying;
@@ -26,35 +36,38 @@ namespace Estrol.X3Jam.Server.CData {
         public int CurrentUser;
         public int MaxUser;
         public int RoomID;
-        public int RoomBG;
+        public int Roomarg2;
         public int SongID;
-        public int Mode;
         public int MinLvl;
         public int MaxLvl;
 
-        public Room(RoomManager rm, int _RoomID, string Name, int ojn, User user, byte flag, string password = "", int mode = 0) {
+        public Room(RoomManager rm, int _RoomID, string Name, int arg3, User user, byte flag, string password = "", RoomMode mode = RoomMode.VS) {
             RoomManager = rm;
 
             RoomName = Name;
             RoomID = _RoomID;
 
             Users = new(8);
-            Users.Add(0, user);
+            AddUser(user, GetEmptyColor());
 
             PasswordFlag = flag;
             Password = password;
 
             WaitForSong = true;
             Arena = RoomArena.Random;
-            Speed = RoomSpeed.Speed10; 
-            IsPlaying = RoomStatus.Waiting; // 1: Waiting, 2: Playing
-            Mode = 0; // 0: Solo, 1: VS
+            Speed = RoomSpeed.Speed10;
+            IsPlaying = RoomStatus.Waiting;
+            Mode = mode;
+            Difficulty = RoomDifficulty.EX;
             MaxUser = 8;
             CurrentUser = 1;
             MinLvl = 0;
             MaxLvl = 0;
 
-            SongID = ojn; // For DEBUG Purpose only
+            Players = new();
+            PlayerCount = 0;
+
+            SongID = arg3; // For DEBUG Purarg1e only
         }
 
         public void SetSongID(int ID) {
@@ -71,13 +84,25 @@ namespace Estrol.X3Jam.Server.CData {
             for (int i = 0; i < 8; i++) {
                 try {
                     var itr = Users[i];
+                    if (itr == null) {
+                        found = i;
+                        break;
+                    }
                 } catch (KeyNotFoundException) {
-                    found = 0;
+                    found = i; // This could mean the slot is available
                     break;
                 }
             }
 
             return found;
+        }
+
+        public RoomColor GetEmptyColor() {
+            if (Color == null) Color = RoomColor.Red;
+            var ReservedColor = Color;
+            Color = Color.Next();
+
+            return ReservedColor;
         }
 
         public User GetUserIndex(int index) {
@@ -106,14 +131,15 @@ namespace Estrol.X3Jam.Server.CData {
             return found;
         }
 
-        public void AddUser(User usr) {
+        public void AddUser(User usr, RoomColor color) {
             usr.Ready = 1;
+            usr.Color = color;
 
             int slot = NearestSlot();
             Users.Add(slot, usr);
 
             CurrentUser++;
-            Event(1, usr);
+            Event(1, usr, (int)color, slot);
         }
 
         public void RemoveUser(User usr) {
@@ -121,13 +147,31 @@ namespace Estrol.X3Jam.Server.CData {
             Users.Remove(item.Key);
 
             CurrentUser--;
-            if (CurrentUser > 0) {
-                // Bruh room master is client side
-                Event(2, usr, item.Key);
+            if (CurrentUser > 1) {
+                if (item.Value.IsRoomMaster) {
+                    item.Value.IsRoomMaster = false;
+
+                    int slot = item.Key;
+                    var user = NearestUser(item.Value);
+                    user.IsRoomMaster = true;
+                    Event(7, usr, item.Key);
+                } else {
+                    Event(2, usr, item.Key);
+                }
             } else {
                 // Indicate that room is abandoned
                 RoomManager.Remove(this);
             }
+        }
+
+        public User NearestUser(User usr) {
+            foreach (KeyValuePair<int, User> itr_usr in Users) {
+                if (itr_usr.Value != usr) {
+                    return itr_usr.Value;
+                }
+            }
+
+            return null;
         }
 
         public int NearestSlot() {
@@ -143,6 +187,27 @@ namespace Estrol.X3Jam.Server.CData {
             return result;
         }
 
+        public void Prepare() {
+            Players.Clear();
+
+            foreach (KeyValuePair<int, User> itr in Users) {
+                itr.Value.IsFinished = false;
+            }
+        }
+
+        public bool Check() {
+            bool flag = true;
+
+            foreach (KeyValuePair<int, User> itr in Users) {
+                if (!itr.Value.IsFinished) {
+                    flag = false;
+                    break;
+                }
+            }
+
+            return flag;
+        }
+
         public int Slot(User usr) {
             foreach (KeyValuePair<int, User> itr in Users) {
                 if (usr == itr.Value) {
@@ -153,21 +218,69 @@ namespace Estrol.X3Jam.Server.CData {
             return -1;
         }
 
+        public void SubmitScore(User usr, ushort kool, ushort great, ushort bad, ushort miss, ushort maxcombo, ushort jam, ushort pass, int score) {
+            Players.Add(new() {
+                Kool = kool,
+                Great = great,
+                Bad = bad,
+                Miss = miss,
+                MaxCombo = maxcombo,
+                JamCombo = jam,
+                Score = score,
+            });
+
+            usr.IsFinished = true;
+
+            PlayerCount++;
+            if (Check()) {
+                Log.Write($"Room {RoomID} finished playing!");
+
+                Players.Sort((p1, p2) => p1.Score.CompareTo(p2.Score));
+
+                int itr = 1;
+                foreach (RoomUser val in Players) {
+                    val.Position = itr;
+
+                    itr++;
+                }
+            }
+        }
+
         public User[] GetUsers() {
             return Users.Values.ToArray();
         }
 
-        public void Event(int num, User usr = null, int pos = 0, int bg = 0, int ojn = 0) {
+        public void _callback(object sender, int event_id, object[] args) {
+            switch (event_id) {
+
+                default: {
+                    Log.Write("Unknown ");
+
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// TODO: refactor the confusing paramters
+        /// </summary>
+        /// <param name="num"></param>
+        /// <param name="usr"></param>
+        /// <param name="arg1"></param>
+        /// <param name="arg2"></param>
+        /// <param name="arg3"></param>
+        public void Event(int num, User usr = null, int arg1 = 0, int arg2 = 0, int arg3 = 0) {
             switch(num) {
                 case 1: { // Case when someone enter room
                     PacketBuffer buf = new();
-                    buf.Write((short)0);
-                    buf.Write((short)0x0bbc);
-                    buf.Write(usr.Username);
-                    buf.Write(usr.Level);
-                    buf.Write((byte)usr.Char.Gender);
-                    buf.Write((byte)pos);
-                    buf.Write(new byte[2]);
+                    buf.Write((short)0);                // Length
+                    buf.Write((short)0x0bbc);           // Opcode
+                    buf.Write((byte)arg2);              // Slot
+                    buf.Write(usr.Username);            // null-terminated username
+                    buf.Write(usr.Level);               // Level
+                    buf.Write((byte)usr.Char.Gender);   // Gender
+                    buf.Write((byte)arg1);              // Color
+                    buf.Write(new byte[2]);             // padding??? (Unknown)
 
                     int[] chars = usr.Char.ToArray();
                     for (int i = 0; i < chars.Length; i++) {
@@ -176,7 +289,9 @@ namespace Estrol.X3Jam.Server.CData {
 
                     buf.Write(usr.MusicLength);
                     buf.Write(usr.MusicCount);
-                    buf.Write(new byte[2]);
+                    buf.SetLength();
+
+                    //buf.Write(new byte[2]);
 
                     byte[] array = buf.ToArray();
 
@@ -199,18 +314,36 @@ namespace Estrol.X3Jam.Server.CData {
                     }
 
                     break;
-                }
+                } 
 
-                case 3: { // Case when room change bg
+                case 3: { // Case when room change arg2
+                    PacketBuffer buf = new();
+                    buf.Write((short)0);
+                    buf.Write((short)0xfa3);
+                    if ((RoomArena)arg2 == RoomArena.Random) {
+                        buf.Write(new byte[] { (byte)arg1, 0x00, 0x00, 0x80 });
+                    } else {
+                        buf.Write(arg1);
+                    }
+
+                    buf.SetLength();
+                    byte[] data = buf.ToArray();
+
                     foreach (KeyValuePair<int, User> itr in Users) {
-
+                        itr.Value.Connection.Send(data);
                     }
                     break;
                 }
 
-                case 4: { // Case when room change OJN ID
-                    foreach (KeyValuePair<int, User> itr in Users) {
+                case 4: { // Case when room change arg3 ID
+                    using PacketBuffer buf = new();
+                    buf.Write((short)8);
+                    buf.Write((short)0xfa1);
+                    buf.Write(arg3);
 
+                    byte[] data = buf.ToArray();
+                    foreach (KeyValuePair<int, User> itr in Users) {
+                        itr.Value.Connection.Send(data);
                     }
                     break;
                 }
@@ -223,6 +356,27 @@ namespace Estrol.X3Jam.Server.CData {
                             0x06, 0x00, 0xa9, 0x0f, 0x00, (byte)slot
                         });
                     }
+                    break;
+                }
+
+                case 6: { // Game Finish
+                    using var buf = new PacketBuffer();
+                    buf.Write((short)0);
+                    buf.Write((short)0xfb2);
+                    buf.Write((byte)8); // Max users
+
+                    foreach (RoomUser user in Players) {
+                        buf.Write(Slot(user.User));
+                        buf.Write(user.Position);
+                        buf.Write(user.Great);
+                        buf.Write(user.Bad);
+                        buf.Write(user.Miss);
+                        buf.Write(user.MaxCombo);
+                        buf.Write(user.JamCombo);
+                        buf.Write(user.Score);
+                        buf.Write(15000);
+                    }
+
                     break;
                 }
             }

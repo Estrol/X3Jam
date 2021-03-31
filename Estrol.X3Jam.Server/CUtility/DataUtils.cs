@@ -61,5 +61,13 @@ namespace Estrol.X3Jam.Server.Utils {
         public static TV GetValue<TK, TV>(this Dictionary<TK, TV> dict, TK key, TV defaultValue = default) {
             return dict.TryGetValue(key, out TV value) ? value : defaultValue;
         }
+
+        public static T Next<T>(this T src) where T : struct {
+            if (!typeof(T).IsEnum) throw new ArgumentException(String.Format("Argument {0} is not an Enum", typeof(T).FullName));
+
+            T[] Arr = (T[])Enum.GetValues(src.GetType());
+            int j = Array.IndexOf<T>(Arr, src) + 1;
+            return (Arr.Length == j) ? Arr[0] : Arr[j];
+        }
     }
 }

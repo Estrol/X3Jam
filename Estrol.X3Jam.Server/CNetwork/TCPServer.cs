@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using Estrol.X3Jam.Server.CData;
@@ -12,8 +13,11 @@ namespace Estrol.X3Jam.Server.CNetwork {
         public delegate void ServerEventSender(object sender, Client state);
         public event ServerEventSender OnServerMessage;
 
+        private List<Client> clients;
+
         public TCPServer(short gamePort) {
             m_gamePort = gamePort;
+            clients = new();
 
             m_ServerSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             m_ServerSocket.Bind(new IPEndPoint(IPAddress.Any, m_gamePort));
@@ -58,11 +62,35 @@ namespace Estrol.X3Jam.Server.CNetwork {
                     m_raw = new byte[Client.MAX_BUFFER_SIZE]
                 };
 
+                clients.Add(state);
+
                 state.m_socket.BeginReceive(state.m_raw, 0, Client.MAX_BUFFER_SIZE, SocketFlags.None, Server_OnAsyncData, state);
                 m_ServerSocket.BeginAccept(Server_OnAsyncConnection, m_ServerSocket);
             } catch (Exception e) {
                 HandleException(e);
             }
+        }
+
+        public void RemoveClient(Client cl) {
+            clients.Remove(cl);
+        }
+
+        public Client GetClient(Client cl, string username) {
+            var endpoint = (IPEndPoint)cl.m_socket.RemoteEndPoint;
+
+            foreach (Client client in clients) {
+                if (client.UserInfo != null) {
+                    var endpoint2 = (IPEndPoint)client.m_socket.RemoteEndPoint;
+                    if (endpoint.Address == endpoint2.Address)
+                        if (endpoint.Port == endpoint2.Port)
+                            continue;
+
+                    if (client.m_user.Username == username)
+                        return client;
+                }
+            }
+
+            return null;
         }
 
         private void Server_OnAsyncData(IAsyncResult ar) {
@@ -86,7 +114,7 @@ namespace Estrol.X3Jam.Server.CNetwork {
                     Console.WriteLine("[C# Exception] A thread tried to access socket that already disconnected");
                 }
             } else {
-                Console.WriteLine("[C# Unhandled Exception] {0}\n{0}", e.Message, e.StackTrace);
+                Console.WriteLine("[C# Unhandled Exception] {0}\n{1}", e.Message, e.StackTrace);
             }
         }
     }

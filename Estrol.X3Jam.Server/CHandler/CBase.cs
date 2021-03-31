@@ -45,7 +45,7 @@ namespace Estrol.X3Jam.Server.CHandler {
         /// Execute Code() function;
         /// </summary>
         public void Handle() => Code();
-        
+
         /// <summary>
         /// Send the data with length of 2 first byte data
         /// </summary>
@@ -73,6 +73,10 @@ namespace Estrol.X3Jam.Server.CHandler {
         }
 
         public void Send(byte[] data, short length) => Client.Send(data, length);
+
+        public byte[] ToArray() {
+            return Stream.ToArray();
+        }
 
         // Single data types
 

@@ -24,7 +24,7 @@ namespace Estrol.X3Jam.Server.CHandler {
             byte[] data = len.Concat(Client.Message.data).ToArray();
             data[2] = 0xa1;
 
-            RoomManager.Send(1, room, room.RoomName, room.Mode);
+            RoomManager.Send(1, room, room.RoomName, (int)room.IsPlaying);
             Write(data);
             Send();
         }

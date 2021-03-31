@@ -99,7 +99,7 @@ namespace Estrol.X3Jam.Website {
             }
 
             if (header.Method == HTTPMethod.POST) {
-                sBody = HeaderData[HeaderData.Length - 1];
+                sBody = HeaderData[^1];
             }
         }
 
