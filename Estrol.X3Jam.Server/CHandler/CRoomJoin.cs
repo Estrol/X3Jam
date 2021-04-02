@@ -51,8 +51,7 @@ namespace Estrol.X3Jam.Server.CHandler {
                     Write((byte)0);
                     Write((byte)1); // Roomaster
                     Write((byte)usr.Color); // Room Color
-                    Log.Write(usr.Color.ToString());
-                    Write((byte)1); // Ready?
+                    Write((byte)0); // Ready?
                     Write((byte)0); 
                     foreach (int itr in usr.Char.ToArray()) {
                         Write(itr);

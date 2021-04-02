@@ -45,14 +45,8 @@ namespace Estrol.X3Jam.Server {
             client.Main = this;
 
             if (message.IsFailed) {
-                if (client.UserInfo != null) {
-                    Channel ch = client.Main.ChannelManager.GetChannelByID(client.UserInfo.ChannelID);
-                    if (ch != null) {
-                        ch.RemoveUser(client.UserInfo);
-                    }
-                }
-
-                client.m_socket.Disconnect(true);
+                var Handler = new CDisconnect(client);
+                Handler.Handle();
                 return;
             }
 
@@ -179,6 +173,26 @@ namespace Estrol.X3Jam.Server {
 
                 case ClientPacket.RoomBGChange:
                     handler = new CRoomBGChange(client);
+                    handler.Handle();
+                    break;
+
+                case ClientPacket.GameStart:
+                    handler = new CGameStart(client);
+                    handler.Handle();
+                    break;
+
+                case ClientPacket.GamePing:
+                    handler = new CGamePing(client);
+                    handler.Handle();
+                    break;
+
+                case ClientPacket.ScoreSubmit:
+                    handler = new CRoomFinish(client);
+                    handler.Handle();
+                    break;
+
+                case ClientPacket.GameInit:
+                    handler = new CGameReady(client);
                     handler.Handle();
                     break;
 

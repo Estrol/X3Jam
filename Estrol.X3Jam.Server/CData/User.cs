@@ -11,7 +11,7 @@ namespace Estrol.X3Jam.Server.CData {
         public string Username { set; get; }
         public string Nickname { set; get; }
         public string[] Info => new[] { Username, Nickname };
-        public int Level { set; get; }
+        public int Level => Char.Level;
         public byte[] MusicCount { set; get; }
         public int MusicLength { set; get; }
         public int ChannelID { set; get; } = -1;
@@ -26,7 +26,6 @@ namespace Estrol.X3Jam.Server.CData {
         public User(string[] auth, Character character) {
             Nickname = auth[0];
             Username = auth[0];
-            Level = 1;
 
             Char = character;
         }

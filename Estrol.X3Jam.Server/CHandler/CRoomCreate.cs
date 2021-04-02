@@ -9,12 +9,14 @@ namespace Estrol.X3Jam.Server.CHandler {
         public override void Code() {
             string Name = DataUtils.GetString(Client.Message.data);
 
+            byte mode = Client.Message.data[2];
             int roomID = RoomManager.EmptyID();
             Room room = new(RoomManager, roomID, Name, 0x0, Client.UserInfo, 0x0);
 
-            Log.Write("[{0}@{1}] Create a room with name: \"{2}\" at position: {3}, in channel: {4}",
+            Log.Write("[{0}@{1}] Create a {2} room with name: \"{3}\" at position: {4}, in channel: {5}",
                 Client.UserInfo.Username,
                 Client.IPAddr,
+                mode == 0x1 ? "VS" : "Solo",
                 Name,
                 roomID,
                 Client.UserInfo.ChannelID

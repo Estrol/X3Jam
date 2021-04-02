@@ -27,7 +27,7 @@
         Tutorial1 = 0x138e,
         Tutorial2 = 0x138f,
         GameStart = 0xfaa,
-        ApplyRing = 0xfac,
+        GameInit = 0xfac,
         GameQuit = 0xfb5,
         GamePing = 0xfae,
         ScoreSubmit = 0xfb0,

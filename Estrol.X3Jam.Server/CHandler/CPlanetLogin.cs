@@ -23,8 +23,6 @@ namespace Estrol.X3Jam.Server.CHandler {
                     });
 
                     Log.Write("[{0}@{1}] Attempt to connect already connected account!", Client.IPAddr, UserAuth[0]);
-                    Client.Main.Server.RemoveClient(Client);
-                    Client.m_socket.Disconnect(true);
                     Send();
                     return;
                 }

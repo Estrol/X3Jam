@@ -72,6 +72,7 @@ namespace Estrol.X3Jam.Server.CData {
 
         public void SetSongID(int ID) {
             SongID = ID;
+            Event(4, null, ID);
         }
 
         public bool CheckPassword(string passwd) {
@@ -144,10 +145,11 @@ namespace Estrol.X3Jam.Server.CData {
 
         public void RemoveUser(User usr) {
             var item = Users.First(itr => itr.Value.Username == usr.Username);
+            int _slot = Slot(usr);
             Users.Remove(item.Key);
 
             CurrentUser--;
-            if (CurrentUser > 1) {
+            if (CurrentUser > 0) {
                 if (item.Value.IsRoomMaster) {
                     item.Value.IsRoomMaster = false;
 
@@ -156,10 +158,12 @@ namespace Estrol.X3Jam.Server.CData {
                     user.IsRoomMaster = true;
                     Event(7, usr, item.Key);
                 } else {
-                    Event(2, usr, item.Key);
+                    Event(2, usr, _slot);
                 }
             } else {
                 // Indicate that room is abandoned
+
+                Log.Write("Room {0} deleted", RoomID);
                 RoomManager.Remove(this);
             }
         }
@@ -229,13 +233,17 @@ namespace Estrol.X3Jam.Server.CData {
                 Score = score,
             });
 
+            usr.Connection.Send(new byte[] {
+                0x06, 0x00, 0xb1, 0x0f, 0x00, 0x00
+            });
+
             usr.IsFinished = true;
 
             PlayerCount++;
             if (Check()) {
                 Log.Write($"Room {RoomID} finished playing!");
 
-                Players.Sort((p1, p2) => p1.Score.CompareTo(p2.Score));
+                Players.Sort((p1, p2) => Slot(p1.User).CompareTo(Slot(p2.User)));
 
                 int itr = 1;
                 foreach (RoomUser val in Players) {
@@ -243,7 +251,16 @@ namespace Estrol.X3Jam.Server.CData {
 
                     itr++;
                 }
+
+                Event(6);
             }
+        }
+
+        public short GetGemFromScore(int score, int kool) {
+            int baseGem = score > 1000000 ? 5000 : 500;
+            float multipler = kool > 500 ? 1.5f : 1.2f;
+
+            return (short)(baseGem * multipler);
         }
 
         public User[] GetUsers() {
@@ -272,6 +289,8 @@ namespace Estrol.X3Jam.Server.CData {
         public void Event(int num, User usr = null, int arg1 = 0, int arg2 = 0, int arg3 = 0) {
             switch(num) {
                 case 1: { // Case when someone enter room
+
+                    Log.Write(usr.Char.Gender.ToString() + " A");
                     PacketBuffer buf = new();
                     buf.Write((short)0);                // Length
                     buf.Write((short)0x0bbc);           // Opcode
@@ -303,14 +322,14 @@ namespace Estrol.X3Jam.Server.CData {
                 }
 
                 case 2: { // Case when someone left room
-                    int slot = Slot(usr);
+                    PacketBuffer buf = new();
+                    buf.Write((short)8);
+                    buf.Write((short)0xbbf);
+                    buf.Write(arg1);
 
+                    byte[] data = buf.ToArray();
                     foreach (KeyValuePair<int, User> itr in Users) {
-                        itr.Value.Connection.Send(new byte[] {
-                            0x06, 0x00,
-                            0xbf, 0x0b,
-                            0x00, (byte)slot // which slot that Leave
-                        });
+                        itr.Value.Connection.Send(data);
                     }
 
                     break;
@@ -335,11 +354,11 @@ namespace Estrol.X3Jam.Server.CData {
                     break;
                 }
 
-                case 4: { // Case when room change arg3 ID
+                case 4: { // Case when room change ojn ID
                     using PacketBuffer buf = new();
                     buf.Write((short)8);
                     buf.Write((short)0xfa1);
-                    buf.Write(arg3);
+                    buf.Write(arg1);
 
                     byte[] data = buf.ToArray();
                     foreach (KeyValuePair<int, User> itr in Users) {
@@ -363,19 +382,53 @@ namespace Estrol.X3Jam.Server.CData {
                     using var buf = new PacketBuffer();
                     buf.Write((short)0);
                     buf.Write((short)0xfb2);
-                    buf.Write((byte)8); // Max users
+                    buf.Write(MaxUser); // Max users
 
-                    foreach (RoomUser user in Players) {
-                        buf.Write(Slot(user.User));
-                        buf.Write(user.Position);
-                        buf.Write(user.Great);
-                        buf.Write(user.Bad);
-                        buf.Write(user.Miss);
-                        buf.Write(user.MaxCombo);
-                        buf.Write(user.JamCombo);
-                        buf.Write(user.Score);
-                        buf.Write(15000);
+                    for (int i = 0; i < MaxUser; i++) {
+                        RoomUser user = Players[i];
+                        if (user != null) {
+                            buf.Write((byte)Slot(user.User));
+                            buf.Write(1);
+                            buf.Write(user.Kool);
+                            buf.Write(user.Great);
+                            buf.Write(user.Bad);
+                            buf.Write(user.Miss);
+                            buf.Write(user.MaxCombo);
+                            buf.Write(user.JamCombo);
+                            buf.Write(user.Score);
+                            buf.Write(GetGemFromScore(user.Score, user.Kool));
+                        } else {
+                            buf.Write((byte)i);
+                            buf.Write(0);
+                        }
                     }
+
+                    buf.SetLength();
+                    byte[] data = buf.ToArray();
+                    foreach (RoomUser rUser in Players) {
+                        rUser.User.Connection.Send(data);
+                    }
+
+                    break;
+                }
+
+                case 7: { // Case someone left in InGame
+                    PacketBuffer buf = new();
+                    buf.Write((short)0x08);
+                    buf.Write((short)0xbbf);
+                    buf.Write(arg1);
+
+                    byte[] data = buf.ToArray();
+                    foreach (RoomUser rUser in Players) {
+                        rUser.User.Connection.Send(data);
+                    }
+
+                    break;
+                }
+
+                case 8: { // Case game ping
+                    PacketBuffer buf = new();
+
 
                     break;
                 }
