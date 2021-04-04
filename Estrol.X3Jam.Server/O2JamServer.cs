@@ -196,6 +196,11 @@ namespace Estrol.X3Jam.Server {
                     handler.Handle();
                     break;
 
+                case ClientPacket.GameQuit:
+                    handler = new CInGameExit(client);
+                    handler.Handle();
+                    break;
+
                 case ClientPacket.Tutorial1:
                 case ClientPacket.Tutorial2:
                     // Ignored

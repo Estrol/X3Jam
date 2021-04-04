@@ -32,7 +32,7 @@ namespace Estrol.X3Jam.Server.CHandler {
             }
             
             Write((byte)room.Speed);
-            Write((short)0);
+            Write((short)room.Mode);
             Write(7);
             for (int i = 0; i < 8; i++) {
                 if (position == i) {

@@ -24,7 +24,7 @@ namespace Estrol.X3Jam.Server.CHandler {
 
                 room.Event(7, null, slot);
             } else {
-                Write(Client.UserInfo.Level + 1);
+                Write(Client.UserInfo.Level);
             }
 
             Send();

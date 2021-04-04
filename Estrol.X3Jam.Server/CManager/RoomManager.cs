@@ -21,40 +21,6 @@ namespace Estrol.X3Jam.Server.CManager {
 
             Rooms = new(_MaxRoom);
             MaxRoom = _MaxRoom;
-
-            /**
-            Rooms.Add(0, new(
-                this,
-                0,
-                "TEST",
-                441,
-                new User(new string[] { "Hello", "World" }, new()),
-                0,
-                "Ass",
-                0x1)
-            );
-
-            Rooms.Add(1, new(
-                this,
-                1,
-                "TEST2",
-                441,
-                new User(new string[] { "Hello1", "World1" }, new()),
-                0,
-                "Ass",
-                0x1)
-            );
-
-            Rooms.Add(2, new(
-                this,
-                2,
-                "TEST3",
-                441,
-                new User(new string[] { "Hello1", "World1" }, new()),
-                0,
-                "Ass",
-                0x1)
-            );*/
         }
 
         public int Count => Rooms.Count;
@@ -119,17 +85,17 @@ namespace Estrol.X3Jam.Server.CManager {
             switch (idcase) {
                 case 1: { // Room Add
                     PacketBuffer buf = new();
-                    short length = (short)(8 + name.Length + 5);
-                    buf.Write(length);
+                    buf.Write((short)0);
                     buf.Write((short)0x7d5);
                     buf.Write(room.RoomID);
                     buf.Write(name);
-                    buf.Write(flag); // 0 = Solo, 1 = VS, 3 = Coop
-                    buf.Write((short)0);
+                    buf.Write((short)flag); // 0 = Solo, 1 = VS, 3 = Coop
+                    buf.Write((short)0); // Ring data
+                    buf.SetLength();
 
                     PacketBuffer buf2 = new();
-                    buf2.Write((short)0xc);
-                    buf2.Write((short)0x77e);
+                    buf2.Write((short)0x0c);
+                    buf2.Write((short)0x7e7);
                     buf2.Write(room.RoomID);
                     buf2.Write(room.SongID);
 
@@ -197,12 +163,11 @@ namespace Estrol.X3Jam.Server.CManager {
 
                 case 5: { // Room Name
                     PacketBuffer buf = new();
-                    short length = (short)(8 + name.Length + 1);
-
-                    buf.Write(length);
+                    buf.Write((short)0);
                     buf.Write((short)0x77e);
                     buf.Write(room.RoomID);
                     buf.Write(name);
+                    buf.SetLength();
 
                     byte[] data = buf.ToArray();
                     foreach (User user in users) {

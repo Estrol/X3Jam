@@ -11,13 +11,13 @@ using Estrol.X3Jam.Server.CManager;
 using Estrol.X3Jam.Server.CUtility;
 using Estrol.X3Jam.Server.CData.RoomEnums;
 using Estrol.X3Jam.Server.Utils;
+using System;
 
 namespace Estrol.X3Jam.Server.CData {
     public class Room {
         public RoomManager RoomManager;
         private Dictionary<int, User> Users;
         private List<RoomUser> Players;
-        private int PlayerCount;
         private RoomColor Color;
 
         public string RoomName;
@@ -41,33 +41,30 @@ namespace Estrol.X3Jam.Server.CData {
         public int MinLvl;
         public int MaxLvl;
 
-        public Room(RoomManager rm, int _RoomID, string Name, int arg3, User user, byte flag, string password = "", RoomMode mode = RoomMode.VS) {
-            RoomManager = rm;
+        public Room(RoomManager cManager, int cID, string cName, User cUser, byte cFlag, string cPassword = "", RoomMode cMode = RoomMode.VS) {
+            RoomManager = cManager;
 
-            RoomName = Name;
-            RoomID = _RoomID;
+            // Properties
+            RoomName = cName;
+            RoomID = cID;
+            Password = cPassword;
 
-            Users = new(8);
-            AddUser(user, GetEmptyColor());
-
-            PasswordFlag = flag;
-            Password = password;
-
-            WaitForSong = true;
+            // Flags
+            Mode = cMode;
             Arena = RoomArena.Random;
             Speed = RoomSpeed.Speed10;
             IsPlaying = RoomStatus.Waiting;
-            Mode = mode;
             Difficulty = RoomDifficulty.EX;
+            WaitForSong = true;
+            PasswordFlag = cFlag;
             MaxUser = 8;
-            CurrentUser = 1;
+            CurrentUser = 0;
             MinLvl = 0;
             MaxLvl = 0;
 
-            Players = new();
-            PlayerCount = 0;
-
-            SongID = arg3; // For DEBUG Purarg1e only
+            // Users
+            Users = new(8);
+            AddUser(cUser, GetEmptyColor());
         }
 
         public void SetSongID(int ID) {
@@ -181,7 +178,7 @@ namespace Estrol.X3Jam.Server.CData {
         public int NearestSlot() {
             int result = 0;
 
-            for (int i = 0; i < 10; i++) {
+            for (int i = 0; i < 8; i++) {
                 if (!Users.ContainsKey(i)) {
                     result = i;
                     break;
@@ -192,10 +189,15 @@ namespace Estrol.X3Jam.Server.CData {
         }
 
         public void Prepare() {
-            Players.Clear();
+            Players = new(MaxUser);
+            IsPlaying = RoomStatus.Playing;
+            Mode = RoomMode.JAM;
 
             foreach (KeyValuePair<int, User> itr in Users) {
                 itr.Value.IsFinished = false;
+                Players.Add(new() {
+                    User = itr.Value
+                });
             }
         }
 
@@ -223,59 +225,36 @@ namespace Estrol.X3Jam.Server.CData {
         }
 
         public void SubmitScore(User usr, ushort kool, ushort great, ushort bad, ushort miss, ushort maxcombo, ushort jam, ushort pass, int score) {
-            Players.Add(new() {
-                Kool = kool,
-                Great = great,
-                Bad = bad,
-                Miss = miss,
-                MaxCombo = maxcombo,
-                JamCombo = jam,
-                Score = score,
-            });
-
-            usr.Connection.Send(new byte[] {
-                0x06, 0x00, 0xb1, 0x0f, 0x00, 0x00
-            });
-
+            var pUser = Players.First(item => item.User == usr);
+            pUser.Kool = kool;
+            pUser.Great = great;
+            pUser.Bad = bad;
+            pUser.MaxCombo = maxcombo;
+            pUser.JamCombo = jam;
+            pUser.Score = score;
             usr.IsFinished = true;
 
-            PlayerCount++;
             if (Check()) {
+                IsPlaying = RoomStatus.Waiting;
+                Mode = RoomMode.VS;
+
                 Log.Write($"Room {RoomID} finished playing!");
+                var copy = new List<RoomUser>(Players);
+                copy.Sort((p1, p2) => p1.Score.CompareTo(p2.Score));
 
-                Players.Sort((p1, p2) => Slot(p1.User).CompareTo(Slot(p2.User)));
-
-                int itr = 1;
-                foreach (RoomUser val in Players) {
-                    val.Position = itr;
-
-                    itr++;
+                int i = 1;
+                foreach (RoomUser _plr in copy) {
+                    RoomUser plr = Players.Find(x => x.User == _plr.User);
+                    plr.Position = 0;
+                    i++;
                 }
 
                 Event(6);
             }
         }
 
-        public short GetGemFromScore(int score, int kool) {
-            int baseGem = score > 1000000 ? 5000 : 500;
-            float multipler = kool > 500 ? 1.5f : 1.2f;
-
-            return (short)(baseGem * multipler);
-        }
-
         public User[] GetUsers() {
             return Users.Values.ToArray();
-        }
-
-        public void _callback(object sender, int event_id, object[] args) {
-            switch (event_id) {
-
-                default: {
-                    Log.Write("Unknown ");
-
-                    break;
-                }
-            }
         }
 
         /// <summary>
@@ -309,8 +288,6 @@ namespace Estrol.X3Jam.Server.CData {
                     buf.Write(usr.MusicLength);
                     buf.Write(usr.MusicCount);
                     buf.SetLength();
-
-                    //buf.Write(new byte[2]);
 
                     byte[] array = buf.ToArray();
 
@@ -385,19 +362,22 @@ namespace Estrol.X3Jam.Server.CData {
                     buf.Write(MaxUser); // Max users
 
                     for (int i = 0; i < MaxUser; i++) {
-                        RoomUser user = Players[i];
-                        if (user != null) {
-                            buf.Write((byte)Slot(user.User));
+                        try {
+                            RoomUser uPlayer = Players[i];
+                            buf.Write((byte)i);
                             buf.Write(1);
-                            buf.Write(user.Kool);
-                            buf.Write(user.Great);
-                            buf.Write(user.Bad);
-                            buf.Write(user.Miss);
-                            buf.Write(user.MaxCombo);
-                            buf.Write(user.JamCombo);
-                            buf.Write(user.Score);
-                            buf.Write(GetGemFromScore(user.Score, user.Kool));
-                        } else {
+                            buf.Write(uPlayer.Kool);
+                            buf.Write(uPlayer.Great);
+                            buf.Write(uPlayer.Bad);
+                            buf.Write(uPlayer.Miss);
+                            buf.Write(uPlayer.MaxCombo);
+                            buf.Write(uPlayer.JamCombo);
+                            buf.Write(uPlayer.Score);
+                            buf.Write(GetGemFromScore(uPlayer.Score, uPlayer.Kool));
+                            buf.Write(uPlayer.User.Level);
+                            buf.Write(0);
+                            buf.Write((short)uPlayer.Position);
+                        } catch (ArgumentOutOfRangeException) {
                             buf.Write((byte)i);
                             buf.Write(0);
                         }
@@ -425,14 +405,14 @@ namespace Estrol.X3Jam.Server.CData {
 
                     break;
                 }
-
-                case 8: { // Case game ping
-                    PacketBuffer buf = new();
-
-
-                    break;
-                }
             }
+        }
+
+        private static short GetGemFromScore(int score, int kool) {
+            int baseGem = score > 1000000 ? 5000 : 500;
+            float multipler = kool > 500 ? 1.5f : 1.2f;
+
+            return (short)(baseGem * multipler);
         }
     }
 }

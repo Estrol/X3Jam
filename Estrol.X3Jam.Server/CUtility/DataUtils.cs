@@ -69,5 +69,9 @@ namespace Estrol.X3Jam.Server.Utils {
             int j = Array.IndexOf<T>(Arr, src) + 1;
             return (Arr.Length == j) ? Arr[0] : Arr[j];
         }
+
+        public static IList<T> Clone<T>(this IList<T> listToClone) where T : ICloneable {
+            return listToClone.Select(item => (T)item.Clone()).ToList();
+        }
     }
 }
