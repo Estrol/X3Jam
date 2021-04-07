@@ -16,5 +16,6 @@ namespace Estrol.X3Jam.Server.CData.RoomEnums {
         public ushort JamCombo { set; get; }
         public ushort MaxCombo { set; get; }
         public int Score { set; get; }
+        public Dictionary<int, User> QueueExits = new();
     }
 }

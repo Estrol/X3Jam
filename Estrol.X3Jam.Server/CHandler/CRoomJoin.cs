@@ -1,6 +1,7 @@
 ﻿using Estrol.X3Jam.Server.CData;
 using Estrol.X3Jam.Utility;
 using System;
+using System.IO;
 using System.Linq;
 
 namespace Estrol.X3Jam.Server.CHandler {
@@ -17,7 +18,7 @@ namespace Estrol.X3Jam.Server.CHandler {
 
             Write((short)0);
             Write((short)0xbbb);
-            Write(0);
+            Write(room.RoomID);
             Write((byte)position);  // todo: fix those functions....
             Write((byte)Color);
             Write(room.RoomName);
@@ -31,9 +32,10 @@ namespace Estrol.X3Jam.Server.CHandler {
                 Write((int)room.Arena);
             }
             
+            Write((byte)room.Mode); // 0 = Solo, 1 = VS, 2 = Tournament, 3 = JAM
+            Write((byte)room.Difficulty);
             Write((byte)room.Speed);
-            Write((short)room.Mode);
-            Write(7);
+            Write(7); // idk this
             for (int i = 0; i < 8; i++) {
                 if (position == i) {
                     continue;
@@ -74,8 +76,7 @@ namespace Estrol.X3Jam.Server.CHandler {
                 }
             } else {
                 Write(0);
-            }
-                
+            } 
 
             Client.UserInfo.Room = roomID;
             room.AddUser(Client.UserInfo, Color);

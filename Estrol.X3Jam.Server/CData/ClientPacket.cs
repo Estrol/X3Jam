@@ -30,6 +30,7 @@
         GameInit = 0xfac,
         GameQuit = 0xfb5,
         GamePing = 0xfae,
+        GameReady = 0xfa8,
         ScoreSubmit = 0xfb0,
         RoomPlrColorChange = 0x0fa4,
     }

@@ -201,6 +201,11 @@ namespace Estrol.X3Jam.Server {
                     handler.Handle();
                     break;
 
+                case ClientPacket.GameReady:
+                    handler = new CRoomUserReady(client);
+                    handler.Handle();
+                    break;
+
                 case ClientPacket.Tutorial1:
                 case ClientPacket.Tutorial2:
                     // Ignored

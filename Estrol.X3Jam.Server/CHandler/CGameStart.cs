@@ -11,7 +11,16 @@ namespace Estrol.X3Jam.Server.CHandler {
 
         public override void Code() {
             Room room = RoomManager.GetID(Client.UserInfo.Room);
-            room.Prepare();
+            if (!room.IsReady()) {
+                Write(new byte[] {
+
+                });
+
+                Send();
+                return;
+            }
+
+            room.GamePrepare();
 
             foreach (User usr in room.GetUsers())
                 usr.Connection.Send(new byte[] {

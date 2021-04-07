@@ -71,6 +71,12 @@ namespace Estrol.X3Jam.Server.CUtility {
         public void Write(short value) => Writer.Write(value);
 
         /// <summary>
+        /// Write 2 unsigned byte integer to "Stream"
+        /// </summary>
+        /// <param name="value"></param>
+        public void Write(ushort value) => Writer.Write(value);
+
+        /// <summary>
         /// Write 4 signed byte integer to "Stream"
         /// </summary>
         /// <param name="value"></param>

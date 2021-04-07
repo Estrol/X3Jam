@@ -1,4 +1,5 @@
 ﻿using Estrol.X3Jam.Server.CData;
+using Estrol.X3Jam.Utility;
 using System;
 using System.IO;
 
@@ -7,14 +8,17 @@ namespace Estrol.X3Jam.Server.CHandler {
         public CRoomBGChange(Client client) : base(client) { }
 
         public override void Code() {
-            using MemoryStream ms = new(Client.Message.data);
-            using BinaryReader br = new(ms);
+            byte[] data = new byte[4];
+            Buffer.BlockCopy(Client.Message.data, 2, data, 0, 4);
 
-            /* Discard */ br.ReadInt16();
+            RoomArena arena;
+            if (data[3] == 0x80) {
+                arena = RoomArena.Random;
+            } else {
+                arena = (RoomArena)BitConverter.ToInt32(data);
+            }
 
-            RoomArena arena = (RoomArena)br.ReadInt32();
             Client.Message.full_data[2] = 0xa3;
-
             Room room = RoomManager.GetIndex(Client.UserInfo.Room);
             room.Arena = arena;
 

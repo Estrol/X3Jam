@@ -12,6 +12,7 @@ using Estrol.X3Jam.Server.CUtility;
 using Estrol.X3Jam.Server.CData.RoomEnums;
 using Estrol.X3Jam.Server.Utils;
 using System;
+using System.IO;
 
 namespace Estrol.X3Jam.Server.CData {
     public class Room {
@@ -146,14 +147,31 @@ namespace Estrol.X3Jam.Server.CData {
             Users.Remove(item.Key);
 
             CurrentUser--;
-            if (CurrentUser > 0) {
+            if (CurrentUser > 0) { /**
+                if (IsPlaying == RoomStatus.Playing) {
+                    foreach (RoomUser user in Players) {
+                        user.QueueExits.Add(_slot, item.Value);
+                    }
+                } else {
+                    if (item.Value.IsRoomMaster) {
+                        item.Value.IsRoomMaster = false;
+
+                        int slot = item.Key;
+                        var user = NearestUser(item.Value);
+                        user.IsRoomMaster = true;
+                        Event(7, usr, item.Key);
+                    } else {
+                        Event(2, usr, _slot);
+                    }
+                } **/
+
                 if (item.Value.IsRoomMaster) {
                     item.Value.IsRoomMaster = false;
 
                     int slot = item.Key;
                     var user = NearestUser(item.Value);
                     user.IsRoomMaster = true;
-                    Event(7, usr, item.Key);
+                    Event(8, usr, item.Key, Slot(user));
                 } else {
                     Event(2, usr, _slot);
                 }
@@ -188,7 +206,7 @@ namespace Estrol.X3Jam.Server.CData {
             return result;
         }
 
-        public void Prepare() {
+        public void GamePrepare() {
             Players = new(MaxUser);
             IsPlaying = RoomStatus.Playing;
             Mode = RoomMode.JAM;
@@ -201,11 +219,24 @@ namespace Estrol.X3Jam.Server.CData {
             }
         }
 
-        public bool Check() {
+        public bool GameCheck() {
             bool flag = true;
 
             foreach (KeyValuePair<int, User> itr in Users) {
                 if (!itr.Value.IsFinished) {
+                    flag = false;
+                    break;
+                }
+            }
+
+            return flag;
+        }
+
+        public bool IsReady() {
+            bool flag = true;
+
+            foreach (KeyValuePair<int, User> itr in Users) {
+                if (itr.Value.Ready == 0) {
                     flag = false;
                     break;
                 }
@@ -234,7 +265,7 @@ namespace Estrol.X3Jam.Server.CData {
             pUser.Score = score;
             usr.IsFinished = true;
 
-            if (Check()) {
+            if (GameCheck()) {
                 IsPlaying = RoomStatus.Waiting;
                 Mode = RoomMode.VS;
 
@@ -243,9 +274,9 @@ namespace Estrol.X3Jam.Server.CData {
                 copy.Sort((p1, p2) => p1.Score.CompareTo(p2.Score));
 
                 int i = 1;
-                foreach (RoomUser _plr in copy) {
-                    RoomUser plr = Players.Find(x => x.User == _plr.User);
-                    plr.Position = 0;
+                foreach (RoomUser p in copy) {
+                    RoomUser plr = Players.Find(x => x.User == p.User);
+                    plr.Position = i;
                     i++;
                 }
 
@@ -377,6 +408,8 @@ namespace Estrol.X3Jam.Server.CData {
                             buf.Write(uPlayer.User.Level);
                             buf.Write(0);
                             buf.Write((short)uPlayer.Position);
+
+                            Log.Write($"[DEBUG] User: {uPlayer.User.Username} {uPlayer.Kool} {uPlayer.Great} {uPlayer.Bad} {uPlayer.Miss} {uPlayer.MaxCombo} {uPlayer.JamCombo} {uPlayer.Score} {GetGemFromScore(uPlayer.Score, uPlayer.Kool)}");
                         } catch (ArgumentOutOfRangeException) {
                             buf.Write((byte)i);
                             buf.Write(0);
@@ -385,6 +418,8 @@ namespace Estrol.X3Jam.Server.CData {
 
                     buf.SetLength();
                     byte[] data = buf.ToArray();
+                    File.WriteAllBytes(AppDomain.CurrentDomain.BaseDirectory + "\\Hello.dmg", data);
+
                     foreach (RoomUser rUser in Players) {
                         rUser.User.Connection.Send(data);
                     }
@@ -401,6 +436,25 @@ namespace Estrol.X3Jam.Server.CData {
                     byte[] data = buf.ToArray();
                     foreach (RoomUser rUser in Players) {
                         rUser.User.Connection.Send(data);
+                    }
+
+                    break;
+                }
+
+                case 8: {
+                    PacketBuffer buf = new();
+                    buf.Write((short)8);
+                    buf.Write((short)0xbbf);
+                    buf.Write(arg1);
+
+                    buf.Write((short)6);
+                    buf.Write((short)0xbbf);
+                    buf.Write((byte)0);
+                    buf.Write((byte)arg2);
+
+                    byte[] data = buf.ToArray();
+                    foreach (KeyValuePair<int, User> itr in Users) {
+                        itr.Value.Connection.Send(data);
                     }
 
                     break;

@@ -62,6 +62,7 @@ namespace Estrol.X3Jam.Server.CData {
         public int ClothAccessory { set; get; } = 0;
         public int Pet { set; get; } = 0;
 
+
         public int[] ToArray() => new[] {
             Instrument, Hair, Accessory, Glove,
             Necklace, Cloth, Pant, Glass,

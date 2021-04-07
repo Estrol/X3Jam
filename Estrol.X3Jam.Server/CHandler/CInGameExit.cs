@@ -11,20 +11,18 @@ namespace Estrol.X3Jam.Server.CHandler {
 
         public override void Code() {
             Room room = RoomManager.GetID(Client.UserInfo.Room);
+            int slot = room.Slot(Client.UserInfo);
+
             Write((short)0x09);
             Write((short)0xfb6);
-            Write((byte)0);
+            Write((byte)slot);
+            Write(Client.UserInfo.Level);
 
             if (room.IsPlaying == RoomStatus.Playing) {
-                int slot = room.Slot(Client.UserInfo);
                 room.SubmitScore(Client.UserInfo, 0, 0, 0, 0, 0, 0, 0, 0);
                 room.RemoveUser(Client.UserInfo);
 
-                Write(Client.UserInfo.Level);
-
                 room.Event(7, null, slot);
-            } else {
-                Write(Client.UserInfo.Level);
             }
 
             Send();
