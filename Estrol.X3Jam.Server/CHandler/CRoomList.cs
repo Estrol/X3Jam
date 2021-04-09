@@ -70,7 +70,15 @@ namespace Estrol.X3Jam.Server.CHandler {
                     buf.Write((byte)room.CurrentUser);
                     buf.Write((byte)room.MinLvl);
                     buf.Write((byte)room.MaxLvl);
-                    buf.Write(new byte[6]);
+                    buf.Write(new byte[4]);
+                    if (room.RingCount > 1) {
+                        buf.Write(room.RingCount);
+                        buf.Write(room.RingData);
+                        buf.Write((short)0);
+                    } else {
+                        buf.Write((short)0);
+                    }
+
                     Log.Write(string.Format("{0} {1}", room.RoomName, room.RoomID));
 
                     ++num;

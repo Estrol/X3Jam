@@ -71,12 +71,7 @@ namespace Estrol.X3Jam.Server.CManager {
         }
 
         public Room[] RoomList() {
-            List<Room> itr_list = new();
-
-            foreach (KeyValuePair<int, Room> itr in Rooms)
-                itr_list.Add(itr.Value);
-
-            return itr_list.ToArray();
+            return Rooms.Values.ToList().ToArray();
         }
 
         public void Send(int idcase, Room room, string name = "", int flag = 0, int max = 0, int current = 0) {
@@ -89,16 +84,24 @@ namespace Estrol.X3Jam.Server.CManager {
                     buf.Write((short)0x7d5);
                     buf.Write(room.RoomID);
                     buf.Write(name);
-                    buf.Write((short)flag); // 0 = Solo, 1 = VS, 3 = Coop
-                    buf.Write((short)0); // Ring data
-                    buf.SetLength();
+                    buf.Write(flag); // 0 = Solo, 1 = VS, 3 = Coop
+                    buf.Write((short)0);
+                    
 
                     PacketBuffer buf2 = new();
-                    buf2.Write((short)0x0c);
-                    buf2.Write((short)0x7e7);
+                    buf2.Write((short)0);
+                    buf2.Write((short)0x7e9);
                     buf2.Write(room.RoomID);
-                    buf2.Write(room.SongID);
+                    if (room.RingCount > 1) {
+                        buf2.Write(room.RingCount);
+                        buf2.Write(room.RingData);
+                        buf2.Write((short)0);
+                    } else {
+                        buf2.Write(0);
+                    }
 
+                    buf.SetLength();
+                    buf2.SetLength();
                     byte[] data = buf.ToArray();
                     byte[] data2 = buf2.ToArray();
                     foreach (User user in users) {
@@ -147,9 +150,12 @@ namespace Estrol.X3Jam.Server.CManager {
                 case 4: { // Room OJN ID Change
                     PacketBuffer buf = new();
                     buf.Write((short)0xc);
-                    buf.Write((short)0x77e);
+                    buf.Write((short)0x7e7);
                     buf.Write(room.RoomID);
-                    buf.Write(room.SongID);
+                    buf.Write((short)room.SongID);
+                    buf.Write((byte)room.Difficulty);
+                    buf.Write((byte)room.Speed);
+                    
 
                     byte[] data = buf.ToArray();
                     foreach (User user in users) {
@@ -181,18 +187,19 @@ namespace Estrol.X3Jam.Server.CManager {
 
                 case 6: { // Room's Rings
                     PacketBuffer buf = new();
-                    short length = (short)(8 + (room.RingData != null ? room.RingData.Length : 4));
 
-                    buf.Write(length);
+                    buf.Write((short)0);
                     buf.Write((short)0x77e);
                     buf.Write(room.RoomID);
-                    if (room.RingData != null) {
+                    if (room.RingCount > 1) {
                         buf.Write(room.RingCount);
                         buf.Write(room.RingData);
+                        buf.Write((short)0);
                     } else {
                         buf.Write(0);
                     }
 
+                    buf.SetLength();
                     byte[] data = buf.ToArray();
                     foreach (User user in users) {
                         if (user.Room == -1) {

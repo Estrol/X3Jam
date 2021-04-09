@@ -31,6 +31,7 @@ namespace Estrol.X3Jam.Server.CHandler {
                     case "annon": {
                         if (args.Length == 0) {
                             MessageSend(channel, usr, "annon <message> [isEveryone=false]", true, true);
+                            break;
                         }
 
                         bool isEveryone = false;

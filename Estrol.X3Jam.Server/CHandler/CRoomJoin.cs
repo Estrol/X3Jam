@@ -51,9 +51,9 @@ namespace Estrol.X3Jam.Server.CHandler {
                     Write(usr.Nickname);
                     Write(usr.Level);
                     Write((byte)0);
-                    Write((byte)1); // Roomaster
+                    Write((byte)(usr.IsRoomMaster ? 1 : 0)); // Roomaster
                     Write((byte)usr.Color); // Room Color
-                    Write((byte)0); // Ready?
+                    Write((byte)usr.Ready); // Ready?
                     Write((byte)0); 
                     foreach (int itr in usr.Char.ToArray()) {
                         Write(itr);
@@ -72,7 +72,9 @@ namespace Estrol.X3Jam.Server.CHandler {
                 if (room.RingCount < 1) {
                     Write(0);
                 } else {
+                    Write(room.RingCount);
                     Write(room.RingData);
+                    Write((short)0);
                 }
             } else {
                 Write(0);

@@ -19,10 +19,12 @@ namespace Estrol.X3Jam.Server.CHandler {
             Write(Client.UserInfo.Level);
 
             if (room.IsPlaying == RoomStatus.Playing) {
-                room.SubmitScore(Client.UserInfo, 0, 0, 0, 0, 0, 0, 0, 0);
-                room.RemoveUser(Client.UserInfo);
+                if (room.CurrentUser > 1) {
+                    room.SubmitScore(Client.UserInfo, 0, 0, 0, 0, 0, 0, 0, 0);
+                    room.RemoveUser(Client.UserInfo);
 
-                room.Event(7, null, slot);
+                    room.Event(7, null, slot);
+                }
             }
 
             Send();

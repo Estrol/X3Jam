@@ -9,9 +9,12 @@ namespace Estrol.X3Jam.Server.CHandler {
 
         public override void Code() {
             ushort SongID = BitConverter.ToUInt16(Client.Message.data, 2);
+            int Diff = Client.Message.data[4];
+            int Speed = Client.Message.data[5];
+
             Room room = RoomManager.GetID(Client.UserInfo.Room);
 
-            room.SetSongID(SongID);
+            room.SetSongID(SongID, Diff, Speed);
             Log.Write("[{0}@{1}] (ch: {2}, room: {3}) Set SongID: {4}",
                 Client.UserInfo.Username, 
                 Client.IPAddr,
@@ -19,14 +22,8 @@ namespace Estrol.X3Jam.Server.CHandler {
                 Client.UserInfo.Room,
                 SongID);
 
-            ushort p_len = (ushort)(Client.Message.data.Length + 2);
-            byte[] len = BitConverter.GetBytes(p_len);
-            byte[] data = len.Concat(Client.Message.data).ToArray();
-            data[2] = 0xa1;
-
-            RoomManager.Send(1, room, room.RoomName, (int)room.IsPlaying);
-            Write(data);
-            Send();
+            //RoomManager.Send(1, room, room.RoomName, (int)room.IsPlaying);
+            RoomManager.Send(4, room);
         }
     }
 }
