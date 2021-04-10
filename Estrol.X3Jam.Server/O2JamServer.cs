@@ -151,12 +151,12 @@ namespace Estrol.X3Jam.Server {
                     handler.Handle();
                     break;
 
-                case ClientPacket.ClientMSG:
+                case ClientPacket.ListChat:
                     handler = new CLobbyMessage(client);
                     handler.Handle();
                     break;
 
-                case ClientPacket.ClientMSG2:
+                case ClientPacket.RoomChat:
                     handler = new CRoomMessage(client);
                     handler.Handle();
                     break;
