@@ -11,16 +11,15 @@ namespace Estrol.X3Jam.Server.CHandler {
 
             short flag1 = BitConverter.ToInt16(Client.Message.data, 2);
             short flag2 = BitConverter.ToInt16(Client.Message.data, 4);
+            int score = BitConverter.ToInt32(Client.Message.data, 10);
+            byte[] positionData = room.Submit(Client.UserInfo, score);
 
             Write((short)0x0);
             Write((short)0xfaf);
             Write((byte)slot);
             Write(flag1);
             Write(flag2);
-            Write(new byte[] {
-                0xFF, 0xFF, 0xFF, 0xFF,
-                0xFF, 0xFF, 0xFF, 0xFF
-            });
+            Write(positionData);
 
             SetL();
             byte[] data = ToArray();

@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Diagnostics;
 using Estrol.X3Jam.Server;
 using Estrol.X3Jam.Utility;
+using Estrol.X3Jam.Server.CData;
 
 namespace Estrol.X3Jam.Website {
     public class WebMain {
@@ -26,37 +27,89 @@ namespace Estrol.X3Jam.Website {
 
         public void Initalize() {
             listener.Start();
+            Log.Write("::Website -> Ready -> Now listening at port {0}", this.port);
         }
 
         public void HandleRequest(object o, WebConnection wc) {
-            switch (wc.header.URLParams) {
+            switch (wc.header.URLFull.AbsolutePath) {
+
                 case "/": {
                     wc.Send("<b>Welcome to X3-JAM</b><br><b1>Nothing here for now</b1>", 200, "text/html");
                     break;
                 }
 
-                case "/accounts/register": {
+                case "/accounts/css/register.css": {
+                    if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "\\conf\\www\\css")) {
+                        goto default;
+                    }
+
+                    if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "\\conf\\www\\css\\register.css")) {
+                        goto default;
+                    }
+
+                    string htmlData = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "\\conf\\www\\css\\register.css");
+                    wc.Send(htmlData, 200, "text/css");
                     break;
                 }
 
+                case "/accounts/register": {
+                    if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + "\\conf\\www")) {
+                        goto default;
+                    }
+
+                    if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "\\conf\\www\\register.html")) {
+                        goto default;
+                    }
+
+                    string htmlData = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + "\\conf\\www\\register.html", Encoding.UTF8);
+                    wc.Send(htmlData, 200, "text/html");
+                    break;
+                }
+
+                case "/userlist.aspx":
+                case "/gamefind/gamefine_main.aspx":
                 case "/gamefind/gamefine_main.asp": {
-                    string fine = "<!DOCTYPE html><html><body style=\"backgro" +
+                    StringBuilder str = new();
+                    str.Append("<!DOCTYPE html><html><body style =\"backgro" +
+                        "und-color:black;\"><p><span style=\"color: #ffffff;\"><s" +
+                        "trong>X3-JAM Server</strong></span><br/><span s" +
+                        "tyle=\"color: #ffffff;\">Online Users:");
+
+                    string totals = "";
+                    int count = 0;
+                    foreach (Channel channel in main.ChannelManager.channels) {
+                        totals += $"CH-{channel.m_ChannelID} [{channel.GetUsers().Length}]<br/>";
+                        foreach (User user in channel.GetUsers()) {
+                            count++;
+                            totals += $"- [{user.Level}] {user.Username}</br>";
+                        }
+
+                        totals += "<br/>";
+                    }
+
+                    str.Append($" {count}</br>");
+                    str.Append(totals);
+                    str.Append("<button type=\"button\" onClick=\"window.location.reload()\">Refresh</button></span></p></body></html>");
+
+                    _ = "<!DOCTYPE html><html><body style=\"backgro" +
                         "und-color:black;\"><p><span style=\"color: #ffffff;\"><s" +
                         "trong>Welcome to X3-JAM</strong></span><br/><span s" +
                         "tyle=\"color: #ffffff;\">Online Users:<br/>- None</" +
                         "span></p></body></html>";
 
-                    wc.Send(fine, 200, "text/html");
+                    wc.Send(str.ToString(), 200, "text/html");
                     break;
                 }
 
-                case "/patch/b.txt": {
+                case "/patch/b.txt":
+                case "/Patch/b.txt": {
                     string data = File.ReadAllText(AppDomain.CurrentDomain.BaseDirectory + @"\conf\news.txt");
                     wc.Send(data);
                     break;
                 }
 
-                case "/patch/a.html": {
+                case "/patch/a.html":
+                case "/Patch/a.html": {
                     string patch_a = "<!DOCTYPE html><html><body style=\"background" +
                         "-color:black;\"><p><span style=\"color: #ffffff;\"><strong>" +
                         "Welcome to X3-JAM</strong></span><br/><span style=\"color: " +

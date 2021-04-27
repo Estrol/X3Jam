@@ -7,16 +7,16 @@ using System.Threading.Tasks;
 namespace Estrol.X3Jam.Server.CData {
     public enum RoomRing {
         // Power Ring
-        Power = 0,
+        Power = 0x9F,
 
         // Arrange Rings
-        Mirror = 0,
-        Random = 0,
-        Panic = 0,
+        Mirror = 0x99,
+        Random = 0x9B,
+        Panic = 0x9D,
 
         // Visibility Rings
-        Hidden = 0,
-        Sudden = 0,
-        Dark = 0
+        Hidden = 0x97,
+        Sudden = 0x93,
+        Dark = 0x95
     }
 }

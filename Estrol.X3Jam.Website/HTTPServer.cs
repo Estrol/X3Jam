@@ -34,6 +34,9 @@ namespace Estrol.X3Jam.Website {
                     ThreadPool.QueueUserWorkItem(HandleClient, client);
                 } catch (Exception e) {
                     if (!e.Message.Contains("An existing connection was forcibly closed by the remote host")) {
+                        if (e.Message.Contains("Requested value '' was not found."))
+                            throw;
+
                         Console.WriteLine("[Website] Exception: {0}", e.Message);
                     }
                 }
@@ -52,6 +55,9 @@ namespace Estrol.X3Jam.Website {
                 }
             } catch (Exception e) {
                 if (!e.Message.Contains("An existing connection was forcibly closed by the remote host")) {
+                    if (e.Message.Contains("Requested value '' was not found."))
+                        throw;
+
                     Console.WriteLine("[Website] Exception: {0}", e.Message);
                 }
             }

@@ -13,6 +13,12 @@ namespace Estrol.X3Jam.Server.CHandler {
         public CRoomList(Client client) : base(client) {}
 
         public override void Code() {
+            Room uRoom = RoomManager.GetID(Client.UserInfo.Room);
+            if (uRoom != null) {
+                uRoom.RemoveUser(Client.UserInfo);
+                Client.UserInfo.Room = -1;
+            }
+
             Channel channelById = ChanManager.GetChannelByID(Client.UserInfo.ChannelID);
             User[] users = channelById.GetUsers();
 
@@ -56,8 +62,6 @@ namespace Estrol.X3Jam.Server.CHandler {
                     * int8[8]   Undocumented
                     */
 
-                    Log.Write(room.Mode.ToString());
-
                     buf.Write(room.RoomID);
                     buf.Write((byte)room.IsPlaying);
                     buf.Write(room.RoomName, Encoding.UTF8);
@@ -78,8 +82,6 @@ namespace Estrol.X3Jam.Server.CHandler {
                     } else {
                         buf.Write((short)0);
                     }
-
-                    Log.Write(string.Format("{0} {1}", room.RoomName, room.RoomID));
 
                     ++num;
                 } else {

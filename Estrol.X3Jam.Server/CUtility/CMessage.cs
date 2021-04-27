@@ -1,23 +1,28 @@
 ﻿using Estrol.X3Jam.Server.CData;
 using Estrol.X3Jam.Utility;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Estrol.X3Jam.Server.Utils {
+namespace Estrol.X3Jam.Server.CUtility {
     public class CMessage {
         public DateTime Time;
-        public ClientPacket opcode;
-        public ushort _opcode;
-        public byte[] data;
-        public byte[] full_data { set; get; }
+        public ClientPacket Opcode;
+        public byte[] Data;
+        public byte[] FullData;
 
         private readonly MemoryStream ms;
         private readonly BinaryReader br;
 
-        public bool IsFailed = false;
+        public ushort _opcode => (ushort)Opcode;
+        public ClientPacket opcode => Opcode;
+        public byte[] full_data => FullData;
+        public byte[] data => Data;
 
-        public CMessage(Client client, byte[] rawData) {
+        public CMessage(CMessageManager Base, Client client, byte[] rawData) {
             ms = new(rawData);
             br = new(ms);
 
@@ -30,14 +35,13 @@ namespace Estrol.X3Jam.Server.Utils {
                 int dataOffset = br.ReadInt32();
                 int dataWithLength = br.ReadInt32();
 
-                data = br.ReadBytes(dataOffset);
+                Data = br.ReadBytes(dataOffset);
                 byte[] bLen = BitConverter.GetBytes((short)dataWithLength);
-                full_data = bLen.Concat(data).ToArray();
+                FullData = bLen.Concat(data).ToArray();
 
-                _opcode = BitConverter.ToUInt16(data, 0);
-                opcode = (ClientPacket)_opcode;
+                Opcode = (ClientPacket)BitConverter.ToUInt16(data, 0);
             } catch (Exception error) {
-                IsFailed = true;
+                Base.IsFailed = true;
                 if (error.Message == "Unable to read beyond the end of the stream.") {
                     Log.Write("[{0}@{1}] Client disconnected with abnormal way.", client.UserInfo.Username, client.IPAddr);
                 } else {

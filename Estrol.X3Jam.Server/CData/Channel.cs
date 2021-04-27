@@ -54,5 +54,15 @@ namespace Estrol.X3Jam.Server.CData {
 
             m_Users = itr.ToArray();
         }
+
+        public string GetSongName(int ID) {
+            foreach (OJN ojn in GetMusicList()) {
+                if (ojn.Id == ID) {
+                    return $"{ojn.OJMString} by {ojn.ArtistString}";
+                }
+            }
+
+            return "Unknown Song by null";
+        }
     }
 }

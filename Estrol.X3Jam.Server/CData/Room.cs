@@ -33,7 +33,7 @@ namespace Estrol.X3Jam.Server.CData {
         public int RingCount;
         public bool WaitForSong;
 
-        public int CurrentUser;
+        public int CurrentUser => Users.Count;
         public int MaxUser;
         public int RoomID;
         public int Roomarg2;
@@ -58,7 +58,7 @@ namespace Estrol.X3Jam.Server.CData {
             WaitForSong = true;
             PasswordFlag = cFlag;
             MaxUser = 8;
-            CurrentUser = 0;
+            //CurrentUser = 0;
             MinLvl = 0;
             MaxLvl = 0;
 
@@ -140,7 +140,7 @@ namespace Estrol.X3Jam.Server.CData {
             int slot = NearestSlot();
             Users.Add(slot, usr);
 
-            CurrentUser++;
+            //CurrentUser++;
             Event(1, usr, (int)color, slot);
         }
 
@@ -149,7 +149,7 @@ namespace Estrol.X3Jam.Server.CData {
             int _slot = Slot(usr);
             Users.Remove(item.Key);
 
-            CurrentUser--;
+            //CurrentUser--;
             if (CurrentUser > 0) {
                 if (item.Value.IsRoomMaster) {
                     item.Value.IsRoomMaster = false;
@@ -163,7 +163,7 @@ namespace Estrol.X3Jam.Server.CData {
             } else {
                 // Indicate that room is abandoned
 
-                Log.Write("Room {0} deleted", RoomID);
+                Log.Write("(ch {0}, room: {1}) Deleted", RoomManager.Channel.m_ChannelID, RoomID);
                 RoomManager.Remove(this);
             }
         }
@@ -204,12 +204,14 @@ namespace Estrol.X3Jam.Server.CData {
         public void GamePrepare() {
             Players = new(MaxUser);
             IsPlaying = RoomStatus.Playing;
-            Mode = RoomMode.JAM;
+            // Mode = RoomMode.JAM;
 
+            Log.Write("(ch {0}, room: {1}) Now playing song: {2}", RoomManager.Channel.m_ChannelID, RoomID, RoomManager.Channel.GetSongName(SongID));
             RoomManager.Send(3, this, null, 2);
             foreach (KeyValuePair<int, User> itr in Users) {
                 itr.Value.IsFinished = false;
                 Players.Add(new() {
+                    Slot = Slot(itr.Value),
                     User = itr.Value
                 });
             }
@@ -263,24 +265,58 @@ namespace Estrol.X3Jam.Server.CData {
 
             if (GameCheck()) {
                 IsPlaying = RoomStatus.Waiting;
-                Mode = RoomMode.VS;
+                // Mode = RoomMode.VS;
 
                 // TODO: Clean up
-                Log.Write($"Room {RoomID} finished playing!");
-                var copy = new List<RoomUser>(Players);
-                copy = copy.OrderByDescending(p => p.Score).ToList();
+                Log.Write("(ch {0}, room: {1}) Finish Playing!", RoomManager.Channel.m_ChannelID, RoomID);
+                List<RoomUser> plrs = new List<RoomUser>(Players)
+                    .OrderBy(prop => prop.Score).ToList();
 
-                int i = 1;
-                foreach (RoomUser p in copy) {
-                    RoomUser plr = Players.Find(x => x.User == p.User);
-                    plr.Position = i;
-                    i++;
+                for (int i = 0; i < 8; i++) {
+                    if (plrs.ElementAtOrDefault(i) != null) {
+                        RoomUser roomUser = plrs[i];
+                        RoomUser player = Players.Find(x => x.Slot == roomUser.Slot);
+                        player.Position = i;
+                    }
                 }
 
                 RoomManager.Send(3, this, null, 1);
                 RoomManager.Send(4, this);
                 Event(6);
             }
+        }
+
+        public byte[] Submit(User usr, int score) {
+            var pUser = Players.First(item => item.User == usr);
+            pUser.Score = score;
+
+            byte[] scores = new byte[] {
+                0xff, 0xff, 0xff, 0xff,
+                0xff, 0xff, 0xff, 0xff
+            };
+
+            if (CurrentUser > 1) {
+                bool IsEmpty = true;
+                foreach (RoomUser user in Players) {
+                    if (user.Score != 0) {
+                        IsEmpty = false;
+                    }
+                }
+
+                if (!IsEmpty) {
+                    List<RoomUser> plrs = new List<RoomUser>(Players)
+                        .OrderByDescending(prop => prop.Score).ToList();
+
+                    for (int i = 0; i < 8; i++) {
+                        if (plrs.ElementAtOrDefault(i) != null) {
+                            RoomUser roomUser = plrs[i];
+                            scores[roomUser.Slot] = (byte)i;
+                        }
+                    }
+                }
+            }
+
+            return scores;
         }
 
         public User[] GetUsers() {
@@ -299,7 +335,6 @@ namespace Estrol.X3Jam.Server.CData {
             switch(num) {
                 case 1: { // Case when someone enter room
 
-                    Log.Write(usr.Char.Gender.ToString() + " A");
                     PacketBuffer buf = new();
                     buf.Write((short)0);                // Length
                     buf.Write((short)0x0bbc);           // Opcode
@@ -411,7 +446,7 @@ namespace Estrol.X3Jam.Server.CData {
                             buf.Write(0);
                             buf.Write((short)uPlayer.Position);
 
-                            Log.Write($"[DEBUG] User: {uPlayer.User.Username} {uPlayer.Kool} {uPlayer.Great} {uPlayer.Bad} {uPlayer.Miss} {uPlayer.MaxCombo} {uPlayer.JamCombo} {uPlayer.Score} {GetGemFromScore(uPlayer.Score, uPlayer.Kool)}");
+                            //Log.Write($"[DEBUG] User: {uPlayer.User.Username} {uPlayer.Kool} {uPlayer.Great} {uPlayer.Bad} {uPlayer.Miss} {uPlayer.MaxCombo} {uPlayer.JamCombo} {uPlayer.Score} {GetGemFromScore(uPlayer.Score, uPlayer.Kool)}");
                         } else {
                             buf.Write((byte)i);
                             buf.Write(0);
@@ -420,7 +455,6 @@ namespace Estrol.X3Jam.Server.CData {
 
                     buf.SetLength();
                     byte[] data = buf.ToArray();
-                    File.WriteAllBytes(AppDomain.CurrentDomain.BaseDirectory + "\\Hello.dmg", data);
 
                     foreach (RoomUser rUser in Players) {
                         rUser.User.Connection.Send(data);

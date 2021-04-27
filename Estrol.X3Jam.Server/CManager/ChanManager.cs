@@ -23,7 +23,7 @@ namespace Estrol.X3Jam.Server.CManager {
                 string[] split_data = data.Split(new[] { ',' });
 
                 try {
-                    Channel ch = new Channel(main, this, i + 1, split_data[0], int.Parse(split_data[1]));
+                    Channel ch = new(main, this, i + 1, split_data[0], int.Parse(split_data[1]));
                     itrs.Add(ch);
 
                     ChannelCount++;

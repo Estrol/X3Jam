@@ -25,15 +25,20 @@ namespace Estrol.X3Jam.Website {
             ns.Read(data, 0, 2000);
             int actualData = ReadDataUntilNull(data);
             byte[] aData = new byte[actualData];
-            Buffer.BlockCopy(this.data, 0, aData, 0, actualData);
+            Buffer.BlockCopy(data, 0, aData, 0, actualData);
             sData = Encoding.ASCII.GetString(aData, 0, actualData);
 
             string[] RawHeaderSeperator = new string[] { "\r\n" };
             string[] HeaderData = sData.Split(RawHeaderSeperator, StringSplitOptions.RemoveEmptyEntries);
 
             string[] data_1 = HeaderData[0].Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+            if (data_1[0] == "\0") {
+                forwarded = false;
+                return;
+            }
+
             header = new HTTPHeader() {
-                Method = (HTTPMethod)Enum.Parse(typeof(HTTPMethod), data_1[0], true),
+                Method = (HTTPMethod)Enum.Parse(typeof(HTTPMethod), data_1[0] == "\0" ? "GET" : data_1[0], true),
                 URLParams = data_1[1],
                 HTTPVersion = data_1[2]
             };
@@ -45,15 +50,16 @@ namespace Estrol.X3Jam.Website {
 
             int data_post_index = 0;
 
-            for (int i = 0; i < HeaderData.Length - 1; i++) {
-                string hData = HeaderData[i + 1];
+            for (int i = 0; i < HeaderData.Length; i++) {
+                string hData = HeaderData[i];
                 string[] SpaceSeperator = new string[] { " " };
                 string[] spData = hData.Split(SpaceSeperator, StringSplitOptions.RemoveEmptyEntries);
-                if (spData[0] == "\0" || spData[0].EndsWith("\0")) break;
+                if (spData.Length == 1) break;
                 string rData = spData[1];
                 data_post_index++;
 
-                switch(spData[0].Replace(":", string.Empty)) {
+                string sCase = spData[0].Replace(":", string.Empty);
+                switch (sCase) {
                     case "Host": {
                         header.Host = rData;
 
@@ -115,7 +121,7 @@ namespace Estrol.X3Jam.Website {
             header.Append(sData);
             header.Append(Environment.NewLine);
 
-            byte[] hData = Encoding.ASCII.GetBytes(header.ToString());
+            byte[] hData = Encoding.UTF8.GetBytes(header.ToString());
 
             ns.Write(hData, 0, hData.Length);
             ns.Flush();

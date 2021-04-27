@@ -41,8 +41,8 @@ namespace Estrol.X3Jam.Server.Utils {
         /// <PARAM name="Path"></PARAM>
         /// <returns></returns>
         public string IniReadValue(string Section, string Key) {
-            StringBuilder temp = new StringBuilder(255);
-            int i = GetPrivateProfileString(Section, Key, "", temp, 255, this.path);
+            StringBuilder temp = new(255);
+            _ = GetPrivateProfileString(Section, Key, "", temp, 255, this.path);
             return temp.ToString();
         }
     }

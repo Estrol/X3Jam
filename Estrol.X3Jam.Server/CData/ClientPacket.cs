@@ -31,7 +31,7 @@
         GameReady = 0xfa8,
         ScoreSubmit = 0xfb0,
         RoomPlrColorChange = 0x0fa4,
-
+        RoomSlotLock = 0x0bc0,
         ListChat = 0x07dc,
         RoomChat = 0x0bc3,
     }

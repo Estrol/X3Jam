@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Estrol.X3Jam.Server.CData.RoomEnums {
     public class RoomUser { 
+        public int Slot { set; get; }
         public int Position { set; get; }
         public User User { set; get; }
         public RoomColor Color { set; get; }

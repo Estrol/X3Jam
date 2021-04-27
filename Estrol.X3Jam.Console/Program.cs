@@ -3,10 +3,11 @@ using System.Threading;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 using Estrol.X3Jam.Server;
 using Estrol.X3Jam.Website;
-using System.Runtime.InteropServices;
 
 namespace Estrol.X3Jam.IConsole {
     public class Program {
@@ -15,19 +16,19 @@ namespace Estrol.X3Jam.IConsole {
         static void Main(string[] args) {
             Type t = Type.GetType("Mono.Runtime");
             if (t != null) {
-                Console.WriteLine("ERROR: You can't run this using mono, please use .NET 5 to run this!");
+                Console.WriteLine("ERROR: You cannot run this server app from linux or using mono, use wine32 instead to run the server. and linux support coming soon using .NET 5 for linux");
                 return;
             }
 
             Console.Title = "X3Jam - O2-JAM 1.8 Server Emulation";
             PrintLogo();
 
-            using Mutex mutex = new(true, "X3JAMSERVER", out bool createNew); 
+            using Mutex mutex = new(false, "Global\\X3JAMMERSERVER", out bool createNew); 
             if (createNew) {
                 O2JamServer Server = new();
                 Server.Intialize();
 
-                WebMain Website = new(Server, 15000);
+                WebMain Website = new(Server, int.Parse(Server.Config.Get("WebPort")));
                 Website.Initalize();
 
                 Console.CancelKeyPress += Console_CancelKeyPress;
@@ -64,7 +65,10 @@ namespace Estrol.X3Jam.IConsole {
             Console.WriteLine(logo);
             Console.WriteLine("\nX3Jam Server Developer version (c) 2021 Estrol's Group Developers (Estrol and MatVeiQaa)");
             Console.WriteLine(string.Format("Current time is {0}\n", DateTime.Now));
-            Console.WriteLine("Server Version: alpha-0.3 build #0012");
+            Console.WriteLine("Server Version: beta-0.5 build #0176");
+            if (IsWine()) {
+                Console.WriteLine("Running with WINE mode!");
+            }
             Console.WriteLine();
         }
 
@@ -90,6 +94,11 @@ namespace Estrol.X3Jam.IConsole {
             }
 
             return Encoding.UTF8.GetString(mso.ToArray());
+        }
+
+        public static bool IsWine() {
+            int count = Process.GetProcessesByName("winlogon").Length;
+            return count == 0;
         }
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]

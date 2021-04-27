@@ -4,6 +4,9 @@
 		<TargetFramework>net5.0</TargetFramework>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<Platforms>AnyCPU;x64</Platforms>
+		<AssemblyName>X3Server</AssemblyName>
+		<SignAssembly>false</SignAssembly>
+		<AssemblyOriginatorKeyFile>X3SERVERASSEMBLYNAMEESTROL.pfx</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
 	<ItemGroup>
 	  <PackageReference Include="System.Data.SQLite" Version="1.0.113.6" />

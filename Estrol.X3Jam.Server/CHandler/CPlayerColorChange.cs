@@ -1,6 +1,7 @@
 ﻿using Estrol.X3Jam.Server.CData;
 using Estrol.X3Jam.Server.CData.RoomEnums;
 using Estrol.X3Jam.Server.CUtility;
+using Estrol.X3Jam.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,14 @@ namespace Estrol.X3Jam.Server.CHandler {
             Write(new byte[] {
                 0x06, 0x00, 0xa9, 0x0f, (byte)slot, 0x01
             });
+
+            Log.Write("[{0}@{1}] (ch: {2}, room: {3}) Player {4} set color: {5}",
+                Client.UserInfo.Username,
+                Client.IPAddr,
+                Client.UserInfo.ChannelID,
+                Client.UserInfo.Room,
+                Client.UserInfo.Username,
+                Client.UserInfo.Color.ToString());
 
             byte[] data = ToArray();
             foreach (User usr in room.GetUsers())

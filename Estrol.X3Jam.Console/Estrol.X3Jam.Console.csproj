@@ -9,12 +9,16 @@
 		<AssemblyName>X3Console</AssemblyName>
 		<Authors>Estrol</Authors>
 		<RootNamespace>Estrol.X3Jam.IConsole</RootNamespace>
+		<SignAssembly>false</SignAssembly>
 	</PropertyGroup>
 	<ItemGroup>
 	  <None Remove="Resources\Icon.ico" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\Estrol.X3Jam.Server\Estrol.X3Jam.Server.csproj" />
+		<ProjectReference Include="..\Estrol.X3Jam.Server\Estrol.X3Jam.Server.csproj">
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+		</ProjectReference>
 		<ProjectReference Include="..\Estrol.X3Jam.Website\Estrol.X3Jam.Website.csproj" />
 	</ItemGroup>
 	<ItemGroup>

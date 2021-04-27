@@ -22,6 +22,13 @@ namespace Estrol.X3Jam.Server.CHandler {
             Room room = RoomManager.GetIndex(Client.UserInfo.Room);
             room.Arena = arena;
 
+            Log.Write("[{0}@{1}] (ch: {2}, room: {3}) Set ArenaID: {4}",
+                Client.UserInfo.Username,
+                Client.IPAddr,
+                Client.UserInfo.ChannelID,
+                Client.UserInfo.Room,
+                arena.ToString());
+
             foreach (User usr in room.GetUsers())
                 usr.Connection.Send(Client.Message.full_data);
         }

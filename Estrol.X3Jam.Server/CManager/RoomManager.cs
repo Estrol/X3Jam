@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 
 namespace Estrol.X3Jam.Server.CManager {
     public class RoomManager {
-        private O2JamServer Server;
-        private Channel Channel;
+        public O2JamServer Server;
+        public Channel Channel;
         private Dictionary<int, Room> Rooms;
         private int MaxRoom;
 
