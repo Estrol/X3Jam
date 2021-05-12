@@ -1,14 +1,12 @@
 # X3-JAM, A new O2-JAM 1.8 Server Emulation
-Currently the project on early progress.
+Cross-platform O2-JAM Server that easy to setup. \
+This project in beta state, and maybe the server might crash in some unexpected ways.
 
-There two entry point in this project solution:
-- `Console` Command-Style based server application for cross platform.
-- `WPF` GUI based server application for Windows Only.
+## Launcher
+Client Launcher for this server provided in folder `Estrol.X3Jam.Launcher`
 
 ## Project Goals
-- Multiplayer support.
-- Player shop support.
-- Website support.
+- Player Inventory and Avatar Skin.
 
 ## Requirements
 - .NET 5
@@ -16,11 +14,11 @@ There two entry point in this project solution:
 
 ## Compile
 - Open solution using Visual Studio 2019
-- Select `Estrol.X3Jam.Console` or `Estrol.X3Jam.WPF`
+- Select `Estrol.X3Jam.Console`
 - Press build (and it will automaticly restore the package)
 
 ## Supported clients
-- Modified 1.8 client (ripped Tcp Obfuscation)
+- Modified 1.8 client (ripped TCP Obfuscation)
 - 1.8 client with DLLInjection
 
 I need know How I can de-obfuscate vanilla 1.8 client packet to able support it without modification or using DLL Injection.

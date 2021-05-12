@@ -40,6 +40,7 @@ namespace Estrol.X3Jam.Server.CData {
         public int SongID;
         public int MinLvl;
         public int MaxLvl;
+        public int RandomArenaNumber;
 
         public Room(RoomManager cManager, int cID, string cName, User cUser, byte cFlag, string cPassword = "", RoomMode cMode = RoomMode.VS) {
             RoomManager = cManager;
@@ -58,9 +59,12 @@ namespace Estrol.X3Jam.Server.CData {
             WaitForSong = true;
             PasswordFlag = cFlag;
             MaxUser = 8;
-            //CurrentUser = 0;
             MinLvl = 0;
             MaxLvl = 0;
+
+            // Room
+            Random rand = new();
+            RandomArenaNumber = rand.Next(0, 12);
 
             // Users
             Users = new(8);
@@ -429,6 +433,8 @@ namespace Estrol.X3Jam.Server.CData {
                     buf.Write((short)0xfb2);
                     buf.Write(MaxUser); // Max users
 
+                    var IsAlone = Players.Count == 1;
+
                     for (int i = 0; i < MaxUser; i++) {
                         if (Players.ElementAtOrDefault(i) != null) {
                             RoomUser uPlayer = Players[i];
@@ -444,7 +450,7 @@ namespace Estrol.X3Jam.Server.CData {
                             buf.Write(GetGemFromScore(uPlayer.Score, uPlayer.Kool));
                             buf.Write(uPlayer.User.Level);
                             buf.Write(0);
-                            buf.Write((short)uPlayer.Position);
+                            buf.Write((short)(IsAlone ? 1 : uPlayer.Position));
 
                             //Log.Write($"[DEBUG] User: {uPlayer.User.Username} {uPlayer.Kool} {uPlayer.Great} {uPlayer.Bad} {uPlayer.Miss} {uPlayer.MaxCombo} {uPlayer.JamCombo} {uPlayer.Score} {GetGemFromScore(uPlayer.Score, uPlayer.Kool)}");
                         } else {
@@ -458,39 +464,6 @@ namespace Estrol.X3Jam.Server.CData {
 
                     foreach (RoomUser rUser in Players) {
                         rUser.User.Connection.Send(data);
-                    }
-
-                    break;
-                }
-
-                case 7: { // Case someone left in InGame
-                    PacketBuffer buf = new();
-                    buf.Write((short)0x08);
-                    buf.Write((short)0xbbf);
-                    buf.Write(arg1);
-
-                    byte[] data = buf.ToArray();
-                    foreach (RoomUser rUser in Players) {
-                        rUser.User.Connection.Send(data);
-                    }
-
-                    break;
-                }
-
-                case 8: {
-                    PacketBuffer buf = new();
-                    buf.Write((short)8);
-                    buf.Write((short)0xbbf);
-                    buf.Write(arg1);
-
-                    buf.Write((short)6);
-                    buf.Write((short)0xbbf);
-                    buf.Write((byte)0);
-                    buf.Write((byte)arg2);
-
-                    byte[] data = buf.ToArray();
-                    foreach (KeyValuePair<int, User> itr in Users) {
-                        itr.Value.Connection.Send(data);
                     }
 
                     break;

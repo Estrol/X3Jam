@@ -16,14 +16,20 @@ namespace Estrol.X3Jam.IConsole {
         static void Main(string[] args) {
             Type t = Type.GetType("Mono.Runtime");
             if (t != null) {
-                Console.WriteLine("ERROR: You cannot run this server app from linux or using mono, use wine32 instead to run the server. and linux support coming soon using .NET 5 for linux");
+                Console.WriteLine("ERROR: You cannot run this server app from linux or using mono, use linux build instead.");
                 return;
             }
 
             Console.Title = "X3Jam - O2-JAM 1.8 Server Emulation";
             PrintLogo();
 
-            using Mutex mutex = new(false, "Global\\X3JAMMERSERVER", out bool createNew); 
+#if RELEASE
+            AppDomain.CurrentDomain.FirstChanceException += (caller, obj) => {
+                ExceptionHandler(caller, obj.Exception);
+            };
+#endif
+
+            using Mutex mutex = new(false, "Global\\X3JAMMERSERVER", out bool createNew);
             if (createNew) {
                 O2JamServer Server = new();
                 Server.Intialize();
@@ -46,6 +52,20 @@ namespace Estrol.X3Jam.IConsole {
             }
         }
 
+#if RELEASE
+        private static void ExceptionHandler(object sender, Exception exception) {
+#if _WINDOWS
+            _ = MessageBox(IntPtr.Zero, exception.Message, "X3JAM Runtime Error", (uint)0x00000010L);
+            Environment.Exit(-1);
+#else
+            Console.WriteLine("ERROR: The server program already open!");
+            Console.WriteLine("ERROR: " + exception.Message);
+            Console.WriteLine("ERROR: " + exception.StackTrace);
+            Environment.Exit(-1);
+#endif
+        }
+#endif
+
         private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e) {
             ExitEvent.Set();
             e.Cancel = true;
@@ -65,10 +85,15 @@ namespace Estrol.X3Jam.IConsole {
             Console.WriteLine(logo);
             Console.WriteLine("\nX3Jam Server Developer version (c) 2021 Estrol's Group Developers (Estrol and MatVeiQaa)");
             Console.WriteLine(string.Format("Current time is {0}\n", DateTime.Now));
-            Console.WriteLine("Server Version: beta-0.5 build #0176");
+            Console.WriteLine("Server Version: Pre-release 0.7 build #0776");
+
+#if _WINDOWS
             if (IsWine()) {
-                Console.WriteLine("Running with WINE mode!");
+                Console.WriteLine("ERROR: WINE DETECTED, Please use Linux build instead than using wine!");
+                Environment.Exit(-1);
             }
+#endif
+
             Console.WriteLine();
         }
 
@@ -102,6 +127,6 @@ namespace Estrol.X3Jam.IConsole {
         }
 
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-        private static extern int MessageBox(IntPtr hWnd, String text, String caption, uint type);
+        private static extern int MessageBox(IntPtr hWnd, string text, string caption, uint type);
     }
 }

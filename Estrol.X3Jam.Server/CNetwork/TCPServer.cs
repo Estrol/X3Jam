@@ -38,7 +38,7 @@ namespace Estrol.X3Jam.Server.CNetwork {
             try {
                 state.m_socket.BeginSend(data, 0, length, 0, Server_OnAsyncSend, state);
             } catch (Exception e) {
-                HandleException(e);
+                HandleException(e, state);
             }
         }
 
@@ -51,7 +51,7 @@ namespace Estrol.X3Jam.Server.CNetwork {
         private void Server_OnAsyncSend(IAsyncResult ar) {}
 
         private void Server_OnAsyncConnection(IAsyncResult ar) {
-            Client state;
+            Client state = null;
 
             try {
                 Socket _socket = (Socket)ar.AsyncState;
@@ -67,7 +67,7 @@ namespace Estrol.X3Jam.Server.CNetwork {
                 state.m_socket.BeginReceive(state.m_raw, 0, Client.MAX_BUFFER_SIZE, SocketFlags.None, Server_OnAsyncData, state);
                 m_ServerSocket.BeginAccept(Server_OnAsyncConnection, m_ServerSocket);
             } catch (Exception e) {
-                HandleException(e);
+                HandleException(e, state);
             }
         }
 
@@ -94,8 +94,9 @@ namespace Estrol.X3Jam.Server.CNetwork {
         }
 
         private void Server_OnAsyncData(IAsyncResult ar) {
+            Client state = null;
             try {
-                Client state = (Client)ar.AsyncState;
+                state = (Client)ar.AsyncState; 
 
                 state.m_length = (ushort)state.m_socket.EndReceive(ar);
                 state.m_data = new byte[state.Length];
@@ -105,20 +106,23 @@ namespace Estrol.X3Jam.Server.CNetwork {
                 if (OnServerMessage == null) return;
                 OnServerMessage(this, state);
             } catch (Exception e) {
-                HandleException(e);
+                HandleException(e, state);
             }
         }
 
-        private void HandleException(Exception e) {
+        private void HandleException(Exception e, Client client) {
             if (e is ObjectDisposedException) {
                 Console.WriteLine("[C# Exception] A thread tried to access disposed object.");
-            } else if (e is SocketException) {
-                SocketException err = (SocketException)e;
+            } else if (e is SocketException err) {
                 if (err.ErrorCode == 10054) {
                     Console.WriteLine("[C# Exception] A thread tried to access socket that already disconnected");
                 }
             } else {
                 Console.WriteLine("[C# Unhandled Exception] {0}\n{1}", e.Message, e.StackTrace);
+                if (client != null) {
+                    RemoveClient(client);
+                    Console.WriteLine("[Socket] Connection {0} has been forcedly disconnect due to Unhandled Exception", client.IPAddr);
+                }
             }
         }
     }

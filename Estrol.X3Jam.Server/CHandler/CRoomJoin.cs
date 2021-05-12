@@ -24,10 +24,7 @@ namespace Estrol.X3Jam.Server.CHandler {
             Write(room.RoomName);
             Write((short)room.SongID);
             if (room.Arena == RoomArena.Random) {
-                Random rand = new();
-                int _room = rand.Next(0, 12);
-
-                Write(new byte[] { (byte)_room, 0x00, 0x00, 0x80 });
+                Write(new byte[] { (byte)room.RandomArenaNumber, 0x00, 0x00, 0x80 });
             } else {
                 Write((int)room.Arena);
             }

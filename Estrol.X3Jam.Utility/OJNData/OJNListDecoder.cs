@@ -1,8 +1,7 @@
 ﻿using System.IO;
 using System.Text;
-using Estrol.X3Jam.Server.CData;
 
-namespace Estrol.X3Jam.Server.OJNData {
+namespace Estrol.X3Jam.Utility {
     public static class OJNListDecoder {
         private const string ChineseEncoding = "big5";
 

@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace Estrol.X3Jam.Server.OJNData {
+namespace Estrol.X3Jam.Utility {
     public class OJNList {
         private Dictionary<int, OJN> headers;
 

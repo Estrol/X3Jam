@@ -1,5 +1,4 @@
 ﻿using Estrol.X3Jam.Server.CData;
-using Estrol.X3Jam.Server.OJNData;
 using Estrol.X3Jam.Utility;
 
 namespace Estrol.X3Jam.Server.CHandler {

@@ -23,7 +23,7 @@ namespace Estrol.X3Jam.Server.CHandler {
                     room.SubmitScore(Client.UserInfo, 0, 0, 0, 0, 0, 0, 0, 0);
                     room.RemoveUser(Client.UserInfo);
 
-                    room.Event(7, null, slot);
+                    // room.Event(2, null, slot);
                 }
             }
 

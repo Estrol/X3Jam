@@ -5,7 +5,7 @@ using Estrol.X3Jam.Utility;
 
 namespace Estrol.X3Jam.Server {
     public class Configuration {
-        public INILoader ini;
+        public ConfLoader ini;
 
         public Configuration() {
             if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\conf")) {
@@ -24,7 +24,7 @@ namespace Estrol.X3Jam.Server {
                 File.WriteAllBytes(AppDomain.CurrentDomain.BaseDirectory + @"\conf\server.conf", Properties.Resources.Config);
             }
 
-            ini = new INILoader(AppDomain.CurrentDomain.BaseDirectory + @"\conf\server.conf");
+            ini = new ConfLoader(AppDomain.CurrentDomain.BaseDirectory + @"\conf\server.conf");
             Log.Write("::Config -> Loaded!");
         }
 
@@ -42,7 +42,7 @@ namespace Estrol.X3Jam.Server {
 
                 for (int i = 0; i < 20; i++) {
                     string val = ini.IniReadValue("CHANNELS", string.Format("CH{0}", i + 1));
-                    if (val == string.Empty) break;
+                    if (val == null) break;
                     CHCount++;
                 }
 

@@ -6,6 +6,8 @@ using System.Net;
 namespace Estrol.X3Jam.Launcher {
     public class Program {
         public static void Main(string[] args) {
+            IConfiguration conf = new(AppDomain.CurrentDomain.BaseDirectory + "\\config.ini");
+
             if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + "\\OTwo.exe")) {
                 Console.WriteLine("[+] Cannot find OTwo.exe");
                 return;
@@ -13,11 +15,11 @@ namespace Estrol.X3Jam.Launcher {
 
             Console.WriteLine("[+] Launching Game!");
 
-            IPAddress addr = Dns.GetHostAddresses("ec2-3-135-19-0.us-east-2.compute.amazonaws.com")[0];
+            IPAddress addr = Dns.GetHostAddresses(conf.IniReadValue("LAUNCHER", "Domain"))[0];
             string server = addr.ToString();
-            string s_port = "16010";
+            string s_port = conf.IniReadValue("LAUNCHER", "ServerPort");
             string web = addr.ToString();
-            string w_port = "16000";
+            string w_port = conf.IniReadValue("LAUNCHER", "WebPort");
 
             ProcessStartInfo ps = new() {
                 UseShellExecute = true,

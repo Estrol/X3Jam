@@ -2,7 +2,11 @@
 using System.Diagnostics;
 
 namespace Estrol.X3Jam.Utility {
-    public static class Log {
+    public class Log : EstrolUtilityBase {
+        private Log() {
+            throw new NotImplementedException("This class is static class");
+        }
+
         public static void Write(string content) {
             OutputToConsole(content);
         }

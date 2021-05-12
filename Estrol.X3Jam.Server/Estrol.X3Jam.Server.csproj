@@ -8,6 +8,9 @@
 		<SignAssembly>false</SignAssembly>
 		<AssemblyOriginatorKeyFile>X3SERVERASSEMBLYNAMEESTROL.pfx</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <PlatformTarget>AnyCPU</PlatformTarget>
+	</PropertyGroup>
 	<ItemGroup>
 	  <PackageReference Include="System.Data.SQLite" Version="1.0.113.6" />
 	</ItemGroup>

@@ -1,11 +1,8 @@
 ﻿using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Estrol.X3Jam.Server.Utils {
-    /// <summary>
-    /// Create a New INI file to store or load data
-    /// </summary>
-    public class INILoader {
+namespace Estrol.X3Jam.Launcher {
+    internal class IConfiguration {
         public string path;
 
         [DllImport("kernel32")]
@@ -17,7 +14,7 @@ namespace Estrol.X3Jam.Server.Utils {
         /// INIFile Constructor.
         /// </summary>
         /// <PARAM name="INIPath"></PARAM>
-        public INILoader(string INIPath) {
+        public IConfiguration(string INIPath) {
             path = INIPath;
         }
         /// <summary>

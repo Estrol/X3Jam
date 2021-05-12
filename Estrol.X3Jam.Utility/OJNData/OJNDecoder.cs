@@ -2,9 +2,9 @@
 using System.IO;
 using System.Linq;
 using System.Text;
-using Estrol.X3Jam.Server.CData;
+using Estrol.X3Jam.Utility;
 
-namespace Estrol.X3Jam.Server.OJNData {
+namespace Estrol.X3Jam.Utility {
     public static class OJNDecoder {
         public static bool Validate(string FileName) {
             return Validate(File.Open(FileName, FileMode.Open));

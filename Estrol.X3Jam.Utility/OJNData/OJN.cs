@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Text;
 
-namespace Estrol.X3Jam.Server.OJNData {
+namespace Estrol.X3Jam.Utility {
     public class OJN {
         public int Id { get; set; }
         public byte[] Signature { get; set; }

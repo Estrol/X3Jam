@@ -20,6 +20,7 @@ namespace Estrol.X3Jam.Server.CHandler {
 
             Client.Message.full_data[2] = 0xa3;
             Room room = RoomManager.GetIndex(Client.UserInfo.Room);
+            room.RandomArenaNumber = data[0];
             room.Arena = arena;
 
             Log.Write("[{0}@{1}] (ch: {2}, room: {3}) Set ArenaID: {4}",

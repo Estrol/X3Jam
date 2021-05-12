@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Estrol.X3Jam.Server.CManager;
-using Estrol.X3Jam.Server.OJNData;
+using Estrol.X3Jam.Utility;
 
 namespace Estrol.X3Jam.Server.CData {
     public class Channel {
@@ -41,7 +41,7 @@ namespace Estrol.X3Jam.Server.CData {
         }
 
         public void AddUser(User usr) {
-            List<User> itr = new List<User>(m_Users) {
+            List<User> itr = new(m_Users) {
                 usr
             };
 
@@ -49,7 +49,7 @@ namespace Estrol.X3Jam.Server.CData {
         }
 
         public void RemoveUser(User usr) {
-            List<User> itr = new List<User>(m_Users);
+            List<User> itr = new(m_Users);
             itr.Remove(usr);
 
             m_Users = itr.ToArray();
@@ -58,7 +58,7 @@ namespace Estrol.X3Jam.Server.CData {
         public string GetSongName(int ID) {
             foreach (OJN ojn in GetMusicList()) {
                 if (ojn.Id == ID) {
-                    return $"{ojn.OJMString} by {ojn.ArtistString}";
+                    return $"{ojn.TitleString} by {ojn.ArtistString}";
                 }
             }
 
