@@ -3,7 +3,7 @@ Cross-platform and complete re-written O2-JAM 1.8 Server, included multiplayer.
 
 ## Current status
 The server software may stable or not stable at same time and might ecounter missing tcp opcode handler. \
-Current status of the project can be seen [here](/projects/1)
+Current status of the project can be seen [here](https://github.com/Estrol/X3Jam/projects/1)
 
 ## Downloads
 Pre-built binaries is not available right now, but you can compile it.
