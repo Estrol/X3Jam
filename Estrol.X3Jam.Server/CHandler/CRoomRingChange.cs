@@ -8,8 +8,7 @@ namespace Estrol.X3Jam.Server.CHandler {
         public CRoomRingChange(Client client) : base(client) { }
 
         public override void Code() {
-            File.WriteAllBytes(AppDomain.CurrentDomain.BaseDirectory + "\\yes.dmg", Client.Message.full_data);
-            int totalRing = BitConverter.ToInt32(Client.Message.data, 2);
+            int totalRing = BitConverter.ToInt32(Client.Message.Data, 2);
             if (totalRing > 3) {
                 Log.Write("Total ring expected to get max 3 but got more than 3 which {0}", totalRing);
             }
@@ -17,7 +16,7 @@ namespace Estrol.X3Jam.Server.CHandler {
             byte[] ring_data;
             if (totalRing > 0) {
                 ring_data = new byte[totalRing * 4];
-                Buffer.BlockCopy(Client.Message.data, 6, ring_data, 0, totalRing * 4);
+                Buffer.BlockCopy(Client.Message.Data, 6, ring_data, 0, totalRing * 4);
             } else {
                 ring_data = new byte[2];
             }

@@ -1,4 +1,8 @@
-﻿using System.IO;
+﻿// Author: SirusDoma
+// License: MIT
+// Code: https://github.com/SirusDoma/O2MusicList
+
+using System.IO;
 using System.Text;
 
 namespace Estrol.X3Jam.Utility {

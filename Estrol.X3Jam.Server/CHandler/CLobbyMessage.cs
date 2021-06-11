@@ -10,7 +10,7 @@ namespace Estrol.X3Jam.Server.CHandler {
         public CLobbyMessage(Client client) : base(client) { }
 
         public override void Code() {
-            string msg = DataUtils.GetString(Client.Message.data);
+            string msg = DataUtils.GetString(Client.Message.Data);
             Channel channel = Client.Main.ChannelManager.GetChannelByID(Client.UserInfo.ChannelID);
             User usr = Client.UserInfo;
 

@@ -9,7 +9,7 @@ namespace Estrol.X3Jam.Server.CHandler {
 
         public override void Code() {
             byte[] data = new byte[4];
-            Buffer.BlockCopy(Client.Message.data, 2, data, 0, 4);
+            Buffer.BlockCopy(Client.Message.Data, 2, data, 0, 4);
 
             RoomArena arena;
             if (data[3] == 0x80) {
@@ -18,7 +18,7 @@ namespace Estrol.X3Jam.Server.CHandler {
                 arena = (RoomArena)BitConverter.ToInt32(data);
             }
 
-            Client.Message.full_data[2] = 0xa3;
+            Client.Message.FullData[2] = 0xa3;
             Room room = RoomManager.GetIndex(Client.UserInfo.Room);
             room.RandomArenaNumber = data[0];
             room.Arena = arena;
@@ -31,7 +31,7 @@ namespace Estrol.X3Jam.Server.CHandler {
                 arena.ToString());
 
             foreach (User usr in room.GetUsers())
-                usr.Connection.Send(Client.Message.full_data);
+                usr.Connection.Send(Client.Message.FullData);
         }
     }
 }

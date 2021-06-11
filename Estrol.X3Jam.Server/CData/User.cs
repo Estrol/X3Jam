@@ -42,8 +42,13 @@ namespace Estrol.X3Jam.Server.CData {
     public class Character {
         public string Username { set; get; }
         public string Nickname { set; get; }
-        public int Rank { set; get; }
-        public int Level { set; get; }
+        public int Rank { set; get; } = 0;
+        public int Level { set; get; } = 0;
+        public int MCash { set; get; } = 0;
+        public int Gold { set; get; } = 0;
+        public int Wins { set; get; } = 0;
+        public int Loses { set; get; } = 0;
+        public int Scores { set; get; } = 0;
         public int Gender { set; get; } = 0;
         public int Instrument { set; get; } = 0;
         public int Hair { set; get; } = 0;

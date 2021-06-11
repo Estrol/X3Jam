@@ -34,5 +34,6 @@
         RoomSlotLock = 0x0bc0,
         ListChat = 0x07dc,
         RoomChat = 0x0bc3,
+        RoomNameChange = 0x0bb8
     }
 }

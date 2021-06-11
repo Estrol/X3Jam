@@ -6,7 +6,7 @@ namespace Estrol.X3Jam.Server.CHandler {
     public class CPlanetLogin: CBase {
         public CPlanetLogin(Client client) : base(client) { }
         public override void Code() {
-            string[] UserAuth = DataUtils.GetUserAuthentication(Client.Message.data);
+            string[] UserAuth = DataUtils.GetUserAuthentication(Client.Message.Data);
 
             User usr = Client.Main.Database.Login(UserAuth[0], UserAuth[1]);
             if (usr == null) {

@@ -1,8 +1,11 @@
-﻿using System;
+﻿// Author: SirusDoma
+// License: MIT
+// Code: https://github.com/SirusDoma/O2MusicList
+
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Estrol.X3Jam.Utility;
 
 namespace Estrol.X3Jam.Utility {
     public static class OJNDecoder {

@@ -9,7 +9,7 @@ namespace Estrol.X3Jam.Server.CHandler {
         public CRoomJoin(Client client) : base(client) { }
 
         public override void Code() {
-            byte roomID = (byte)BitConverter.ToInt16(Client.Message.data, 3);
+            byte roomID = (byte)BitConverter.ToInt16(Client.Message.Data, 3);
             Log.Write("[{0}@{1}] Entering room {2}", Client.UserInfo.Username, Client.IPAddr, roomID);
 
             Room room = RoomManager.GetID(roomID);

@@ -20,11 +20,28 @@
 			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 		</ProjectReference>
 		<ProjectReference Include="..\Estrol.X3Jam.Website\Estrol.X3Jam.Website.csproj" />
+		<PackageReference Include="ini-parser-netstandard" Version="2.5.2">
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+		</PackageReference>
 	</ItemGroup>
 	<ItemGroup>
-	  <Resource Include="Resources\Icon.ico" />
+	  <Compile Update="Properties\Resources.Designer.cs">
+	    <DesignTime>True</DesignTime>
+	    <AutoGen>True</AutoGen>
+	    <DependentUpon>Resources.resx</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+	<ItemGroup>
+	  <EmbeddedResource Update="Properties\Resources.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
 	</ItemGroup>
 	<PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
 		<DefineConstants>_WINDOWS</DefineConstants>
 	</PropertyGroup>
+	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+	  <Exec Command="del $(ProjectDir)Resources\version.txt &amp; git rev-parse HEAD &gt;$(ProjectDir)Resources\version.txt" />
+	</Target>
 </Project>

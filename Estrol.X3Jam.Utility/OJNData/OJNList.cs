@@ -1,4 +1,8 @@
-﻿using System;
+﻿// Author: SirusDoma
+// License: MIT
+// Code: https://github.com/SirusDoma/O2MusicList
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

@@ -9,9 +9,9 @@ namespace Estrol.X3Jam.Server.CHandler {
             Room room = RoomManager.GetID(Client.UserInfo.Room);
             int slot = room.Slot(Client.UserInfo);
 
-            short flag1 = BitConverter.ToInt16(Client.Message.data, 2);
-            short flag2 = BitConverter.ToInt16(Client.Message.data, 4);
-            int score = BitConverter.ToInt32(Client.Message.data, 10);
+            short flag1 = BitConverter.ToInt16(Client.Message.Data, 2);
+            short flag2 = BitConverter.ToInt16(Client.Message.Data, 4);
+            int score = BitConverter.ToInt32(Client.Message.Data, 10);
             byte[] positionData = room.Submit(Client.UserInfo, score);
 
             Write((short)0x0);

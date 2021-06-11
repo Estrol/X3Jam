@@ -13,7 +13,7 @@ namespace Estrol.X3Jam.Server.CHandler {
         public CPlayerColorChange(Client client) : base(client) { }
 
         public override void Code() {
-            byte color = Client.Message.data[2];
+            byte color = Client.Message.Data[2];
             Room room = RoomManager.GetID(Client.UserInfo.Room);
             int slot = room.Slot(Client.UserInfo);
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Estrol.X3Jam.Server.CManager;
 using Estrol.X3Jam.Utility;
 
@@ -23,7 +24,9 @@ namespace Estrol.X3Jam.Server.CData {
             m_Users = Array.Empty<User>();
             m_ChannelID = ID;
             m_MaxRoom = MaxRoom;
-            m_MusicList = OJNListDecoder.Decode(AppDomain.CurrentDomain.BaseDirectory + @"\conf\musiclist\" + MusicList);
+
+            string OJNListPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "conf", "musiclist", MusicList);
+            m_MusicList = OJNListDecoder.Decode(OJNListPath);
         }
 
         public int Count => RManager.Count;

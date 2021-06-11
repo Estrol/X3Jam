@@ -8,9 +8,9 @@ namespace Estrol.X3Jam.Server.CHandler {
         public CRoomMusicID(Client client) : base(client) { }
 
         public override void Code() {
-            ushort SongID = BitConverter.ToUInt16(Client.Message.data, 2);
-            int Diff = Client.Message.data[4];
-            int Speed = Client.Message.data[5];
+            ushort SongID = BitConverter.ToUInt16(Client.Message.Data, 2);
+            int Diff = Client.Message.Data[4];
+            int Speed = Client.Message.Data[5];
 
             Room room = RoomManager.GetID(Client.UserInfo.Room);
 

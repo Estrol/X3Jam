@@ -7,9 +7,9 @@ namespace Estrol.X3Jam.Server.CHandler {
         public CCreateRoom(Client client) : base(client) { }
 
         public override void Code() {
-            string Name = DataUtils.GetString(Client.Message.data);
+            string Name = DataUtils.GetString(Client.Message.Data);
 
-            byte mode = Client.Message.data[2];
+            byte mode = Client.Message.Data[2];
             int roomID = RoomManager.EmptyID();
             Room room = new(RoomManager, roomID, Name, Client.UserInfo, 0x0);
             //Room room = new(RoomManager, roomID, Name, 0x0, Client.UserInfo, 0x0);

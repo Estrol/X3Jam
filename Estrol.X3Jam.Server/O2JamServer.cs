@@ -8,6 +8,7 @@ using Estrol.X3Jam.Server.CNetwork;
 using Estrol.X3Jam.Server.CHandler;
 using Estrol.X3Jam.Server.CManager;
 using Estrol.X3Jam.Server.CUtility;
+using System.IO;
 
 namespace Estrol.X3Jam.Server {
     public class O2JamServer {
@@ -34,12 +35,22 @@ namespace Estrol.X3Jam.Server {
 
             short port = short.Parse(Config.Get("GamePort"));
 
-            Server = new(port);
+            Server = new(this, port);
             Server.OnServerMessage += TCPMessage;
             Server.Start();
         }
 
+        public void Close() {
+            Log.Write("Shut-down O2-JAM Server...");
+            using PacketBuffer buf = new();
+
+
+            Database.Close();
+        }
+
         public void TCPMessage(object o, Client client) {
+            client.Config = Config;
+
             CMessageManager cMessage = new(client, client.Buffer);
             if (cMessage.IsFailed) {
                 var Handler = new CDisconnect(client);
@@ -52,7 +63,15 @@ namespace Estrol.X3Jam.Server {
                 client.Message = message;
                 client.Main = this;
 
-                string name = Enum.GetName(typeof(ClientPacket), message.opcode);
+                if (message.IsFailed) {
+                    byte[] body = Encoding.UTF8.GetBytes("SERV ERR");
+
+                    client.Send(body, (short)body.Length);
+                    client.m_socket.Disconnect(true);
+                    break;
+                }
+
+                string name = Enum.GetName(typeof(ClientPacket), message.Opcode);
                 if (name != null && !StaticOpcode.Contains(name)) {
                     if (client.UserInfo == null) {
                         client.m_socket.Close();
@@ -62,7 +81,7 @@ namespace Estrol.X3Jam.Server {
                 }
 
                 CBase handler;
-                switch (message.opcode) {
+                switch (message.Opcode) {
                     case ClientPacket.Connect:
                         handler = new CConnect(client);
                         handler.Handle();
@@ -208,32 +227,55 @@ namespace Estrol.X3Jam.Server {
                         handler.Handle();
                         break;
 
+                    case ClientPacket.RoomNameChange:
+                        handler = new CRoomNameChange(client);
+                        handler.Handle();
+                        break;
+
                     case ClientPacket.Tutorial1:
                     case ClientPacket.Tutorial2:
                         // Ignored
                         break;
 
                     default: {
-                        byte[] opcode = new byte[2];
-                        Buffer.BlockCopy(message.data, 0, opcode, 0, 2);
+                        if (message.IsHTTP) {
+                            string body = "HTTP Method is not allowed. Please use O2-JAM Client to connect this port!";
 
-                        string msg = null;
-                        if (message.data.Length > 2) {
-                            byte[] mData = new byte[message.data.Length - 2];
-                            Buffer.BlockCopy(message.data, 2, mData, 0, message.data.Length - 2);
+                            string response = $"HTTP/1.1 405 Method Not Allowed{Environment.NewLine}";
+                            response += $"Content-Type: text/plain{Environment.NewLine}";
+                            response += $"Content-Length: {body.Length}{Environment.NewLine}";
+                            response += Environment.NewLine;
 
-                            msg = ToHexString(mData);
+                            response += body;
+
+                            byte[] data = Encoding.UTF8.GetBytes(response);
+                            client.Send(data, (short)data.Length);
+                            client.m_socket.Disconnect(true);
+                            return;
                         }
 
-                        Log.Write("Unhandled opcode");
-                        Log.Write("Code: {0}", message._opcode.ToString("X4"));
-                        Log.Write("Data: {0}", msg ?? "Empty");
+                        if (client.UserInfo != null) {
+                            byte[] opcode = new byte[2];
+                            Buffer.BlockCopy(message.Data, 0, opcode, 0, 2);
+
+                            string msg = null;
+                            if (message.Data.Length > 2) {
+                                byte[] mData = new byte[message.Data.Length - 2];
+                                Buffer.BlockCopy(message.Data, 2, mData, 0, message.Data.Length - 2);
+
+                                msg = ToHexString(mData);
+                            }
+
+                            Log.Write("Unhandled opcode");
+                            Log.Write("Code: {0}", ((ushort)message.Opcode).ToString("X4"));
+                            Log.Write("Data: {0}", msg ?? "Empty");
+                        }
 
                         break;
                     }
                 }
 
-                if (message.opcode == ClientPacket.Disconnect) return;
+                if (message.Opcode == ClientPacket.Disconnect) return;
             }
             
             client.Read();

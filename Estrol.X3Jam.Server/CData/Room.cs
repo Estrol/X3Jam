@@ -262,6 +262,7 @@ namespace Estrol.X3Jam.Server.CData {
             pUser.Kool = kool;
             pUser.Great = great;
             pUser.Bad = bad;
+            pUser.Miss = miss;
             pUser.MaxCombo = maxcombo;
             pUser.JamCombo = jam;
             pUser.Score = score;
@@ -452,7 +453,7 @@ namespace Estrol.X3Jam.Server.CData {
                             buf.Write(0);
                             buf.Write((short)(IsAlone ? 1 : uPlayer.Position));
 
-                            //Log.Write($"[DEBUG] User: {uPlayer.User.Username} {uPlayer.Kool} {uPlayer.Great} {uPlayer.Bad} {uPlayer.Miss} {uPlayer.MaxCombo} {uPlayer.JamCombo} {uPlayer.Score} {GetGemFromScore(uPlayer.Score, uPlayer.Kool)}");
+                            // Log.Write($"[DEBUG] User: {uPlayer.User.Username} {uPlayer.Kool} {uPlayer.Great} {uPlayer.Bad} {uPlayer.Miss} {uPlayer.MaxCombo} {uPlayer.JamCombo} {uPlayer.Score} {GetGemFromScore(uPlayer.Score, uPlayer.Kool)}");
                         } else {
                             buf.Write((byte)i);
                             buf.Write(0);

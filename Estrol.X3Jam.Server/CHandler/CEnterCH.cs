@@ -6,7 +6,7 @@ namespace Estrol.X3Jam.Server.CHandler {
         public CEnterCH(Client client) : base(client) { }
 
         public override void Code() {
-            int ChID = Client.Message.data[4] + 1;
+            int ChID = Client.Message.Data[4] + 1;
             if (ChID > Client.Main.ChannelManager.ChannelCount) {
                 Log.Write("[{0}@{1}] Attempting to enter channel: {2}, that doesn't exists in server!",
                     Client.UserInfo.Username,

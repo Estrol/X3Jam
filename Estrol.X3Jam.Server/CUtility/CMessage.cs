@@ -13,20 +13,39 @@ namespace Estrol.X3Jam.Server.CUtility {
         public ClientPacket Opcode;
         public byte[] Data;
         public byte[] FullData;
+        public bool IsHTTP;
+        public bool IsFailed;
+
+        public string[] HTTPMethod = {
+            "GET",
+            "HEAD",
+            "POST",
+            "PUT",
+            "DELETE",
+            "CONNECT",
+            "OPTIONS",
+            "TRACE",
+            "PATCH"
+        };
 
         private readonly MemoryStream ms;
         private readonly BinaryReader br;
-
-        public ushort _opcode => (ushort)Opcode;
-        public ClientPacket opcode => Opcode;
-        public byte[] full_data => FullData;
-        public byte[] data => Data;
 
         public CMessage(CMessageManager Base, Client client, byte[] rawData) {
             ms = new(rawData);
             br = new(ms);
 
             try {
+                // This is needed to check whatever the request is HTTP or not
+                string sData = Encoding.UTF8.GetString(ms.ToArray());
+                string[] RawHeaderSeperator = new string[] { "\r\n" };
+                string HttpHeader = sData.Split(RawHeaderSeperator, StringSplitOptions.RemoveEmptyEntries)[0];
+                string HttpData = HttpHeader.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries)[0];
+
+                if (HttpData != "\0" && HTTPMethod.Contains(HttpData)) {
+                    IsHTTP = true;
+                }
+
                 br.BaseStream.Seek(2, SeekOrigin.Begin);
                 int timestamp = br.ReadInt32();
                 Time = new DateTime(1970, 1, 1).AddSeconds(timestamp);
@@ -37,10 +56,15 @@ namespace Estrol.X3Jam.Server.CUtility {
 
                 Data = br.ReadBytes(dataOffset);
                 byte[] bLen = BitConverter.GetBytes((short)dataWithLength);
-                FullData = bLen.Concat(data).ToArray();
+                FullData = bLen.Concat(Data).ToArray();
 
-                Opcode = (ClientPacket)BitConverter.ToUInt16(data, 0);
+                Opcode = (ClientPacket)BitConverter.ToUInt16(Data, 0);
             } catch (Exception error) {
+                if (error is ArgumentOutOfRangeException) {
+                    IsFailed = true;
+                    return;
+                }
+
                 Base.IsFailed = true;
                 if (error.Message == "Unable to read beyond the end of the stream.") {
                     Log.Write("[{0}@{1}] Client disconnected with abnormal way.", client.UserInfo.Username, client.IPAddr);

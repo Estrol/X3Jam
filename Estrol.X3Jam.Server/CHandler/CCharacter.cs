@@ -1,5 +1,6 @@
 ﻿using Estrol.X3Jam.Server.CData;
 using Estrol.X3Jam.Utility;
+using System.Collections.Generic;
 
 namespace Estrol.X3Jam.Server.CHandler {
     public class CCharacter: CBase {
@@ -27,26 +28,82 @@ namespace Estrol.X3Jam.Server.CHandler {
                 Write(Avatar[i]);
             }
 
+            List<RingItem> list = new();
+
             // Inventory
+            // NOTE: I don't know why it must be 35 inventory slot.
+            Item[] items = Client.Main.Database.GetInventory(Client.UserInfo.Username);
             for (int i = 0; i < 35; i++) {
-                Write(0);
+                var item = items[i];
+
+                if (item == null) {
+                    Write(0);
+                } else {
+                    Write(item.ItemId);
+                    Write(item.ItemCount);
+
+                    if (item.IsRing) {
+                        var itr = list.Find((i) => i.Ring == item.RingName);
+                        if (itr == null) {
+                            list.Add(new() {
+                                Ring = item.RingName,
+                                Count = item.ItemCount
+                            });
+                        } else {
+                            itr.Count += item.ItemCount;
+                        }
+                    }
+                }
             }
 
-            Write(7); // Rings owned count;
-            Write(0x5c);
-            Write(500);
-            Write(0x5b);
-            Write(500);
-            Write(0x97);
-            Write(500);
-            Write(0x99);
-            Write(500);
-            Write(0x95);
-            Write(500);
-            Write(0x93);
-            Write(500);
-            Write(0x9d);
-            Write(500);
+            Write(list.Count);
+            foreach (RingItem itr in list.ToArray()) {
+                switch (itr.Ring) {
+                    case RoomRing.Power: {
+                        Write(0x9F);
+                        Write(itr.Count);
+                        break;
+                    }
+
+                    case RoomRing.Mirror: {
+                        Write(0x9D);
+                        Write(itr.Count);
+                        break;
+                    }
+
+                    case RoomRing.Random: {
+                        Write(0x9B);
+                        Write(itr.Count);
+                        break;
+                    }
+
+                    case RoomRing.Sudden: {
+                        Write(0x95);
+                        Write(itr.Count);
+                        break;
+                    }
+
+                    case RoomRing.Dark: {
+                        Write(0x93);
+                        Write(itr.Count);
+                        break;
+                    }
+
+                    case RoomRing.Hidden: {
+                        Write(0x97);
+                        Write(itr.Count);
+                        break;
+                    }
+
+                    case RoomRing.Panic: {
+                        Write(0x99);
+                        Write(itr.Count);
+                        break;
+                    }
+                }
+
+                Write(itr.Count);
+            }
 
             // Todo: Analyze this later.
             //Write(new byte[] {
@@ -68,10 +125,14 @@ namespace Estrol.X3Jam.Server.CHandler {
             //});
 
             Log.Write("[{0}@{1}] Get Character and Inventory Info", Client.UserInfo.Username, Client.IPAddr);
-            System.IO.File.WriteAllBytes("yes.ok", ToArray());
 
             SetL();
             Send();
+        }
+
+        public class RingItem {
+            public RoomRing Ring;
+            public int Count;
         }
     }
 }

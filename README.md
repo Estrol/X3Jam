@@ -1,27 +1,34 @@
-# X3-JAM, A new O2-JAM 1.8 Server Emulation
-Cross-platform O2-JAM Server that easy to setup. \
-This project in beta state, and maybe the server might crash in some unexpected ways.
+# X3-JAM, A re-written O2-JAM Server
+Cross-platform and complete re-written O2-JAM 1.8 Server, included multiplayer.
 
-## Launcher
-Client Launcher for this server provided in folder `Estrol.X3Jam.Launcher`
+## Current status
+The server software may stable or not stable at same time and might ecounter missing tcp opcode handler.
 
 ## Project Goals
-- Player Inventory and Avatar Skin.
+- Player Inventory and Avatar Skin. (66% Done)
+- Able to decode O2-JAM client packet without any memory editing. (0% Done)
 
-## Requirements
+## Downloads
+Pre-built binaries is not available right now, but you can compile it.
+
+## Building the server.
+### Prerequisites
 - .NET 5
-- System.Data.SQLite
+- Visual Studio 2019
 
-## Compile
+### Building
+Currently only providing build throught Visual Studio Solution.
 - Open solution using Visual Studio 2019
 - Select `Estrol.X3Jam.Console`
 - Press build (and it will automaticly restore the package)
 
 ## Supported clients
-- Modified 1.8 client (ripped TCP Obfuscation)
-- 1.8 client with DLLInjection
-
-I need know How I can de-obfuscate vanilla 1.8 client packet to able support it without modification or using DLL Injection.
+Any vanilla 1.8 client is supported with Special Launcher (Available in Estrol.X3Jam.Launcher, but it may cause Anti-virus alert.)
 
 ## License
-This project licensed under [GPL-V3](/LICENSE.txt)
+This software licensed under [GPL-3.0](/LICENSE.txt) with some MIT Licensed code. 
+
+[tl;dr](https://tldrlegal.com/license/gnu-general-public-license-v3-(gpl-3)) You may copy, distribute and modify the software as long as you track changes/dates in source files. Any modifications to or software including (via compiler) GPL-licensed code must also be made available under the GPL along with build & install instructions.
+
+MIT Licensed code that used in this project:
+- [SirusDoma](https://github.com/SirusDoma)'s [O2MusicList](https://github.com/SirusDoma/O2MusicList) (OJN, OJNDecoder, OJNFileFormat, OJNGenre, OJNList, OJNListDecoder)

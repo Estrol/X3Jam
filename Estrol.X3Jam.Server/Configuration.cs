@@ -7,25 +7,29 @@ namespace Estrol.X3Jam.Server {
     public class Configuration {
         public ConfLoader ini;
 
-        public Configuration() {
-            if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\conf")) {
-                Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + @"\conf");
+        public Configuration() { 
+            var ConfFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "conf");
+            if (!Directory.Exists(ConfFolder)) {
+                Directory.CreateDirectory(ConfFolder);
             }
 
-            if (!Directory.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\conf\musiclist")) {
-                Directory.CreateDirectory(AppDomain.CurrentDomain.BaseDirectory + @"\conf\musiclist");
+            var MusicListFolder = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "conf", "musiclist");
+            if (!Directory.Exists(MusicListFolder)) {
+                Directory.CreateDirectory(MusicListFolder);
             }
 
-            if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\conf\News.txt")) {
-                File.WriteAllText(AppDomain.CurrentDomain.BaseDirectory + @"\conf\News.txt", Properties.Resources.News);
+            var NewsFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "conf", "News.txt");
+            if (!File.Exists(NewsFile)) {
+                File.WriteAllText(NewsFile, Properties.Resources.News);
             }
 
-            if (!File.Exists(AppDomain.CurrentDomain.BaseDirectory + @"\conf\server.conf")) {
-                File.WriteAllBytes(AppDomain.CurrentDomain.BaseDirectory + @"\conf\server.conf", Properties.Resources.Config);
+            var ConfFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "conf", "server.conf");
+            if (!File.Exists(ConfFile)) {
+                File.WriteAllBytes(ConfFile, Properties.Resources.Config);
             }
 
-            ini = new ConfLoader(AppDomain.CurrentDomain.BaseDirectory + @"\conf\server.conf");
-            Log.Write("::Config -> Loaded!");
+            ini = new ConfLoader(ConfFile);
+            Log.Write("Server Configuration Loaded!");
         }
 
         public string Get(string section) {

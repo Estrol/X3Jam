@@ -1,4 +1,8 @@
-﻿using System.Linq;
+﻿// Author: SirusDoma
+// License: MIT
+// Code: https://github.com/SirusDoma/O2MusicList
+
+using System.Linq;
 using System.Text;
 
 namespace Estrol.X3Jam.Utility {

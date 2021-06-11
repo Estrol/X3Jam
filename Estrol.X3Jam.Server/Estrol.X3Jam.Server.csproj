@@ -12,9 +12,15 @@
 	  <PlatformTarget>AnyCPU</PlatformTarget>
 	</PropertyGroup>
 	<ItemGroup>
+	  <None Remove="Resources\server.conf" />
+	</ItemGroup>
+	<ItemGroup>
 	  <PackageReference Include="System.Data.SQLite" Version="1.0.113.6" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\Estrol.X3Jam.Utility\Estrol.X3Jam.Utility.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Resource Include="Resources\server.conf" />
 	</ItemGroup>
 </Project>

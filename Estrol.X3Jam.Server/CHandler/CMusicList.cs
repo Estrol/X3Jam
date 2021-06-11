@@ -8,9 +8,9 @@ namespace Estrol.X3Jam.Server.CHandler {
         public CMusicList(Client client) : base(client) { }
 
         public override void Code() {
-            int length = BitConverter.ToInt32(Client.Message.data, 2);
+            int length = BitConverter.ToInt32(Client.Message.Data, 2);
             byte[] list = new byte[length * 2];
-            Buffer.BlockCopy(Client.Message.data, 6, list, 0, length * 2);
+            Buffer.BlockCopy(Client.Message.Data, 6, list, 0, length * 2);
 
             Client.UserInfo.MusicLength = length;
             Client.UserInfo.MusicCount = list;

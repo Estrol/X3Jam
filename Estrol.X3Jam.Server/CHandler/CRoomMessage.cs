@@ -6,7 +6,7 @@ namespace Estrol.X3Jam.Server.CHandler {
         public CRoomMessage(Client client) : base(client) { }
 
         public override void Code() {
-            string msg = DataUtils.GetString(Client.Message.data);
+            string msg = DataUtils.GetString(Client.Message.Data);
 
             byte[] data = DataUtils.CreateMessageA(Client.UserInfo.Nickname, msg);
             Room room = RoomManager.GetID(Client.UserInfo.Room);

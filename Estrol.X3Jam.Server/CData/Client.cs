@@ -14,6 +14,7 @@ namespace Estrol.X3Jam.Server.CData {
         public byte[] m_data;
         public ushort m_length;
 
+        public Configuration Config { set; get; }
         public CMessage Message { set; get; }
         public O2JamServer Main { set; get; }
         public byte[] Buffer => m_data;

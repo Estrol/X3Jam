@@ -92,11 +92,28 @@ namespace Estrol.X3Jam.Server.CHandler {
 
                 }
             }
+
             buf.Write(byte.MaxValue);
             buf.Write(new byte[11]);
             buf.SetLength();
+
             Log.Write("[{0}@{1}] Room List. {2} room in total", Client.UserInfo.Username, Client.IPAddr, num);
             Send(buf.ToArray());
+
+            string chat_data = Client.Config.Get("ChannelMessage");
+            if (chat_data != null && chat_data != string.Empty) {
+                chat_data = chat_data.Replace("{USER}", Client.UserInfo.Username);
+                chat_data = chat_data.Replace("{CH}", Client.UserInfo.ChannelID.ToString());
+
+                DateTime date = DateTime.Now;
+                chat_data = chat_data.Replace("{TIME}", date.ToString("f"));
+
+                string[] replyList = chat_data.Split('|', StringSplitOptions.RemoveEmptyEntries);
+                foreach (string reply in replyList) {
+                    byte[] chat = DataUtils.CreateMessage("System", reply);
+                    Send(chat);
+                }
+            }
         }
     }
 }

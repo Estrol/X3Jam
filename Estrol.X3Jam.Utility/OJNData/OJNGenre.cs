@@ -1,4 +1,8 @@
-﻿namespace Estrol.X3Jam.Utility {
+﻿// Author: SirusDoma
+// License: MIT
+// Code: https://github.com/SirusDoma/O2MusicList
+
+namespace Estrol.X3Jam.Utility {
     public enum OJNGenre {
         Ballad = 0,
         Rock = 1,
