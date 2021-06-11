@@ -4,7 +4,9 @@ using System.Collections.Generic;
 
 namespace Estrol.X3Jam.Server.CHandler {
     public class CCharacter: CBase {
-        public CCharacter(Client client) : base(client) { }
+        public CCharacter(Client client) : base(client) {
+            PrintTheResult = true;
+        }
 
         public override void Code() {
             Write((short)0);

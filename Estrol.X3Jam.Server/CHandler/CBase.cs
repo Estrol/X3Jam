@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Text;
+using Estrol.X3Jam.Utility;
 using Estrol.X3Jam.Server.CData;
 using Estrol.X3Jam.Server.CManager;
 
@@ -13,6 +14,8 @@ namespace Estrol.X3Jam.Server.CHandler {
         public BinaryWriter Writer { get; private set; }
         public RoomManager RoomManager { get; private set; }
         public ChanManager ChanManager { get; private set; }
+
+        public bool PrintTheResult = false;
 
         /// <summary>
         /// Intialize Client handler
@@ -47,6 +50,19 @@ namespace Estrol.X3Jam.Server.CHandler {
         public void Handle() => Code();
 
         /// <summary>
+        /// Log the Send() output to local file to debug
+        /// </summary>
+        /// <param name="contents"></param>
+        private static void Print(byte[] contents) {
+            string stringify = Hexdump.HexDump(contents);
+            if (!Directory.Exists(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Debug"))) {
+                Directory.CreateDirectory(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Debug"));
+            }
+
+            File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Debug", $"{Guid.NewGuid()}.txt"), stringify);
+        }
+
+        /// <summary>
         /// Send the data with length of 2 first byte data
         /// </summary>
         public void Send() {
@@ -63,16 +79,20 @@ namespace Estrol.X3Jam.Server.CHandler {
             TSend(data, length);
         }
 
-        private void TSend(byte[] data, short length) {
-            Client.Send(data, length);
-        }
-
         public void Send(byte[] data) {
             short length = BitConverter.ToInt16(data, 0);
             Send(data, length);
         }
 
-        public void Send(byte[] data, short length) => Client.Send(data, length);
+        public void Send(byte[] data, short length) => TSend(data, length);
+
+        private void TSend(byte[] data, short length) {
+            if (PrintTheResult) {
+                Print(data);
+            }
+
+            Client.Send(data, length);
+        }
 
         public byte[] ToArray() {
             return Stream.ToArray();
