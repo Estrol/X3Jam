@@ -12,7 +12,7 @@ namespace Estrol.X3Jam.Server.CHandler {
             });
 
             for (int i = 0; i < 40; i++) {
-                Channel ch = Client.Main.ChannelManager.GetChannelByID(i + 1);
+                Channel ch = Main.ChannelManager.GetChannelByID(i + 1);
 
                 if (ch != null) {
                     Write((short)(ch.m_ChannelID - 1));

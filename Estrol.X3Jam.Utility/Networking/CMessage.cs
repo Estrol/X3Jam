@@ -1,13 +1,11 @@
 ﻿using Estrol.X3Jam.Server.CData;
-using Estrol.X3Jam.Utility;
+using Estrol.X3Jam.Utility.Data.Enums;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace Estrol.X3Jam.Server.CUtility {
+namespace Estrol.X3Jam.Utility.Networking {
     public class CMessage {
         public DateTime Time;
         public ClientPacket Opcode;

@@ -1,5 +1,5 @@
-﻿using Estrol.X3Jam.Server.CNetwork;
-using Estrol.X3Jam.Server.CUtility;
+﻿using Estrol.X3Jam.Utility;
+using Estrol.X3Jam.Utility.Networking;
 using System.Net;
 using System.Net.Sockets;
 
@@ -16,7 +16,9 @@ namespace Estrol.X3Jam.Server.CData {
 
         public Configuration Config { set; get; }
         public CMessage Message { set; get; }
-        public O2JamServer Main { set; get; }
+
+        // Seriously this make me pain so I set it as object
+        public object Main { set; get; }
         public byte[] Buffer => m_data;
         public ushort Length => m_length;
         public User UserInfo => m_user;

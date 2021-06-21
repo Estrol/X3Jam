@@ -3,15 +3,14 @@
  * TODO: clean this shit (such code style, etc) after it working properly
  */
 
+using System;
 using System.Linq;
 using System.Collections.Generic;
 
 using Estrol.X3Jam.Utility;
 using Estrol.X3Jam.Server.CManager;
 using Estrol.X3Jam.Server.CUtility;
-using Estrol.X3Jam.Server.CData.RoomEnums;
-using System;
-using System.IO;
+using Estrol.X3Jam.Utility.Data;
 
 namespace Estrol.X3Jam.Server.CData {
     public class Room {
@@ -34,13 +33,25 @@ namespace Estrol.X3Jam.Server.CData {
         public bool WaitForSong;
 
         public int CurrentUser => Users.Count;
-        public int MaxUser;
+        public int MaxUser {
+            get {
+                return ListSlot.Where(x => x)
+                    .ToArray()
+                    .Length;
+            }
+        }
+
         public int RoomID;
         public int Roomarg2;
         public int SongID;
         public int MinLvl;
         public int MaxLvl;
         public int RandomArenaNumber;
+
+        public bool[] ListSlot = {
+            true, true, true, true,
+            true, true, true, true
+        };
 
         public Room(RoomManager cManager, int cID, string cName, User cUser, byte cFlag, string cPassword = "", RoomMode cMode = RoomMode.VS) {
             RoomManager = cManager;
@@ -58,7 +69,6 @@ namespace Estrol.X3Jam.Server.CData {
             Difficulty = RoomDifficulty.EX;
             WaitForSong = true;
             PasswordFlag = cFlag;
-            MaxUser = 8;
             MinLvl = 0;
             MaxLvl = 0;
 
@@ -88,15 +98,11 @@ namespace Estrol.X3Jam.Server.CData {
             int found = 0;
 
             for (int i = 0; i < 8; i++) {
-                try {
-                    var itr = Users[i];
-                    if (itr == null) {
+                if (!Users.TryGetValue(i, out _)) {
+                    if (ListSlot[i]) {
                         found = i;
                         break;
                     }
-                } catch (KeyNotFoundException) {
-                    found = i; // This could mean the slot is available
-                    break;
                 }
             }
 

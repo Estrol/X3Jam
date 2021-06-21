@@ -8,7 +8,7 @@ namespace Estrol.X3Jam.Server.CHandler {
         public override void Code() {
             string[] UserAuth = DataUtils.GetUserAuthentication(Client.Message.Data);
 
-            User usr = Client.Main.Database.Login(UserAuth[0], UserAuth[1]);
+            User usr = Main.Database.Login(UserAuth[0], UserAuth[1]);
             if (usr == null) {
                 Write(new byte[] {
                     0x08, 0x00, 0xf0, 0x03, 0xff, 0xff, 0xff, 0xff
@@ -16,7 +16,7 @@ namespace Estrol.X3Jam.Server.CHandler {
 
                 Log.Write("[{0}@{1}] User: {2} attempting to connect in planet login manager with wrong credentinal (could be manually login using custom websocket?).", "null", Client.IPAddr, UserAuth[0]);
             } else {
-                var result = Client.Main.Server.GetClient(Client, usr.Username);
+                var result = Main.Server.GetClient(Client, usr.Username);
                 if (result != null) {
                     Write(new byte[] {
                         0x08, 0x00, 0xe9, 0x03, 0xfe, 0xff, 0xff, 0xff

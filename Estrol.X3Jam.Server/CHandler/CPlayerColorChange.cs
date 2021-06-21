@@ -1,7 +1,7 @@
 ﻿using Estrol.X3Jam.Server.CData;
-using Estrol.X3Jam.Server.CData.RoomEnums;
 using Estrol.X3Jam.Server.CUtility;
 using Estrol.X3Jam.Utility;
+using Estrol.X3Jam.Utility.Data;
 using System;
 using System.Collections.Generic;
 using System.Linq;

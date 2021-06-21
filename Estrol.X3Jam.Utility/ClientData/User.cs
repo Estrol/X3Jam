@@ -1,4 +1,4 @@
-﻿using Estrol.X3Jam.Server.CData.RoomEnums;
+﻿using Estrol.X3Jam.Utility.Data;
 using System;
 using System.Collections;
 using System.Collections.Generic;

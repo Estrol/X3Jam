@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Estrol.X3Jam.Server.CData;
 
-namespace Estrol.X3Jam.Server.CData.RoomEnums {
+namespace Estrol.X3Jam.Utility.Data {
     public class RoomUser { 
         public int Slot { set; get; }
         public int Position { set; get; }

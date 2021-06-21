@@ -173,15 +173,25 @@ namespace Estrol.X3Jam.Website {
                             var msg_str = JsonSerializer.Serialize(msg);
                             wc.Send(msg_str, 409, "application/json");
                         } else {
-                            main.Database.Register(data.username, data.password, data.email);
+                            try {
+                                main.Database.Register(data.username, data.password, data.email);
 
-                            var msg = new JSON_RegisterResponse() {
-                                success = true,
-                                message = "User created!"
-                            };
+                                var msg = new JSON_RegisterResponse() {
+                                    success = true,
+                                    message = "User created!"
+                                };
 
-                            var msg_str = JsonSerializer.Serialize(msg);
-                            wc.Send(msg_str, 200, "application/json");
+                                var msg_str = JsonSerializer.Serialize(msg);
+                                wc.Send(msg_str, 200, "application/json");
+                            } catch (Exception e) {
+                                var msg = new JSON_RegisterResponse() {
+                                    success = false,
+                                    message = e.Message
+                                };
+
+                                var msg_str = JsonSerializer.Serialize(msg);
+                                wc.Send(msg_str, 401, "application/json");
+                            }
                         }
                     } catch (Exception e) {
                         Log.Write(e.Message);

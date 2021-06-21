@@ -30,8 +30,8 @@ namespace Estrol.X3Jam.Server.CHandler {
 
         public void Intialize(Client client, bool stream) {
             Client = client;
-            Main = Client.Main;
-            ChanManager = Client.Main.ChannelManager;
+            Main = (O2JamServer)Client.Main;
+            ChanManager = Main.ChannelManager;
             if (Client.UserInfo != null && Client.UserInfo.ChannelID != -1) {
                 RoomManager = ChanManager.GetChannelByID(Client.UserInfo.ChannelID).RManager;
             }

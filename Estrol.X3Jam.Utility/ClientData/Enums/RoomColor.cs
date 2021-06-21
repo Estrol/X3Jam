@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Estrol.X3Jam.Server.CData.RoomEnums {
+﻿namespace Estrol.X3Jam.Utility.Data {
     public enum RoomColor {
         Red = 0,
         Orange = 1,

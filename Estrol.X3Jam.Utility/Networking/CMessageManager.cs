@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
-namespace Estrol.X3Jam.Server.CUtility {
+namespace Estrol.X3Jam.Utility.Networking {
     public class CMessageManager {
         public bool IsFailed = false;
         public List<byte[]> stacks = new();

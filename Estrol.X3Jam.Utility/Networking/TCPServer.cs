@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using Estrol.X3Jam.Server.CData;
-using Estrol.X3Jam.Server.CHandler;
 using Estrol.X3Jam.Utility;
 
-namespace Estrol.X3Jam.Server.CNetwork {
+namespace Estrol.X3Jam.Utility.Networking {
     public class TCPServer {
-        private O2JamServer m_GameServer;
         private Socket m_ServerSocket;
         private short m_gamePort;
 
@@ -17,8 +15,7 @@ namespace Estrol.X3Jam.Server.CNetwork {
 
         private List<Client> clients;
 
-        public TCPServer(O2JamServer server, short gamePort) {
-            m_GameServer = server;
+        public TCPServer(short gamePort) {
             m_gamePort = gamePort;
             clients = new();
 
@@ -119,8 +116,7 @@ namespace Estrol.X3Jam.Server.CNetwork {
             } else if (e is SocketException err) {
                 if (err.ErrorCode == 10054) {
                     Console.WriteLine("[C# Exception] A thread tried to access socket that already disconnected");
-                    CBase disconnect = new CDisconnect(client);
-                    disconnect.Handle();
+                    RemoveClient(client);
                 }
             } else {
                 Console.WriteLine("[C# Unhandled Exception] {0}\n{1}", e.Message, e.StackTrace);

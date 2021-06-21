@@ -6,7 +6,7 @@ namespace Estrol.X3Jam.Server.CHandler {
         public COJNList(Client client) : base(client) { }
 
         public override void Code() {
-            Channel ch = Client.Main.ChannelManager.GetChannelByID(Client.UserInfo.ChannelID);
+            Channel ch = Main.ChannelManager.GetChannelByID(Client.UserInfo.ChannelID);
             OJN[] headers = ch.GetMusicList();
 
             short length = (short)(6 + (headers.Length * 12) + 12);

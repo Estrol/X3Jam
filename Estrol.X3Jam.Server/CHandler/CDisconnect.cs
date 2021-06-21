@@ -9,7 +9,7 @@ namespace Estrol.X3Jam.Server.CHandler {
             string usr = "null";
 
             if (Client.UserInfo != null) {
-                Channel ch = Client.Main.ChannelManager.GetChannelByID(Client.UserInfo.ChannelID);
+                Channel ch = Main.ChannelManager.GetChannelByID(Client.UserInfo.ChannelID);
                 if (ch != null) {
                     Room room = ch.RManager.GetID(Client.UserInfo.Room);
                     if (room != null) {
@@ -22,7 +22,7 @@ namespace Estrol.X3Jam.Server.CHandler {
             }
 
             Log.Write("[{0}@{1}] Disconnected", usr, Client.IPAddr);
-            Client.Main.Server.RemoveClient(Client);
+            Main.Server.RemoveClient(Client);
             Client.m_socket.Disconnect(true);
         }
     }

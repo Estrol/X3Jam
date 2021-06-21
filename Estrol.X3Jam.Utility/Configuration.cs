@@ -1,9 +1,7 @@
 ﻿using System;
 using System.IO;
-using Estrol.X3Jam.Server.Utils;
-using Estrol.X3Jam.Utility;
 
-namespace Estrol.X3Jam.Server {
+namespace Estrol.X3Jam.Utility {
     public class Configuration {
         public ConfLoader ini;
 

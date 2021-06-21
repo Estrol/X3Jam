@@ -1,4 +1,4 @@
-﻿namespace Estrol.X3Jam.Server.CData {
+﻿namespace Estrol.X3Jam.Utility.Data.Enums {
     public enum ClientPacket : ushort {
         Disconnect = 0xfff0,
         Login = 0x03ef,
@@ -34,6 +34,7 @@
         RoomSlotLock = 0x0bc0,
         ListChat = 0x07dc,
         RoomChat = 0x0bc3,
-        RoomNameChange = 0x0bb8
+        RoomNameChange = 0x0bb8,
+        RoomSlotToggle = 0xbc0
     }
 }

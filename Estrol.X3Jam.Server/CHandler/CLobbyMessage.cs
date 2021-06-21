@@ -11,7 +11,7 @@ namespace Estrol.X3Jam.Server.CHandler {
 
         public override void Code() {
             string msg = DataUtils.GetString(Client.Message.Data);
-            Channel channel = Client.Main.ChannelManager.GetChannelByID(Client.UserInfo.ChannelID);
+            Channel channel = Main.ChannelManager.GetChannelByID(Client.UserInfo.ChannelID);
             User usr = Client.UserInfo;
 
             if (msg.StartsWith("!") && msg.Length > 1) {

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Estrol.X3Jam.Server.CData {
+﻿namespace Estrol.X3Jam.Utility.Data {
     public enum RoomArena : byte {
         Random =  0xff,
         Arena1 = 0x1,

@@ -3,17 +3,18 @@ using System.Linq;
 using System.Text;
 
 using Estrol.X3Jam.Utility;
+using Estrol.X3Jam.Database;
 using Estrol.X3Jam.Server.CData;
-using Estrol.X3Jam.Server.CNetwork;
 using Estrol.X3Jam.Server.CHandler;
 using Estrol.X3Jam.Server.CManager;
 using Estrol.X3Jam.Server.CUtility;
-using System.IO;
+using Estrol.X3Jam.Utility.Networking;
+using Estrol.X3Jam.Utility.Data.Enums;
 
 namespace Estrol.X3Jam.Server {
     public class O2JamServer {
         public Configuration Config;
-        public DataNetwork Database;
+        public DataNetworkRewrite Database;
         public ChanManager ChannelManager;
         public TCPServer Server;
 
@@ -31,11 +32,11 @@ namespace Estrol.X3Jam.Server {
             Config = new();
             ChannelManager = new(this);
             Database = new();
-            Database.Intialize();
+            Database.Start();
 
             short port = short.Parse(Config.Get("GamePort"));
 
-            Server = new(this, port);
+            Server = new(port);
             Server.OnServerMessage += TCPMessage;
             Server.Start();
         }
@@ -43,7 +44,6 @@ namespace Estrol.X3Jam.Server {
         public void Close() {
             Log.Write("Shut-down O2-JAM Server...");
             using PacketBuffer buf = new();
-
 
             Database.Close();
         }
@@ -229,6 +229,11 @@ namespace Estrol.X3Jam.Server {
 
                     case ClientPacket.RoomNameChange:
                         handler = new CRoomNameChange(client);
+                        handler.Handle();
+                        break;
+
+                    case ClientPacket.RoomSlotToggle:
+                        handler = new CRoomSlotToggle(client);
                         handler.Handle();
                         break;
 
