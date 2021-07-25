@@ -9,7 +9,7 @@ namespace Estrol.X3Jam.Server.CHandler {
         public override void Code() {
             string[] UserAuth = DataUtils.GetUserAuthentication(Client.Message.Data);
 
-            User usr = Main.Database.Login(UserAuth[0], UserAuth[1]);
+            User usr = Main.Database.Login(UserAuth[0], UserAuth[1], false);
             if (usr == null) {
                 Write(new byte[] {
                     0x08, 0x00, 0xf0, 0x03, 0xff, 0xff, 0xff, 0xff

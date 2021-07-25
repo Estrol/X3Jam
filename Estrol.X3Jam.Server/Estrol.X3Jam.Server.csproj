@@ -4,7 +4,7 @@
 		<TargetFramework>net5.0</TargetFramework>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<Platforms>AnyCPU;x64</Platforms>
-		<AssemblyName>X3Server</AssemblyName>
+		<AssemblyName>X3!Server</AssemblyName>
 		<SignAssembly>false</SignAssembly>
 		<AssemblyOriginatorKeyFile>X3SERVERASSEMBLYNAMEESTROL.pfx</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
@@ -12,6 +12,8 @@
 	  <PlatformTarget>AnyCPU</PlatformTarget>
 	</PropertyGroup>
 	<ItemGroup>
+	  <None Remove="CHandler\CCharacter.cs~RF9dce7bb.TMP" />
+	  <None Remove="CHandler\CRoomJoin.cs~RFbdd5242.TMP" />
 	  <None Remove="Resources\server.conf" />
 	</ItemGroup>
 	<ItemGroup>

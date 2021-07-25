@@ -1,4 +1,4 @@
-﻿namespace Estrol.X3Jam.Website {
+﻿namespace Estrol.X3Jam.Website.Services {
     public enum HTTPMethod {
         GET = 1,
         HEAD = 2,

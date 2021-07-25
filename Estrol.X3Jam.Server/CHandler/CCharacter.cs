@@ -2,25 +2,25 @@
 using Estrol.X3Jam.Utility;
 using Estrol.X3Jam.Utility.Data;
 using Estrol.X3Jam.Utility.Parser;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Estrol.X3Jam.Server.CHandler {
     public class CCharacter: CBase {
-        public CCharacter(Client client) : base(client) {
-            PrintTheResult = true;
-        }
+        public CCharacter(Client client) : base(client) {}
 
         public override void Code() {
+            Character character = Client.UserInfo.Char;
+
             Write((short)0);
             Write((short)0x7d1);
             Write(0);
             Write(Client.UserInfo.Nickname);
-            Write((byte)Client.UserInfo.Char.Gender); // Female Character
+            Write((byte)character.Gender); // Gender
             Write(10);
-            Write(6000); // mCash
+            Write(character.MCash); // mCash
             Write(0);
-            Write(Client.UserInfo.Char.Level);
+            Write(character.Level);
             Write(0);
             Write(0);
             Write(0);
@@ -28,18 +28,30 @@ namespace Estrol.X3Jam.Server.CHandler {
             Write(0);
             Write((byte)0);
 
-            int[] Avatar = Client.UserInfo.Char.ToArray();
-            for (int i = 0; i < Avatar.Length; i++) {
-                Write(Avatar[i]);
-            }
+            // Character
+            Write(character.Instrument); // 0
+            Write(character.Hair); // 1
+            Write(character.Accessory); // 2
+            Write(character.Glove); // 3
+            Write(character.Necklace); // 4
+            Write(character.Cloth); // 5
+            Write(character.Pant); // 6
+            Write(character.Glass); // 7
+            Write(character.Earring); // 8
+            Write(character.ClothAccessory); // 9
+            Write(character.Shoe); // 10
+            Write(character.Face); // 11
+            Write(character.Wing); // 12
+            Write(character.InstrumentAccessory); // 13
+            Write(character.Pet); // 14
+            Write(character.HairAccessory); // 15
 
             List<Item> effectItems = new();
 
             // Inventory
-            // NOTE: I don't know why it must be 35 inventory slot.
-            Item[] items = Main.Database.GetInventory(Client.UserInfo.Username);
-            for (int i = 0; i < 35; i++) {
-                var item = items[i];
+            // NOTE: I don't know why it must be 30 inventory slot.
+            for (int i = 0; i < 30; i++) {
+                var item = Client.UserInfo.Inv.GetItemFromIndex(i);
 
                 if (item == null) {
                     Write(0);
@@ -50,6 +62,11 @@ namespace Estrol.X3Jam.Server.CHandler {
                         effectItems.Add(item);
                     }
                 }
+            }
+
+            // 5x4 Padding for what?
+            for (int i = 0; i < 5; i++) {
+                Write(0);
             }
 
             // Write all list effect items's Count

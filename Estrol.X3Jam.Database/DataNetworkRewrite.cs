@@ -8,6 +8,7 @@ using System.Reflection;
 using Estrol.X3Jam.Utility.Parser;
 using Estrol.X3Jam.Server.CData;
 using Estrol.X3Jam.Utility.Data;
+using Estrol.X3Jam.Utility.ClientData.Enums;
 
 namespace Estrol.X3Jam.Database {
     public class DataNetworkRewrite {
@@ -18,9 +19,11 @@ namespace Estrol.X3Jam.Database {
         private ItemList[] m_ItemLists;
 
         public DataNetworkRewrite() {
-            Log.Write("Itemlist Database Loaded!");
             managers = new();
             config = new();
+
+            m_ItemLists = ItemListParser.LoadData(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "conf", "Itemdata.dat"));
+            Log.Write($"Loaded {m_ItemLists.Length} Items from ItemList.dat");
 
             string db_name = config.ini.IniReadValue("DATABASE", "SQLProviderName");
             Type asm = managers.Get(db_name);
@@ -30,8 +33,6 @@ namespace Estrol.X3Jam.Database {
 
             ConstructorInfo ctor = asm.GetConstructor(new[] { typeof(ItemList[]), typeof(Configuration) });
             client = (ProviderBase)ctor.Invoke(new object[] { m_ItemLists, config });
-
-            m_ItemLists = ItemListParser.LoadData(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "conf", "Itemdata.dat"));
         }
 
         public void Start() {
@@ -45,6 +46,8 @@ namespace Estrol.X3Jam.Database {
             client.Stop();
         }
 
+        public ItemList[] ItemLists => m_ItemLists;
+
         public int PlayerCount {
             get {
                 if (!m_ready) {
@@ -56,6 +59,8 @@ namespace Estrol.X3Jam.Database {
         }
 
         public ExistResult Exists(string username, string email) {
+            username = username.ToLower();
+
             ExistsInformation result = client.QueryExistsUser(username, email);
 
             return new() {
@@ -64,29 +69,54 @@ namespace Estrol.X3Jam.Database {
             };
         }
 
-        public void Register(string username, string password, string email) {
+        public void Register(string username, string nickname, string password, string email) {
             username = username.ToLower();
 
-            RegisterInformation result = client.RegisterAccount(username, username, "Female", password, email);
+            RegisterInformation result = client.RegisterAccount(username, nickname, "Male", password, email);
             if (!result.IsSuccess) {
                 throw new Exception(result.Message);
             }
         }
 
-        public User Login(string username, string password) {
+        public User Login(string username, string password, bool fetchStorage = true) {
             username = username.ToLower();
 
             LoginInformation result = client.QueryLoginInfo(username, password);
             if (result.IsExist) {
-                Character character = GetChar(username);
+                Character character = null;
+                Inventory inventory = null;
+                
+                if (fetchStorage) {
+                    character = GetChar(username);
+                    inventory = new() {
+                        items = GetInventory(username)
+                    };
+                }
 
-                return new(new string[] { result.Username, result.Nickname }, character);
+                return new(new string[] { result.Username, result.Nickname }, character, inventory);
             }
 
             return null;
         }
 
+        public User[] GetUsers() {
+            GetUsersInformation result = client.GetUsers();
+
+            return result.Users;
+        }
+
+        // It's safe to ignore this if you decided to host server
+        public string GenerateInviteCode() {
+            return client.GenerateInviteCode();
+        }
+
+        public bool VerifyInviteCode(string key) {
+            return client.VerifyInviteCode(key);
+        }
+
         public Item[] GetInventory(string username) {
+            username = username.ToLower();
+
             InventoryInformation result = client.QueryInventory(username);
 
             Item[] inventory = new Item[35];
@@ -97,6 +127,7 @@ namespace Estrol.X3Jam.Database {
                 Item item = new() {
                     ItemId = data[0],
                     ItemCount = data[1],
+                    ItemGender = item_info.Gender,
                     Function = item_info.ItemFunction
                 };
 
@@ -107,11 +138,19 @@ namespace Estrol.X3Jam.Database {
         }
 
         public void SetInventory(string username, int slot, int itemId, int amount) {
+            username = username.ToLower();
+
             client.InsertInventory(username, slot, itemId, amount);
         }
 
         public Character GetChar(string username) {
+            username = username.ToLower();
+
             CharacterInformation result = client.QueryCharacter(username);
+            
+            if (!result.IsSuccess) {
+                return null;
+            }
 
             Character character = new() {
                 Username = result.Username,
@@ -145,6 +184,10 @@ namespace Estrol.X3Jam.Database {
             };
 
             return character;
+        }
+
+        public void SetChar(string username, int itemId, CharacterRenderSlot pos) {
+            client.UpdateCharacter(username, itemId, pos);
         }
 
         public class ExistResult {

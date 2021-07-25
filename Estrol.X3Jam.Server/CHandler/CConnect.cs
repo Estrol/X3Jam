@@ -10,7 +10,7 @@ namespace Estrol.X3Jam.Server.CHandler {
                 0x04, 0x00, 0xf2, 0x03
             });
 
-            Log.Write("Client connected!");
+            Log.Write("[null@{0}] Client connected!", Client.IPAddr);
             Send();
         }
     }

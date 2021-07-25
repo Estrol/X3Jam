@@ -1,5 +1,6 @@
 ﻿using Estrol.X3Jam.Database.SQLResult;
 using Estrol.X3Jam.Utility;
+using Estrol.X3Jam.Utility.ClientData.Enums;
 using Estrol.X3Jam.Utility.Parser;
 using System;
 using System.Collections.Generic;
@@ -38,6 +39,13 @@ namespace Estrol.X3Jam.Database.Providers {
             throw new NotImplementedException("Method 'RegisterAccount' not yet implemented");
         }
 
+        /// <sumary>
+        /// When overridden in a derived class, return all registered users information (without password)
+        /// </sumary>
+        public virtual GetUsersInformation GetUsers() {
+            throw new NotImplementedException("Method 'GetUsers' not yet implemented");
+        }
+
         /// <summary>
         /// When overridden in a derived class, get login credentials else throw exception
         /// </summary>
@@ -60,6 +68,13 @@ namespace Estrol.X3Jam.Database.Providers {
         }
 
         /// <summary>
+        /// When overridden in a derived class, update the user's character in database else throw exception
+        /// </summary>
+        public virtual bool UpdateCharacter(string username, int itemId, CharacterRenderSlot pos) {
+            throw new NotImplementedException("Method 'UpdateCharacter' not yet implemented");
+        }
+
+        /// <summary>
         /// When overridden in a derived class, get the user's inventory else throw exception
         /// </summary>
         public virtual InventoryInformation QueryInventory(string username) {
@@ -78,6 +93,20 @@ namespace Estrol.X3Jam.Database.Providers {
         /// </summary>
         public virtual int QueryPlayerCount() {
             throw new NotImplementedException("Method 'QueryPlayerCount' not yet implemented");
+        }
+
+        /// <summary>
+        /// When overridden in a derived class, generate key to verify invitation code else throw exception
+        /// </summary>
+        public virtual string GenerateInviteCode() {
+            throw new NotImplementedException("Method 'GenerateInvideCode' not yet implemented");
+        }
+
+        /// <summary>
+        /// When overridden in a derived class,verify code if valid else throw exception
+        /// </summary>
+        public virtual bool VerifyInviteCode(string key) {
+            throw new NotImplementedException("Method 'VerifyInviteCode' not yet implemented");
         }
 
         public virtual int[] GetDefaultAvatar(string gender) {

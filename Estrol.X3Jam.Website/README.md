@@ -5,26 +5,35 @@ This module trying to achived HTTP server without Administrator's permissions
 Written for X3-JAM Website module.
 
 ## How?
-Main gateway on HTTP Server was in `HTTPServer.cs` \
-which Implement `HTTPServer` class. 
+Main gateway on HTTP Server was in `HTTPSocketServer.cs` \
+which Implement `HTTPSocketServer` class. 
 ```csharp
-public HTTPServer(IPAddress ip, int port);
+public HTTPSocketServer(int port);
 ```
 
-To get client request and parse it you need listen HTTPServer#Data event
+To get client request and parse it you need listen HTTPSocketServer#OnServerData event
 ```csharp
-HTTPServer.Data(object o, WebConnection wb);
+HTTPSocketServer.Data(object o, HTTPClient wb);
 ```
 
-`WebConnection` object data
+`HTTPClient` object data
 ```csharp
-public class WebConnection {
-    public TcpClient tc;
-    public NetworkStream ns;
-    public byte[] data = new byte[2000];
-    public Uri url;
+public class HTTPClient {
+    public const int MAX_BUFFER_SIZE = 10000;
 
-    public WebConnection(TcpClient tc, NetworkStream ns);
-    public void Send(object data);
-}
+    // Internal
+    public HTTPSocketServer Main { set; get; }
+    public Socket ClientSocket { set; get; }
+    public byte[] ResponseData { set; get; }
+    public int DataLength { set; get; }
+
+    // Public
+    public HTTPHeader Headers { set; get; }
+    public Uri URL { set; get; }
+    public byte[] BodyArray { set; get; }
+    public string BodyString => Encoding.ASCII.GetString(BodyArray);
+
+    // Method
+    public void Send(string data, int statusCode = 200, string contentType = "text/plain");
+
 ```

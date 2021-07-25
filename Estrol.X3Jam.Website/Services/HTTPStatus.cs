@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Estrol.X3Jam.Website {
+namespace Estrol.X3Jam.Website.Services {
     public static class HTTPStatus {
         public static string GetResponseStatus(int code) {
             if (!Enum.IsDefined(typeof(HTTPResponse), code)) {

@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <AssemblyName>X3!Database</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>

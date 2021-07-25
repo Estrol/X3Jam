@@ -4,6 +4,7 @@
 		<TargetFramework>net5.0</TargetFramework>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<Platforms>AnyCPU;x64</Platforms>
+		<AssemblyName>X3!WebService</AssemblyName>
 	</PropertyGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\Estrol.X3Jam.Server\Estrol.X3Jam.Server.csproj" />

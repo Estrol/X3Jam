@@ -6,16 +6,27 @@
 		<StartupObject>Estrol.X3Jam.IConsole.Program</StartupObject>
 		<Platforms>AnyCPU;x64</Platforms>
 		<ApplicationIcon>Icon.ico</ApplicationIcon>
-		<AssemblyName>X3Console</AssemblyName>
+		<AssemblyName>X3!ConsoleApp</AssemblyName>
 		<Authors>Estrol</Authors>
 		<RootNamespace>Estrol.X3Jam.IConsole</RootNamespace>
 		<SignAssembly>false</SignAssembly>
+		<DebugType>embedded</DebugType>
+		<Nullable>enable</Nullable>
 	</PropertyGroup>
 	<ItemGroup>
+	  <None Remove="IUtils.cs~RFa6380f2.TMP" />
 	  <None Remove="Resources\Icon.ico" />
 	</ItemGroup>
 	<ItemGroup>
+		<TrimmerRootAssembly Include="System.Threading" />
+		<TrimmerRootAssembly Include="System.Collections" />
+	</ItemGroup>
+	<ItemGroup>
 		<ProjectReference Include="..\Estrol.X3Jam.Server\Estrol.X3Jam.Server.csproj">
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+		</ProjectReference>
+		<ProjectReference Include="..\Estrol.X3Jam.Database\Estrol.X3Jam.Database.csproj">
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 		</ProjectReference>
@@ -24,6 +35,20 @@
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 		</PackageReference>
+	</ItemGroup>
+	<ItemGroup>
+		<Content Update="Microsoft.Extensions.DependencyModel.dll">
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+		</Content>
+		<Content Update="INIFileParser.dll">
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+		</Content>
+		<Content Update="System.Reflection.Assembly.dll">
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+			<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+		</Content>
 	</ItemGroup>
 	<ItemGroup>
 	  <Compile Update="Properties\Resources.Designer.cs">
@@ -40,6 +65,9 @@
 	</ItemGroup>
 	<PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
 		<DefineConstants>_WINDOWS</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+	  <Prefer32Bit>true</Prefer32Bit>
 	</PropertyGroup>
 	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
 	  <Exec Command="del $(ProjectDir)Resources\version.txt &amp; git rev-parse HEAD &gt;$(ProjectDir)Resources\version.txt" />

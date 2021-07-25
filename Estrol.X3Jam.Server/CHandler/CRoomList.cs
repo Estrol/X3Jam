@@ -2,17 +2,15 @@
 using Estrol.X3Jam.Server.CUtility;
 using Estrol.X3Jam.Utility;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Estrol.X3Jam.Server.CHandler {
     public class CRoomList : CBase {
         public CRoomList(Client client) : base(client) {}
 
         public override void Code() {
+
+            // Indicate that user ALT+TAB and avoid room stuck
             Room uRoom = RoomManager.GetID(Client.UserInfo.Room);
             if (uRoom != null) {
                 uRoom.RemoveUser(Client.UserInfo);
@@ -102,7 +100,7 @@ namespace Estrol.X3Jam.Server.CHandler {
 
             string chat_data = Client.Config.Get("ChannelMessage");
             if (chat_data != null && chat_data != string.Empty) {
-                chat_data = chat_data.Replace("{USER}", Client.UserInfo.Username);
+                chat_data = chat_data.Replace("{USER}", Client.UserInfo.Nickname);
                 chat_data = chat_data.Replace("{CH}", Client.UserInfo.ChannelID.ToString());
 
                 DateTime date = DateTime.Now;

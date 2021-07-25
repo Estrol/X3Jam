@@ -13,6 +13,9 @@ namespace Estrol.X3Jam.Utility.Networking {
         public delegate void ServerEventSender(object sender, Client state);
         public event ServerEventSender OnServerMessage;
 
+        public delegate void ServerErrorSender(object sender, Client state);
+        public event ServerErrorSender OnServerError;
+
         private List<Client> clients;
 
         public TCPServer(short gamePort) {
@@ -116,12 +119,12 @@ namespace Estrol.X3Jam.Utility.Networking {
             } else if (e is SocketException err) {
                 if (err.ErrorCode == 10054) {
                     Console.WriteLine("[C# Exception] A thread tried to access socket that already disconnected");
-                    RemoveClient(client);
+                    OnServerError?.Invoke(this, client);
                 }
             } else {
                 Console.WriteLine("[C# Unhandled Exception] {0}\n{1}", e.Message, e.StackTrace);
                 if (client != null) {
-                    RemoveClient(client);
+                    OnServerError?.Invoke(this, client);
                     Console.WriteLine("[Socket] Connection {0} has been forcedly disconnect due to Unhandled Exception", client.IPAddr);
                 }
             }

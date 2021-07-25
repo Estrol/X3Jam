@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Threading;
 
 using Estrol.X3Jam.Utility;
 using Estrol.X3Jam.Server.CData;
+using System.Diagnostics;
 
 namespace Estrol.X3Jam.Server.CHandler {
     public class CMusicList: CBase {
@@ -15,8 +17,9 @@ namespace Estrol.X3Jam.Server.CHandler {
             Client.UserInfo.MusicLength = length;
             Client.UserInfo.MusicCount = list;
 
-            Write(new byte[] { 0x04, 0x00, 0xe9, 0x07 });
             Log.Write("[{0}@{1}] Client Music List: {2} Songs", Client.UserInfo.Username, Client.IPAddr, length);
+
+            Write(new byte[] { 0x04, 0x00, 0xe9, 0x07 });
             Send();
         }
     }

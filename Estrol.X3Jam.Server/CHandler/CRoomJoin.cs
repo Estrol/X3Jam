@@ -48,20 +48,36 @@ namespace Estrol.X3Jam.Server.CHandler {
                     Write(1);
                     Write(usr.Nickname);
                     Write(usr.Level);
-                    Write((byte)0);
+                    Write((byte)usr.Char.Gender); // Gender
                     Write((byte)(usr.IsRoomMaster ? 1 : 0)); // Roomaster
                     Write((byte)usr.Color); // Room Color
                     Write((byte)usr.Ready); // Ready?
-                    Write((byte)0); 
-                    foreach (int itr in usr.Char.ToArray()) {
-                        Write(itr);
-                    }
+                    Write((byte)0);
+
+                    Write(usr.Char.Instrument); // 0
+                    Write(usr.Char.Hair); // 1
+                    Write(usr.Char.Accessory); // 2
+                    Write(usr.Char.Glove); // 3
+                    Write(usr.Char.Necklace); // 4
+                    Write(usr.Char.Cloth); // 5
+                    Write(usr.Char.Pant); // 6
+                    Write(usr.Char.Glass); // 7
+                    Write(usr.Char.Earring); // 8
+                    Write(usr.Char.ClothAccessory); // 9
+                    Write(usr.Char.Shoe); // 10
+                    Write(usr.Char.Face); // 11
+                    Write(usr.Char.Wing); // 12
+                    Write(usr.Char.InstrumentAccessory); // 13
+                    Write(usr.Char.Pet); // 14
+                    Write(usr.Char.HairAccessory); // 15
 
                     Write(usr.MusicLength);
                     Write(usr.MusicCount);
                 } else {
+                    bool IsLocked = !room.ListSlot[i];
+
                     Write((byte)i);
-                    Write(0);
+                    Write(IsLocked ? 2 : 0); // 0 = Not locked, 2 = Locked (based on research)
                 }
             }
 

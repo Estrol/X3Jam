@@ -23,7 +23,7 @@ namespace Estrol.X3Jam.Utility.Parser {
                     Id = br.ReadInt32(),
                     ItemCategory = br.ReadByte(),
                     Planet = br.ReadByte(),
-                    Flags = br.ReadUInt16(),
+                    Flags = br.ReadUInt16(), // Gender...
                     Amount = br.ReadUInt16(),
                     ItemSpecial = br.ReadByte(),
                     ItemFunction = (ItemFunction)br.ReadByte(),
@@ -32,6 +32,49 @@ namespace Estrol.X3Jam.Utility.Parser {
                     PriceEP = br.ReadInt32(),
                     RoomRenderCategory = br.ReadByte(),
                 };
+
+                switch (item.Flags) {
+                    // Female
+                    case 0: {
+                        item.Gender = ItemGender.Female;
+                        break;
+                    }
+
+                    // Male
+                    case 128: {
+                        item.Gender = ItemGender.Male;
+                        break;
+                    }
+
+                    // Female and Male
+                    case 256: {
+                        item.Gender = ItemGender.Both;
+                        break;
+                    }
+
+                    // Female and New
+                    case 2048: {
+                        item.Gender = ItemGender.Female;
+                        break;
+                    }
+
+                    // Male and New
+                    case 2176: {
+                        item.Gender = ItemGender.Male;
+                        break;
+                    }
+
+                    // Both and New
+                    case 2304: {
+                        item.Gender = ItemGender.Both;
+                        break;
+                    }
+
+                    default: {
+                        item.Gender = ItemGender.Unknown;
+                        break;
+                    }
+                }
 
                 if (i == 0) {
                     item.Files = new string[11];
@@ -93,6 +136,7 @@ namespace Estrol.X3Jam.Utility.Parser {
         public byte ItemCategory;
         public byte Planet;
         public ushort Flags;
+        public ItemGender Gender;
         public ushort Amount;
         public byte ItemSpecial;
         public ItemFunction ItemFunction;

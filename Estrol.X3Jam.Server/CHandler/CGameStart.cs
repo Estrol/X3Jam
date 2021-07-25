@@ -13,7 +13,8 @@ namespace Estrol.X3Jam.Server.CHandler {
             Room room = RoomManager.GetID(Client.UserInfo.Room);
             if (!room.IsReady()) {
                 Write(new byte[] {
-
+                    0x08, 0x00, 0xab, 0x0f, 
+                    0x01, 0x00, 0x00, 0x00
                 });
 
                 Send();
@@ -22,11 +23,15 @@ namespace Estrol.X3Jam.Server.CHandler {
 
             room.GamePrepare();
 
+            Random rnd = new();
+            int timeRandom = rnd.Next(0, int.MaxValue);
+
+            Write(new byte[] { 0x0c, 0x00, 0xab, 0x0f, 0x00, 0x00, 0x00, 0x00 });
+            Write(timeRandom); // this needed to make random ring work for each play
+
+            byte[] data = ToArray();
             foreach (User usr in room.GetUsers())
-                usr.Connection.Send(new byte[] {
-                    0x0c, 0x00, 0xab, 0x0f, 0x00, 0x00, 0x00, 0x00,
-                    0x093, 0x21, 0x74, 0x025
-                });
+                usr.Connection.Send(data);
         }
     }
 }

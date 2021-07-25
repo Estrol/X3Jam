@@ -37,7 +37,8 @@ namespace Estrol.X3Jam.Server {
             short port = short.Parse(Config.Get("GamePort"));
 
             Server = new(port);
-            Server.OnServerMessage += TCPMessage;
+            Server.OnServerError += OnError;
+            Server.OnServerMessage += OnMessage;
             Server.Start();
         }
 
@@ -48,7 +49,12 @@ namespace Estrol.X3Jam.Server {
             Database.Close();
         }
 
-        public void TCPMessage(object o, Client client) {
+        public void OnError(object o, Client client) {
+            var handler = new CDisconnect(client);
+            handler.Handle();
+        }
+
+        public void OnMessage(object o, Client client) {
             client.Config = Config;
 
             CMessageManager cMessage = new(client, client.Buffer);
@@ -72,6 +78,8 @@ namespace Estrol.X3Jam.Server {
                 }
 
                 string name = Enum.GetName(typeof(ClientPacket), message.Opcode);
+
+
                 if (name != null && !StaticOpcode.Contains(name)) {
                     if (client.UserInfo == null) {
                         client.m_socket.Close();
@@ -153,7 +161,7 @@ namespace Estrol.X3Jam.Server {
                         break;
 
                     case ClientPacket.Timest:
-                        handler = new CTimest(client);
+                        handler = new CUserGCash(client);
                         handler.Handle();
                         break;
 
@@ -237,28 +245,27 @@ namespace Estrol.X3Jam.Server {
                         handler.Handle();
                         break;
 
+                    case ClientPacket.StoreActionBuy:
+                        handler = new CStoreActionBuy(client);
+                        handler.Handle();
+                        break;
+
+                    case ClientPacket.StoreActionBack:
+                        handler = new CStoreActionBack(client);
+                        handler.Handle();
+                        break;
+
+                    case ClientPacket.InventoryEquip:
+                        handler = new CInventoryEquip(client);
+                        handler.Handle();
+                        break;
+
                     case ClientPacket.Tutorial1:
                     case ClientPacket.Tutorial2:
                         // Ignored
                         break;
 
                     default: {
-                        if (message.IsHTTP) {
-                            string body = "HTTP Method is not allowed. Please use O2-JAM Client to connect this port!";
-
-                            string response = $"HTTP/1.1 405 Method Not Allowed{Environment.NewLine}";
-                            response += $"Content-Type: text/plain{Environment.NewLine}";
-                            response += $"Content-Length: {body.Length}{Environment.NewLine}";
-                            response += Environment.NewLine;
-
-                            response += body;
-
-                            byte[] data = Encoding.UTF8.GetBytes(response);
-                            client.Send(data, (short)data.Length);
-                            client.m_socket.Disconnect(true);
-                            return;
-                        }
-
                         if (client.UserInfo != null) {
                             byte[] opcode = new byte[2];
                             Buffer.BlockCopy(message.Data, 0, opcode, 0, 2);
@@ -274,9 +281,24 @@ namespace Estrol.X3Jam.Server {
                             Log.Write("Unhandled opcode");
                             Log.Write("Code: {0}", ((ushort)message.Opcode).ToString("X4"));
                             Log.Write("Data: {0}", msg ?? "Empty");
+                            break;
                         }
 
-                        break;
+                        if (message.IsHTTP) {
+                            string body = "HTTP Method is not allowed. Please use O2-JAM Client to connect this port!";
+
+                            string response = $"HTTP/1.1 405 Method Not Allowed{Environment.NewLine}";
+                            response += $"Content-Type: text/plain{Environment.NewLine}";
+                            response += $"Content-Length: {body.Length}{Environment.NewLine}";
+                            response += Environment.NewLine;
+                            response += body;
+
+                            byte[] data = Encoding.UTF8.GetBytes(response);
+                            client.Send(data, (short)data.Length);
+                        }
+                        
+                        client.m_socket.Disconnect(true); // Disconnect to avoid CPU-spike
+                        return;
                     }
                 }
 

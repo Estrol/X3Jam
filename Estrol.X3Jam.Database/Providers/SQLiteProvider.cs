@@ -13,6 +13,10 @@ using System.Text.RegularExpressions;
 using System.Data.SQLite;
 using Estrol.X3Jam.Utility.Parser;
 using Estrol.X3Jam.Utility;
+using Estrol.X3Jam.Utility.ClientData.Enums;
+using System.Security.Cryptography;
+using System.Text;
+using System.Collections.Generic;
 
 /// <summary>
 /// The purpose of this class to make my implementation of local database using SQLite
@@ -40,7 +44,10 @@ namespace Estrol.X3Jam.Database.Providers {
         public override void Start() {
             SQLiteClient.Open();
 
-            SQLiteCommand cm = new SQLiteCommand(SQLiteClient);
+            SQLiteCommand cm = new(SQLiteClient);
+
+            cm.CommandText = "CREATE TABLE IF NOT EXISTS X3JAM_users_invite(Id INTEGER PRIMARY KEY, InviteCode TEXT)";
+            cm.ExecuteNonQuery();
 
             cm.CommandText = "CREATE TABLE IF NOT EXISTS X3JAM_users_info(Id INTEGER PRIMARY KEY, Username TEXT, Nickname TEXT, Email TEXT, Gender TEXT, Password TEXT)";
             cm.ExecuteNonQuery();
@@ -131,8 +138,35 @@ namespace Estrol.X3Jam.Database.Providers {
             return info;
         }
 
+        public override GetUsersInformation GetUsers() {
+            SQLiteCommand cmd = new(SQLiteClient);
+            cmd.CommandText = "SELECT * FROM X3JAM_users_info";
+
+            List<User> users = new();
+            var reader = cmd.ExecuteReader();
+
+            while (reader.Read()) {
+                var characterInfo = QueryCharacter((string)reader["Username"]);
+                Character character = new() {
+                    Username = (string)reader["Username"],
+                    Nickname = (string)reader["Nickname"],
+                    Level = characterInfo.Level,
+                    Wins = characterInfo.Wins,
+                    Loses = characterInfo.Loses,
+                    MCash = characterInfo.MCash,
+                    Gold = characterInfo.Gold
+                };
+
+                users.Add(new User(new string[] { (string)reader["Username"], (string)reader["Nickname"] }, character, null));
+            }
+
+            return new() {
+                Users = users.ToArray()
+            };
+        }
+
         public override int QueryPlayerCount() {
-            SQLiteCommand cmd = new SQLiteCommand(SQLiteClient);
+            SQLiteCommand cmd = new(SQLiteClient);
             cmd.CommandText = "SELECT COUNT(Id) FROM X3JAM_users_info";
 
             int RowCount = Convert.ToInt32(cmd.ExecuteScalar());
@@ -140,7 +174,7 @@ namespace Estrol.X3Jam.Database.Providers {
         }
 
         public override ExistsInformation QueryExistsUser(string username, string email) {
-            SQLiteCommand cmd = new SQLiteCommand(SQLiteClient);
+            SQLiteCommand cmd = new(SQLiteClient);
 
             username = username.ToLower();
             cmd.CommandText = "SELECT * FROM X3JAM_users_info WHERE Username = ?";
@@ -156,37 +190,39 @@ namespace Estrol.X3Jam.Database.Providers {
             }
 
             reader.Close();
-            try {
-                MailAddress mail = new(email);
-                Dns.GetHostAddresses(mail.Host);
-            } catch (Exception e) {
-                if (e is FormatException) {
-                    return new() {
-                        IsExist = true,
-                        Message = "Invalid Email Format!"
-                    };
+            if (email.Length == 0) {
+                try {
+                    MailAddress mail = new(email);
+                    Dns.GetHostAddresses(mail.Host);
+                } catch (Exception e) {
+                    if (e is FormatException) {
+                        return new() {
+                            IsExist = true,
+                            Message = "Invalid Email Format!"
+                        };
+                    }
+
+                    if (e is SocketException) {
+                        return new() {
+                            IsExist = true,
+                            Message = "Unable to resolve Email Domain!"
+                        };
+                    }
+
+                    throw;
                 }
 
-                if (e is SocketException) {
+                cmd.Parameters.Clear();
+                cmd.CommandText = "SELECT * FROM X3JAM_users_info WHERE Email = ?";
+                cmd.Parameters.AddWithValue("Email", email);
+
+                reader = cmd.ExecuteReader();
+                while (reader.Read()) {
                     return new() {
                         IsExist = true,
-                        Message = "Unable to resolve Email Domain!"
+                        Message = "Another user with this email already exist"
                     };
                 }
-
-                throw;
-            }
-
-            cmd.Parameters.Clear();
-            cmd.CommandText = "SELECT * FROM X3JAM_users_info WHERE Email = ?";
-            cmd.Parameters.AddWithValue("Email", email);
-
-            reader = cmd.ExecuteReader();
-            while (reader.Read()) {
-                return new() {
-                    IsExist = true,
-                    Message = "Another user with this email already exist"
-                };
             }
 
             return new() {
@@ -199,7 +235,7 @@ namespace Estrol.X3Jam.Database.Providers {
             CharacterInformation item = new();
             item.Data = new int[16];
 
-            SQLiteCommand cmd = new SQLiteCommand(SQLiteClient);
+            SQLiteCommand cmd = new(SQLiteClient);
 
             LoginInformation login = null;
             cmd.CommandText = "SELECT * FROM X3JAM_users_info WHERE Username = ?";
@@ -215,6 +251,12 @@ namespace Estrol.X3Jam.Database.Providers {
                 };
             }
 
+            if (login == null) {
+                return new() {
+                    IsSuccess = false,
+                };
+            }
+
             reader0.Close();
             cmd.Parameters.Clear();
             cmd.CommandText = "SELECT * FROM X3JAM_users_character WHERE Username = ?";
@@ -226,6 +268,7 @@ namespace Estrol.X3Jam.Database.Providers {
                     item.Data[i] = reader.GetInt32((i + 10) + 1);
                 }
 
+                item.IsSuccess = true;
                 item.Username = username;
                 item.Nickname = (string)reader["Nickname"];
                 item.Rank = Convert.ToInt32((long)reader["Rank"]);
@@ -306,6 +349,7 @@ namespace Estrol.X3Jam.Database.Providers {
 
             cmd.ExecuteNonQuery();
 
+            item.IsSuccess = true;
             item.Username = username;
             item.Nickname = login.Nickname;
             item.Rank = 0;
@@ -320,6 +364,52 @@ namespace Estrol.X3Jam.Database.Providers {
             item.Data = chars;
 
             return item;
+        }
+
+        public override bool UpdateCharacter(string username, int itemId, CharacterRenderSlot pos) {
+            string ColumnName = Enum.GetName(typeof(CharacterRenderSlot), pos);
+
+            SQLiteCommand cmd = new(SQLiteClient);
+            cmd.CommandText = $"UPDATE X3JAM_users_character set {ColumnName} = :{ColumnName} WHERE Username = :Username";
+            cmd.Parameters.AddWithValue("Username", username);
+            cmd.Parameters.AddWithValue(ColumnName, itemId);
+
+            cmd.ExecuteNonQuery();
+            return true;
+        }
+
+        public override string GenerateInviteCode() {
+            SQLiteCommand cmd = new(SQLiteClient);
+            cmd.CommandText = "INSERT INTO X3JAM_users_invite(InviteCode) VALUES(?)";
+
+            RNGCryptoServiceProvider crypto = new();
+            byte[] data = new byte[15];
+            crypto.GetBytes(data);
+
+            string cryptString = Convert.ToBase64String(data);
+            cmd.Parameters.AddWithValue("InviteCode", cryptString);
+            cmd.ExecuteNonQuery();
+
+            return cryptString;
+        }
+
+        public override bool VerifyInviteCode(string key) {
+            SQLiteCommand cmd = new(SQLiteClient);
+
+            cmd.CommandText = "SELECT InviteCode FROM X3JAM_users_invite WHERE InviteCode = ?";
+            cmd.Parameters.AddWithValue("InviteCode", key);
+
+            var reader = cmd.ExecuteReader();
+            if (reader.Read()) {
+                reader.Close();
+
+                cmd.CommandText = "DELETE FROM X3JAM_users_invite WHERE InviteCode = ?";
+                cmd.ExecuteNonQuery();
+
+                return true;
+            }
+
+            return false;
         }
 
         public override InventoryInformation QueryInventory(string username) {
@@ -382,69 +472,35 @@ namespace Estrol.X3Jam.Database.Providers {
 
         public override void InsertInventory(string username, int slot, int itemId, int amount) {
             SQLiteCommand cmd = new SQLiteCommand(SQLiteClient);
-
-            int item_slot = -1;
-            string item_value = "";
-
             string format = "|Id{0}|Count{1}|INV{2}|"; // 0 = ItemId, 1 = ItemCount, 2 = slot
-            var item = Array.Find(m_ItemList, itr => itr.Id == itemId);
+            string parsed = string.Format(format, itemId, amount, slot);
+            cmd.CommandText = $"UPDATE X3JAM_users_inventory SET Inventory{slot} = :inv{slot} WHERE Username = :name";
+            cmd.Parameters.AddWithValue("name", username);
+            cmd.Parameters.AddWithValue($"inv{slot}", parsed);
 
-            if (item != null) {
-                if (item.ItemFunction != ItemFunction.Cosmetic) {
-                    var result = FindSlot(username, itemId);
-                    item_slot = result.Item1;
-                    item_value = result.Item2;
-
-                    if (item_slot > -1) {
-                        goto caseModify;
-                    } else {
-                        goto caseDefault;
-                    }
-                } else {
-                    goto caseDefault;
-                }
-            } else {
-                goto caseDefault;
-            }
-
-            caseModify:
-            {
-                int[] data = ParseSQLRows(item_value);
-                string parsed = string.Format(format, data[0], data[1] + amount, data[2]);
-                cmd.CommandText = $"UPDATE table SET Inventory{data[2]} = ? WHERE Username = ?";
-                cmd.Parameters.AddWithValue("Username", username);
-                cmd.Parameters.AddWithValue($"Inventory{data[2]}", parsed);
-
-                cmd.ExecuteNonQuery();
-            }
-
-            caseDefault:
-            {
-                string parsed = string.Format(format, itemId, amount, slot);
-                cmd.CommandText = $"UPDATE table SET Inventory{slot} = ? WHERE Username = ?";
-                cmd.Parameters.AddWithValue("Username", username);
-                cmd.Parameters.AddWithValue($"Inventory{slot}", parsed);
-
-                cmd.ExecuteNonQuery();
-            }
+            cmd.ExecuteNonQuery();
         }
 
         private (int, string) FindSlot(string username, int itemId) {
-            SQLiteCommand cmd = new SQLiteCommand(SQLiteClient);
+            SQLiteCommand cmd = new(SQLiteClient);
 
             Regex regex = new(string.Format("/Id{0}/g", itemId));
             int slot = -1;
             string value = "";
 
             cmd.CommandText = "SELECT * FROM X3JAM_users_inventory WHERE Username = ?";
+            cmd.Parameters.AddWithValue("Username", username);
+
             DbDataReader reader = cmd.ExecuteReader();
 
-            for (var i = 0; i < reader.FieldCount; i++) {
-                var _value = reader.GetString(i);
-                if (regex.IsMatch(_value)) {
-                    slot = i;
-                    value = _value;
-                    break;
+            if (reader.Read()) {
+                for (var i = 0; i < 35; i++) {
+                    var _value = (string)reader[$"Inventory{i}"];
+                    if (regex.IsMatch(_value)) {
+                        slot = i;
+                        value = _value;
+                        break;
+                    }
                 }
             }
 

@@ -42,7 +42,9 @@ namespace Estrol.X3Jam.Server.CHandler {
             }
         }
 
-        public abstract void Code();
+        public virtual void Code() {
+            throw new NotImplementedException("This function not yet implemented");
+        }
 
         /// <summary>
         /// Execute Code() function;
@@ -105,6 +107,12 @@ namespace Estrol.X3Jam.Server.CHandler {
         /// </summary>
         /// <param name="val"></param>
         public void Write(short val) => Writer.Write(val);
+
+        /// <summary>
+        /// Write unsigned short into array
+        /// </summary>
+        /// <param name="val"></param>
+        public void Write(ushort val) => Writer.Write(val);
 
         /// <summary>
         /// Write int32 to array

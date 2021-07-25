@@ -94,21 +94,6 @@ namespace Estrol.X3Jam.Server.CData {
             return passwd == Password;
         }
 
-        public int GetNearestEmpty() {
-            int found = 0;
-
-            for (int i = 0; i < 8; i++) {
-                if (!Users.TryGetValue(i, out _)) {
-                    if (ListSlot[i]) {
-                        found = i;
-                        break;
-                    }
-                }
-            }
-
-            return found;
-        }
-
         public RoomColor GetEmptyColor() {
             if (Color == null) Color = RoomColor.Red;
             var ReservedColor = Color;
@@ -199,16 +184,18 @@ namespace Estrol.X3Jam.Server.CData {
         }
 
         public int NearestSlot() {
-            int result = 0;
+            int found = 0;
 
             for (int i = 0; i < 8; i++) {
-                if (!Users.ContainsKey(i)) {
-                    result = i;
-                    break;
+                if (!Users.TryGetValue(i, out _)) {
+                    if (ListSlot[i]) {
+                        found = i;
+                        break;
+                    }
                 }
             }
 
-            return result;
+            return found;
         }
 
         public void GamePrepare() {
@@ -458,7 +445,6 @@ namespace Estrol.X3Jam.Server.CData {
                             buf.Write(uPlayer.User.Level);
                             buf.Write(0);
                             buf.Write((short)(IsAlone ? 1 : uPlayer.Position));
-
                             // Log.Write($"[DEBUG] User: {uPlayer.User.Username} {uPlayer.Kool} {uPlayer.Great} {uPlayer.Bad} {uPlayer.Miss} {uPlayer.MaxCombo} {uPlayer.JamCombo} {uPlayer.Score} {GetGemFromScore(uPlayer.Score, uPlayer.Kool)}");
                         } else {
                             buf.Write((byte)i);
@@ -467,6 +453,7 @@ namespace Estrol.X3Jam.Server.CData {
                     }
 
                     buf.SetLength();
+
                     byte[] data = buf.ToArray();
 
                     foreach (RoomUser rUser in Players) {
